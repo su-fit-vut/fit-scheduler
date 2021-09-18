@@ -953,8 +953,6 @@ function exportIcal() {
     // Export all events from final schedule
     $.each(scheduleFin, function(dayIndex, day) {
         $.each(day, function(j, subject) {
-            console.log(subject);
-
             // Calculate correct datetimes from subject object
             var fromDatetime = getDatetimeFromHourNumber(subject.from, dayIndex);
             var fromDatetimeIcal = getIcalDatetime(fromDatetime);
