@@ -953,12 +953,16 @@ function exportIcal() {
     // Export all events from final schedule
     $.each(scheduleFin, function(dayIndex, day) {
         $.each(day, function(j, subject) {
+            console.log(subject);
+
             // Calculate correct datetimes from subject object
             var fromDatetime = getDatetimeFromHourNumber(subject.from, dayIndex);
             var fromDatetimeIcal = getIcalDatetime(fromDatetime);
             var toDatetime = getDatetimeFromHourNumber(subject.to, dayIndex);
             toDatetime = new Date(toDatetime.getTime() - 10 * 1000 * 60);
             var toDatetimeIcal = getIcalDatetime(toDatetime);
+
+            var typeString = getTypeString(subject.type);
 
             // Event header
             contents += "BEGIN:VEVENT\r\n";
@@ -971,7 +975,7 @@ function exportIcal() {
             contents += "RRULE:FREQ=WEEKLY\r\n";
 
             // Additional info
-            contents += "SUMMARY:" + subject.name + "\r\n";
+            contents += "SUMMARY:" + subject.name + " " + typeString + "\r\n";
             contents += "LOCATION:" + subject.rooms.join(" ") + "\r\n";
             contents += "URL:https://www.fit.vut.cz/study/course/" + subject.url + "\r\n";
 
@@ -1065,6 +1069,7 @@ function getIcalDatetime(date) {
     buffer += padNumber(date.getUTCHours());
     buffer += padNumber(date.getUTCMinutes());
     buffer += padNumber(date.getUTCSeconds());
+    buffer += "Z";
     return buffer;
 }
 function getDatetimeFromHourNumber(hour, dayIndex) {
@@ -1077,4 +1082,16 @@ function getDatetimeFromHourNumber(hour, dayIndex) {
     date.setHours(hour, 0, 0, 0);
 
     return date;
+}
+function getTypeString(type) {
+    switch(type) {
+        case "d":
+            return "Democvičení";
+        case "c":
+            return "Cvičení";
+        case "p":
+            return "Přednáška";
+        default:
+            return "Jiný typ";
+    }
 }
