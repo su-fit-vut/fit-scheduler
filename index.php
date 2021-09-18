@@ -17,7 +17,7 @@
     <div class="res_mes">Šířka okna menší než 700px není podporována.</div>
     <div class="header">
         <div class="header_logo"></div>
-        <div class="header_text">scheduler <span class="header_text_version">v. 2.2</span></div>
+        <div class="header_text">scheduler <span class="header_text_version">v. 2.3</span></div>
         <div class="header_menu_icon"></div>
         <div class="header_message"></div>
         <div class="clear"></div>
