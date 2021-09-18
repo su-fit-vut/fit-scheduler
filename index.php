@@ -6,12 +6,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">    
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>FIT scheduler</title>
 
     <link rel="stylesheet" href="./style.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-    <script src="./script.js"></script>    
+    <script src="./script.js"></script>
 </head>
 <body>
     <div class="res_mes">Šířka okna menší než 700px není podporována.</div>
@@ -74,6 +74,7 @@
             <input class="sch_load hidden" type="file" name="sch_load">
             <input class="menu_button menu_button_l menu_load_button" type="button" value="Otevřít">
             <input class="menu_button menu_button_l menu_save_button" type="button" value="Uložit">
+            <input class="menu_button menu_button_l menu_button_wide menu_export_ical_button" type="button" value="Exportovat do iCalendar">
             <input class="menu_button menu_button_r menu_submit_button" type="button" value="Zobrazit">
             <div class="clean"></div>
         </div>
@@ -88,7 +89,7 @@
         <div class="bubble">Kliknutím na popelnicu hodina zašedne. To je pro případy kdy víte, že tuto hodinu můžete určitě vyřadit. Opětovným kliknutím se vrátí. Vlastní cvičení popelnice úplně odstraní.</div>
         <div class="bubble">Nad pracovním rozvrhem je pole pro přidání vlastního cvičení z wisu. Pro případ že wis nesouhlasí s vypsanýma cvičeníma jak jsem psal výše.</div>
         <div class="bubble">V menu jsou tlačítka "Otevřít" a "Uložit" díky kterým, si lze rozvrh uložit a potom ho otevřít později, nebo někoumu poslat atd.</div>
-        <div class="bubble bubble_red">Neručim za nic. Znova opakuju data se načítají z karet předmětů, takže konzistenze s wisem a realitou není zaručená. Plus jsem to programoval já :Hahaa:.</div>        
+        <div class="bubble bubble_red">Neručim za nic. Znova opakuju data se načítají z karet předmětů, takže konzistenze s wisem a realitou není zaručená. Plus jsem to programoval já :Hahaa:.</div>
     </div>
     <div class="sec_half">
         <div class="title">Rozvrhy na FITu</div>
@@ -314,6 +315,6 @@
     <div class="parsing hidden">
         <div class="subjects"></div>
         <div class="subject"></div>
-    </iframe>    
+    </iframe>
 </body>
 </html>
