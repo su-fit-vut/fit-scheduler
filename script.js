@@ -1,9 +1,5 @@
 var newPlanYear = 2019;                                                         // První rok nového plánu
 
-var actYear;                                                                    // Aktuální rok
-var actMonth;                                                                   // Aktuální měsíc
-var subjectsLoaded = false;                                                     // Zda jsou načtené dostupné předměty a lze zobrazit menu
-
 var actWorkingSubjectIndex = 0;                                                 // Aktuálně parsovaný předmět
 var subjectsAll = [[[[], []],[[], []],[[], []]],[[[], []],[[], []],[[], []]]];  // List předmětů
 var subjectsWorking = [];                                                       // Vybrané předměty
@@ -17,112 +13,213 @@ var scheduleCustom = [[], [], [], [], []];                                      
 var scheduleIndexes = [];                                                       // Indexy vybraných hodin
 var scheduleFaded = [];                                                         // Potmavené hodiny
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/////////////////////////////////// Variables //////////////////////////////////
+var studies = []; // Array of loaded studies
+
+
+
+
 ///////////////////////////////////// Main /////////////////////////////////////
 $(document).ready(function() {
-    // Init
+    // Semester radio auto select
     var d = new Date();
-    actMonth = d.getMonth();
-    actYear = d.getFullYear();
-
-    if(actMonth === 11 || actMonth < 4) {
-        $(".menu_column_row_radio[name='sem'][value='1']").prop("checked", true);
+    if(d.getMonth() === 11 || d.getMonth() < 4) {
+        $(".sem_radio[value='1']").prop("checked", true);
     } else {
-        $(".menu_column_row_radio[name='sem'][value='0']").prop("checked", true);
+        $(".sem_radio[value='0']").prop("checked", true);
     }
-    loadSubjects();
 
-    // Events
-    $(document).on("click", ".header_menu_icon", function() {
-        $(".header_menu_icon").addClass("hidden");
-        $(".header_info_icon").addClass("hidden");
-        $(".header_cross_icon").removeClass("hidden");
-
-        $(".menu").removeClass("hidden");
-    });
-    $(document).on("click", ".header_info_icon", function() {
-        $(".header_menu_icon").addClass("hidden");
-        $(".header_info_icon").addClass("hidden");
-        $(".header_cross_icon").removeClass("hidden");
-
-        $(".info").removeClass("hidden");
-    });
-    $(document).on("click", ".header_cross_icon", function() {
-        $(".header_menu_icon").removeClass("hidden");
-        $(".header_info_icon").removeClass("hidden");
-        $(".header_cross_icon").addClass("hidden");
-
-        $(".menu").addClass("hidden");
-        $(".info").addClass("hidden");
-    });
-
-    $(document).on("click", ".sem_radio", function() {
-        showSubjects();
-    });
-    $(document).on("click", ".grade_checkbox", function() {
-        showSubjects();
-    });
-    $(document).on("click", ".menu_submit_button", function() {
-        $(".header_menu_icon").css("background-image", "url(./images/menu.png)")
-        $(".menu").addClass("hidden");
-        loadWorkingSubjects();
-    });
-    $(document).on("click", ".menu_save_button", function() {
-        save();
-    });
-    $(document).on("click", ".menu_load_button", function() {
-        $(".sch_load").trigger("click");
-    });
-    $(document).on("change", ".sch_load", function() {
-        load();
-    });
-
-    $(document).on("click", ".schedule_cell_star", function() {
-        if($(this).parent().css("border-left-style") === "solid") {
-            $(this).parent().css("border-style", "dashed");
-            scheduleIndexes = arrayRemove(scheduleIndexes, $(this).siblings(".day").html() + "|" +  $(this).siblings(".id").html());
-        } else {
-            $(this).parent().css("border-style", "solid");
-            scheduleIndexes.push($(this).siblings(".day").html() + "|" + $(this).siblings(".id").html());
-        }
-        calculateFinSchedule();
-    });
-    $(document).on("click", ".schedule_cell_bin", function() {
-        if($(this).parent().hasClass("schedule_cell_deleted")) {
-            $(this).parent().removeClass("schedule_cell_deleted");
-            scheduleFaded = arrayRemove(scheduleFaded, $(this).siblings(".day").html() + "|" + $(this).siblings(".id").html());
-        } else {
-            $(this).parent().addClass("schedule_cell_deleted");
-            scheduleFaded.push($(this).siblings(".day").html() + "|" + $(this).siblings(".id").html());
-
-            $(this).parent().css("border-style", "dashed");
-            scheduleIndexes = arrayRemove(scheduleIndexes, $(this).siblings(".day").html() + "|" + $(this).siblings(".id").html());
-            calculateFinSchedule();
-        }
-    });
-    $(document).on("click", ".schedule_cell_bin_cc", function() {
-        $(this).parent().remove();
-
-        var scheduleToRemove;
-        var id = $(this).siblings(".id").html();
-        var day = +$(this).siblings(".day").html();
-        $.each(scheduleCustom[day], function(i, sch) {
-            if(sch.id === id) {
-                scheduleToRemove = sch;
-                return false;
-            }
-        });
-        scheduleCustom[day] = arrayRemove(scheduleCustom[day], scheduleToRemove);
-
-        calculateSchedule();
-    });
-    $(document).on("click", ".sch_add_button", function() {
-        addCustomSchedule();
-    });
+    // Start menu load
+    loadStudies();
 });
 
-/////////////////////////////////// Subjects ///////////////////////////////////
+//////////////////////////////////// Events ////////////////////////////////////
+// Header
+$(document).on("click", ".header_menu_icon", function() {
+    $(".header_menu_icon").addClass("hidden");
+    $(".header_info_icon").addClass("hidden");
+    $(".header_cross_icon").removeClass("hidden");
+
+    $(".menu").removeClass("hidden");
+    $(".info").addClass("hidden");
+});
+$(document).on("click", ".header_info_icon", function() {
+    $(".header_menu_icon").addClass("hidden");
+    $(".header_info_icon").addClass("hidden");
+    $(".header_cross_icon").removeClass("hidden");
+
+    $(".menu").addClass("hidden");
+    $(".info").removeClass("hidden");
+});
+$(document).on("click", ".header_cross_icon", function() {
+    $(".header_menu_icon").removeClass("hidden");
+    $(".header_info_icon").removeClass("hidden");
+    $(".header_cross_icon").addClass("hidden");
+
+    $(".menu").addClass("hidden");
+    $(".info").addClass("hidden");
+});
+
+// Menu
+$(document).on("click", ".menu_sem_radio", function() {
+    renderSubjects();
+});
+$(document).on("click", ".menu_bit_checkbox", function() {
+    renderSubjects();
+});
+$(document).on("click", ".menu_mit_radio", function() {
+    if($(this).hasClass("mit_radio_checked")) {
+        $(".menu_mit_radio").removeClass("mit_radio_checked");
+        $(this).prop("checked", false);
+    } else {
+        $(".menu_mit_radio").removeClass("mit_radio_checked");
+        $(this).addClass("mit_radio_checked");
+    }
+
+    renderSubjects();
+});
+$(document).on("click", ".menu_grade_checkbox", function() {
+    renderSubjects();
+});
+
+// Controls
+$(document).on("click", ".menu_submit_button", function() {
+    $(".header_menu_icon").removeClass("hidden");
+    $(".header_info_icon").removeClass("hidden");
+    $(".header_cross_icon").addClass("hidden");
+
+    $(".menu").addClass("hidden");
+    $(".info").addClass("hidden");
+
+    loadWorkingSubjects();
+});
+$(document).on("click", ".menu_save_button", function() {
+    save();
+});
+$(document).on("click", ".menu_load_button", function() {
+    $(".sch_load").trigger("click");
+});
+$(document).on("change", ".sch_load", function() {
+    load();
+});
+
+// Schedule
+$(document).on("click", ".schedule_cell_star", function() {
+    if($(this).parent().css("border-left-style") === "solid") {
+        $(this).parent().css("border-style", "dashed");
+        scheduleIndexes = arrayRemove(scheduleIndexes, $(this).siblings(".day").html() + "|" +  $(this).siblings(".id").html());
+    } else {
+        $(this).parent().css("border-style", "solid");
+        scheduleIndexes.push($(this).siblings(".day").html() + "|" + $(this).siblings(".id").html());
+    }
+    calculateFinSchedule();
+});
+$(document).on("click", ".schedule_cell_bin", function() {
+    if($(this).parent().hasClass("schedule_cell_deleted")) {
+        $(this).parent().removeClass("schedule_cell_deleted");
+        scheduleFaded = arrayRemove(scheduleFaded, $(this).siblings(".day").html() + "|" + $(this).siblings(".id").html());
+    } else {
+        $(this).parent().addClass("schedule_cell_deleted");
+        scheduleFaded.push($(this).siblings(".day").html() + "|" + $(this).siblings(".id").html());
+
+        $(this).parent().css("border-style", "dashed");
+        scheduleIndexes = arrayRemove(scheduleIndexes, $(this).siblings(".day").html() + "|" + $(this).siblings(".id").html());
+        calculateFinSchedule();
+    }
+});
+$(document).on("click", ".schedule_cell_bin_cc", function() {
+    $(this).parent().remove();
+
+    var scheduleToRemove;
+    var id = $(this).siblings(".id").html();
+    var day = +$(this).siblings(".day").html();
+    $.each(scheduleCustom[day], function(i, sch) {
+        if(sch.id === id) {
+            scheduleToRemove = sch;
+            return false;
+        }
+    });
+    scheduleCustom[day] = arrayRemove(scheduleCustom[day], scheduleToRemove);
+
+    calculateSchedule();
+});
+$(document).on("click", ".sch_add_button", function() {
+    addCustomSchedule();
+});
+
+///////////////////////////////////// Menu /////////////////////////////////////
+function loadStudies() {
+    $(".header_message").html("Načítám studia...");
+
+    $.ajax({
+        url: "./load.php",
+        method: "POST",
+        data: {
+            "a": "s",
+            "b": ""
+        },
+        success: parseStudies
+    });
+}
+function parseStudies(e) {
+    // Parse studies
+    var link_array = $(e).find("div#tab-bc").find("li.c-programmes__item").first().find("a.b-programme__link").prop("href").split("/");
+    link_array.pop("");
+
+    studies.push({
+        name: "BIT",
+        link: link_array[link_array.length - 2] + " " + link_array[link_array.length - 1],
+    });
+
+    $(e).find("div#tab-mgr").find("li.c-programmes__item").first().find("li.c-branches__item").each(function(i, stud) {
+        var link_array = $(stud).find("h4.b-branch__title").children("a").prop("href").split("/");
+        link_array.pop("");
+
+        studies.push({
+            name: "MIT " + $(stud).find("h4.b-branch__title").children("span").html(),
+            link: link_array[link_array.length - 2] + " " + link_array[link_array.length - 1],
+        });
+    });
+
+    $(".header_message").html("");
+    $(".header_menu_icon").removeClass("hidden");
+    $(".header_info_icon").removeClass("hidden");
+
+    console.log(studies);
+
+    $.each(studies, function(i, stud) {
+        if(stud.name === "BIT") {
+            $(".menu_stud_column").append(` <div class="menu_column_row">
+                                                <input class="menu_column_row_checkbox menu_bit_checkbox" type="checkbox" name="bit" value="` + stud.link + `">
+                                                <div class="menu_column_row_text">BIT</div>
+                                                <div class="cleaner"></div>
+                                            </div>`);
+        } else {
+            $(".menu_stud_column").append(` <div class="menu_column_row">
+                                                <input class="menu_column_row_radio menu_mit_radio" type="radio" name="mit" value="` + stud.link + `">
+                                                <div class="menu_column_row_text">` + stud.name + `</div>
+                                                <div class="cleaner"></div>
+                                            </div>`);
+        }
+    });
+}
+
 function loadSubjects() {
-    $(".header_message").html("Načítám...");
+    $(".header_message").html("Načítám předměty...");
 
     $.ajax({
         url: "./load.php",
@@ -189,9 +286,6 @@ function parseSubjects(e) {
 
     // Write subjects
     if(e.a === "b") {
-        $(".header_message").html("");
-        subjectsLoaded = true;
-
         $(".menu_com_sub").html("");
         for(sem = 0; sem < 2; sem++) {
             for(grade = 0; grade < 3; grade++) {
@@ -226,10 +320,10 @@ function parseSubjects(e) {
                 });
             }
         }
-        showSubjects();
+        renderSubjects();
     }
 }
-function showSubjects() {
+function renderSubjects() {
     var sem = +$(".menu_column_row_radio[name='sem']:checked").prop("value");
 
     $.each($(".menu_com_sub .menu_column_row"), function(i, sub) {
@@ -946,7 +1040,7 @@ function load() {
 
         $(".header_menu_icon").css("background-image", "url(./images/menu.png)")
         $(".menu").addClass("hidden");
-        showSubjects();
+        renderSubjects();
         loadWorkingSubjects();
     }
     reader.onerror = function (e) {
