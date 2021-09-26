@@ -10,15 +10,57 @@
         <div class="conta">
             <div class="header">
                 <div class="header_logo"></div>
-                <div class="header_text">scheduler <span class="header_text_version">v. 3.0</span></div>
-                <div class="header_icon header_info_icon"></div>
+                <div class="header_text_name">scheduler</div>
+                <div class="header_text_version">v. 3.0</div>
+                <div class="header_icon header_cross_icon hidden"></div>
                 <div class="header_icon header_menu_icon"></div>
+                <div class="header_icon header_info_icon"></div>
                 <div class="header_message"></div>
                 <div class="clear"></div>
             </div>
             <div class="rolldown">
-                <div class="menu hidden">
+                <div class="rolldown_menu hidden">
                     <div class="menu_columns">
+                        <div class="menu_column">
+                            <div class="menu_column_title">Studium</div>
+                            <div class="menu_column_conta">
+                                <div class="menu_column_row">
+                                    <input class="menu_column_row_checkbox stud_checkbox" type="checkbox" name="stud" value="0">
+                                    <div class="menu_column_row_text">BIT</div>
+                                    <div class="clear"></div>
+                                </div>
+                                <div class="menu_column_row">
+                                    <input class="menu_column_row_checkbox stud_checkbox" type="checkbox" name="stud" value="1">
+                                    <div class="menu_column_row_text">MIT</div>
+                                    <div class="clear"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="menu_column">
+                            <div class="menu_column_title">Specializace</div>
+                            <div class="menu_column_conta">
+                                <div class="menu_column_row">
+                                    <input class="menu_column_row_checkbox spec_checkbox" type="radio" name="spec" value="0">
+                                    <div class="menu_column_row_text">MITAI</div>
+                                    <div class="clear"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="menu_column">
+                            <div class="menu_column_title">Semestr</div>
+                            <div class="menu_column_conta">
+                                <div class="menu_column_row">
+                                    <input class="menu_column_row_radio sem_radio" type="radio" name="sem" value="0">
+                                    <div class="menu_column_row_text">Zimní</div>
+                                    <div class="clear"></div>
+                                </div>
+                                <div class="menu_column_row">
+                                    <input class="menu_column_row_radio sem_radio" type="radio" name="sem" value="1">
+                                    <div class="menu_column_row_text">Letní</div>
+                                    <div class="clear"></div>
+                                </div>
+                            </div>
+                        </div>
                         <div class="menu_column">
                             <div class="menu_column_title">Ročník</div>
                             <div class="menu_column_conta">
@@ -35,21 +77,6 @@
                                 <div class="menu_column_row">
                                     <input class="menu_column_row_checkbox grade_checkbox" type="checkbox" name="grade" value="2">
                                     <div class="menu_column_row_text">3BIT</div>
-                                    <div class="clear"></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="menu_column">
-                            <div class="menu_column_title">Semestr</div>
-                            <div class="menu_column_conta">
-                                <div class="menu_column_row">
-                                    <input class="menu_column_row_radio sem_radio" type="radio" name="sem" value="0">
-                                    <div class="menu_column_row_text">Zimní</div>
-                                    <div class="clear"></div>
-                                </div>
-                                <div class="menu_column_row">
-                                    <input class="menu_column_row_radio sem_radio" type="radio" name="sem" value="1">
-                                    <div class="menu_column_row_text">Letní</div>
                                     <div class="clear"></div>
                                 </div>
                             </div>
@@ -74,7 +101,7 @@
                     </div>
                 </div>
 
-                <div class="info hidden">
+                <div class="rolldown_info hidden">
                     <div class="sec_half">
                         <div class="title">Info k aplikaci</div>
                         <div class="bubble bubble_red">Přečti si to pls.</div>

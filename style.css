@@ -24,23 +24,28 @@ html, body, * {
             background-repeat: no-repeat;
             background-size: auto 80%;
         }
-        .header_text {
+        .header_text_name {
             float: left;
             line-height: 50px;
             padding-left: 5px;
             color: #ffffff;
             font-size: 30px;
         }
-            .header_text_version {
-                font-size: 15px;
-            }
+        .header_text_version {
+            float: left;
+            line-height: 40px;
+            padding-left: 10px;
+            padding-top: 10px;
+            color: #ffffff;
+            font-size: 15px;
+        }
 
         .header_message {
             float: right;
             line-height: 50px;
-            font-size: 20px;
             padding-right: 20px;
             color: #999999;
+            font-size: 20px;
         }
         .header_icon {
             float: right;
@@ -60,8 +65,11 @@ html, body, * {
             .header_menu_icon {
                 background-image: url(./images/menu.png);
             }
+            .header_cross_icon {
+                background-image: url(./images/cross.png);
+            }
 
-    .menu {
+    .rolldown_menu {
         position: absolute;
         top: 54px;
         left: 0px;
@@ -126,6 +134,10 @@ html, body, * {
                             color: #ffffff;
                             text-align: center;
                         }
+
+            .menu_column_cleaner {
+                clear: both;
+            }
 
         .menu_buttons {
             width: calc(100% - 10px);
@@ -507,8 +519,5 @@ html, body, * {
 @media (max-width: 860px) {
     .menu_column {
         width: calc(50% - 10px);
-    }
-    .menu_column_cleaner {
-        clear: both;
     }
 }
