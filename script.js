@@ -37,22 +37,22 @@ $(document).ready(function() {
         $(".header_info_icon").addClass("hidden");
         $(".header_cross_icon").removeClass("hidden");
 
-        $(".rolldown_menu").removeClass("hidden");
+        $(".menu").removeClass("hidden");
     });
     $(document).on("click", ".header_info_icon", function() {
         $(".header_menu_icon").addClass("hidden");
         $(".header_info_icon").addClass("hidden");
         $(".header_cross_icon").removeClass("hidden");
 
-        $(".rolldown_info").removeClass("hidden");
+        $(".info").removeClass("hidden");
     });
     $(document).on("click", ".header_cross_icon", function() {
         $(".header_menu_icon").removeClass("hidden");
         $(".header_info_icon").removeClass("hidden");
         $(".header_cross_icon").addClass("hidden");
 
-        $(".rolldown_menu").addClass("hidden");
-        $(".rolldown_info").addClass("hidden");
+        $(".menu").addClass("hidden");
+        $(".info").addClass("hidden");
     });
 
     $(document).on("click", ".sem_radio", function() {
@@ -197,14 +197,14 @@ function parseSubjects(e) {
             for(grade = 0; grade < 3; grade++) {
                 $(".menu_com_sub").append(` <div class="menu_column_row ` + grade + ` ` + (sem === 0 ? "w" : "s") + ` hidden">
                                                 <div class="menu_column_row_text_split">` + (grade + 1) + `BIT</div>
-                                                <div class="clear"></div>
+                                                <div class="cleaner"></div>
                                             </div>`);
 
                 $.each(subjectsAll[sem][grade][0], function(i, sub) {
                     $(".menu_com_sub").append(` <div class="menu_column_row ` + grade + ` ` + (sem === 0 ? "w" : "s") + ` hidden">
                                                     <input class="menu_column_row_checkbox" type="checkbox" value="` + sub.url + `">
                                                     <div class="menu_column_row_text">` + sub.name + `</div>
-                                                    <div class="clear"></div>
+                                                    <div class="cleaner"></div>
                                                 </div>`);
                 });
             }
@@ -215,13 +215,13 @@ function parseSubjects(e) {
             for(grade = 0; grade < 3; grade++) {
                 $(".menu_opt_sub").append(` <div class="menu_column_row ` + grade + ` ` + (sem === 0 ? "w" : "s") + ` hidden">
                                                 <div class="menu_column_row_text_split">` + (grade + 1) + `BIT</div>
-                                                <div class="clear"></div>
+                                                <div class="cleaner"></div>
                                             </div>`);
                 $.each(subjectsAll[sem][grade][1], function(i, sub) {
                     $(".menu_opt_sub").append(`<div class="menu_column_row ` + grade + ` ` + (sem === 0 ? "w" : "s") + ` hidden">
                                                     <input class="menu_column_row_checkbox" type="checkbox" value="` + sub.url + `">
                                                     <div class="menu_column_row_text">` + sub.name + `</div>
-                                                    <div class="clear"></div>
+                                                    <div class="cleaner"></div>
                                                </div>`);
                 });
             }
@@ -351,7 +351,7 @@ function parseWorkingSubject(e) {
                                     <div class="range">
                                         <div class="range_name">` + subjectsWorking[actWorkingSubjectIndex].name + `</div>
                                         <div class="range_value">` + $(".subject").find("p:contains('Rozsah')").parent().next().children().html() + `</div>
-                                        <div class="clear"></div>
+                                        <div class="cleaner"></div>
                                     </div>
                                 </a>`);
 

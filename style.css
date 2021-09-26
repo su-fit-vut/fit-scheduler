@@ -10,28 +10,28 @@ html, body, * {
     width: 100%;
 }
     .header {
-        height: 50px;
         width: 100%;
+        height: 50px;
         background-color: #333333;
         border-bottom: 5px #000000 solid;
     }
         .header_logo {
             float: left;
-            height: 100%;
             width: 120px;
+            height: 100%;
             background-image: url(./images/logo.png);
             background-position: 50% 50%;
             background-repeat: no-repeat;
             background-size: auto 80%;
         }
-        .header_text_name {
+        .header_name {
             float: left;
             line-height: 50px;
             padding-left: 5px;
             color: #ffffff;
             font-size: 30px;
         }
-        .header_text_version {
+        .header_version {
             float: left;
             line-height: 40px;
             padding-left: 10px;
@@ -39,7 +39,6 @@ html, body, * {
             color: #ffffff;
             font-size: 15px;
         }
-
         .header_message {
             float: right;
             line-height: 50px;
@@ -69,124 +68,135 @@ html, body, * {
                 background-image: url(./images/cross.png);
             }
 
-    .rolldown_menu {
+    .rolldown {
         position: absolute;
-        top: 54px;
+        width: 100%;
         left: 0px;
-        width: calc(100% - 20px);
-        padding: 10px;
-        background-color: #051221;
+        top: 55px;
         z-index: 1000;
     }
-        .menu_columns {
-            width: 100%;
+        .menu {
+            width: calc(100% - 20px);
+            padding: 10px;
+            background-color: #051221;
         }
-            .menu_column {
-                float: left;
-                width: 200px;
-                padding: 0 5px;
+            .menu_columns {
+                width: 100%;
             }
-                .menu_column_title {
-                    width: 100%;
-                    line-height: 30px;
-                    font-size: 20px;
-                    color: #ffffff;
-                    border-bottom: 2px #ffffff solid;
+                .menu_column {
+                    float: left;
+                    width: calc((100% / 6) - 10px);
+                    padding: 0 5px;
                 }
-                .menu_column_conta {
-                    width: 100%;
-                    max-height: 300px;
-                    padding-top: 5px;
-                    overflow-y: auto;
-                }
-                    .menu_column_row {
+                    .menu_column_title {
                         width: 100%;
-                        height: 30px;
+                        line-height: 30px;
+                        border-bottom: 2px #ffffff solid;
+                        color: #ffffff;
+                        font-size: 20px;
                     }
-                        .menu_column_row_checkbox {
-                            display: block;
-                            float: left;
-                            height: 20px;
-                            width: 20px;
-                            margin: 5px 0;
+                    .menu_column_input_text {
+                        display: block;
+                        width: 100%;
+                        line-height: calc(25px - 10px);
+                        padding: 5px;
+                        margin-top: 7px;
+                        font-size: 16px;
+                        outline: none;
+                        border: none;
+                        border-radius: 6px;
+                        color: #ffffff;
+                        background-color: #333333;
+                    }
+                    .menu_column_conta {
+                        width: 100%;
+                        max-height: 420px;
+                        padding-top: 5px;
+                        overflow-y: auto;
+                    }
+                        .menu_column_row {
+                            width: 100%;
+                            height: 30px;
                         }
-                        .menu_column_row_radio {
-                            display: block;
-                            float: left;
-                            height: 18px;
-                            width: 18px;
-                            margin: 6px 0;
-                        }
-                        .menu_column_row_text {
-                            float: left;
-                            line-height: 30px;
-                            font-size: 15px;
-                            padding-left: 5px;
-                            color: #ffffff;
-                        }
-                        .menu_column_row_text_split {
-                            float: left;
-                            width: calc(100% - 20px);
-                            line-height: 29px;
-                            margin: 0 10px;
-                            border-bottom: 1px #ffffff solid;
-                            font-size: 15px;
-                            color: #ffffff;
-                            text-align: center;
-                        }
+                            .menu_column_row_checkbox {
+                                display: block;
+                                float: left;
+                                width: 20px;
+                                height: 20px;
+                                margin: 5px 0;
+                            }
+                            .menu_column_row_radio {
+                                display: block;
+                                float: left;
+                                width: 18px;
+                                height: 18px;
+                                margin: 6px 0;
+                            }
+                            .menu_column_row_text {
+                                float: left;
+                                line-height: 30px;
+                                font-size: 15px;
+                                padding-left: 5px;
+                                color: #ffffff;
+                            }
+                            .menu_column_row_text_split {
+                                width: calc(100% - 10px);
+                                line-height: 22px;
+                                margin: 3px 5px 3px 5px;
+                                border-top: 1px #ffffff solid;
+                                border-bottom: 1px #ffffff solid;
+                                font-size: 15px;
+                                color: #ffffff;
+                                text-align: center;
+                            }
 
-            .menu_column_cleaner {
-                clear: both;
+            .menu_buttons {
+                width: 100%;
+                height: 30px;
+                padding-top: 30px;
             }
+                .menu_button {
+                    display: block;
+                    float: right;
+                    height: 30px;
+                    width: 150px;
+                    border-radius: 0;
+                    border: 0;
+                    border-bottom: 4px #025C00 solid;
+                    background-color: #038C00;
+                    color: #ffffff;
+                    font-size: 16px;
+                    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+                    cursor: pointer;
+                }
+                .menu_button:hover {
+                    background-color: #04AD00;
+                }
+                .menu_button:active {
+                    margin-top: 2px;
+                    height: 28px;
+                    border-bottom-width: 2px;
+                }
 
-        .menu_buttons {
-            width: calc(100% - 10px);
-            height: 35px;
-            padding: 0 5px;
-            padding-top: 15px;
+                .menu_button_disabled {
+                    border-bottom: 4px #242424 solid;
+                    background-color: #454545;
+                    cursor: default;
+                }
+                .menu_button_disabled:hover {
+                    background-color: #454545;
+                }
+                .menu_button_disabled:active {
+                    margin-top: 0px;
+                    height: 30px;
+                    border-bottom-width: 4px;
+                }
+
+        .info {
+            width: calc(100% - 20px);
+            padding: 10px;
+            background-color: #ffffff;
         }
-            .menu_button {
-                display: block;
-                margin-left: 10px;
-                height: 31px;
-                width: 100px;
-                border-radius: 0;
-                border: 0;
-                border-bottom: 4px #025C00 solid;
-                background-color: #038C00;
-                color: #ffffff;
-                font-size: 16px;
-                font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-                cursor: pointer;
-            }
-            .menu_button:hover {
-                background-color: #04AD00;
-            }
-            .menu_button:active {
-                margin-top: 2px;
-                height: 29px;
-                border-bottom-width: 2px;
-            }
-            .menu_button_l {
-                float: left;
-            }
-            .menu_button_r {
-                float: right;
-            }
-
-            .menu_button_disabled {
-                border-bottom: 4px #242424 solid;
-                background-color: #454545;
-                cursor: default;
-            }
-            .menu_button_disabled:hover {
-                background-color: #454545;
-            }
-            .menu_button_disabled:active {
-                margin-top: 0px;
-                height: 31px;
-                border-bottom-width: 4px;
-            }
 
     .sec {
         width: calc(100% - 40px);
@@ -501,7 +511,7 @@ html, body, * {
             border-bottom-width: 2px;
         }
 
-.clear {
+.cleaner {
     clear: both;
 }
 .hidden {
@@ -516,8 +526,11 @@ html, body, * {
     color: #101A85;
 }
 
-@media (max-width: 860px) {
+@media (max-width: 1200px) {
     .menu_column {
-        width: calc(50% - 10px);
+        width: calc((100% / 3) - 10px);
+    }
+    .menu_column_cleaner {
+        clear: both;
     }
 }
