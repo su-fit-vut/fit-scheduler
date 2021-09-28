@@ -517,6 +517,9 @@ html, body, * {
 .hidden {
     display: none;
 }
+.hidden_search {
+    display: none;
+}
 .red {
     font-weight: bold;
     color: rgb(134, 11, 0);

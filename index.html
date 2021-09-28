@@ -26,12 +26,12 @@
                             <div class="menu_column_title">Semestr</div>
                             <div class="menu_column_conta">
                                 <div class="menu_column_row">
-                                    <input class="menu_column_row_radio menu_sem_radio" type="radio" name="sem" value="0">
+                                    <input class="menu_column_row_radio menu_sem_radio" type="radio" name="sem_radio" value="winter">
                                     <div class="menu_column_row_text">Zimní</div>
                                     <div class="cleaner"></div>
                                 </div>
                                 <div class="menu_column_row">
-                                    <input class="menu_column_row_radio menu_sem_radio" type="radio" name="sem" value="1">
+                                    <input class="menu_column_row_radio menu_sem_radio" type="radio" name="sem_radio" value="summer">
                                     <div class="menu_column_row_text">Letní</div>
                                     <div class="cleaner"></div>
                                 </div>
@@ -44,28 +44,28 @@
                         <div class="menu_column">
                             <div class="menu_column_title">Ročník</div>
                             <div class="menu_column_conta">
-                                <div class="menu_column_row">
-                                    <input class="menu_column_row_checkbox menu_grade_checkbox" type="checkbox" name="grade" value="0">
+                                <div class="menu_column_row hidden">
+                                    <input class="menu_column_row_checkbox menu_grade_checkbox" type="checkbox" value="0_BIT">
                                     <div class="menu_column_row_text">1BIT</div>
                                     <div class="cleaner"></div>
                                 </div>
-                                <div class="menu_column_row">
-                                    <input class="menu_column_row_checkbox menu_grade_checkbox" type="checkbox" name="grade" value="1">
+                                <div class="menu_column_row hidden">
+                                    <input class="menu_column_row_checkbox menu_grade_checkbox" type="checkbox" value="1_BIT">
                                     <div class="menu_column_row_text">2BIT</div>
                                     <div class="cleaner"></div>
                                 </div>
-                                <div class="menu_column_row">
-                                    <input class="menu_column_row_checkbox menu_grade_checkbox" type="checkbox" name="grade" value="2">
+                                <div class="menu_column_row hidden">
+                                    <input class="menu_column_row_checkbox menu_grade_checkbox" type="checkbox" value="2_BIT">
                                     <div class="menu_column_row_text">3BIT</div>
                                     <div class="cleaner"></div>
                                 </div>
-                                <div class="menu_column_row">
-                                    <input class="menu_column_row_checkbox menu_grade_checkbox" type="checkbox" name="grade" value="3">
+                                <div class="menu_column_row hidden">
+                                    <input class="menu_column_row_checkbox menu_grade_checkbox" type="checkbox" value="0_MIT">
                                     <div class="menu_column_row_text">1MIT</div>
                                     <div class="cleaner"></div>
                                 </div>
-                                <div class="menu_column_row">
-                                    <input class="menu_column_row_checkbox menu_grade_checkbox" type="checkbox" name="grade" value="4">
+                                <div class="menu_column_row hidden">
+                                    <input class="menu_column_row_checkbox menu_grade_checkbox" type="checkbox" value="1_MIT">
                                     <div class="menu_column_row_text">2MIT</div>
                                     <div class="cleaner"></div>
                                 </div>
@@ -74,24 +74,23 @@
                         <div class="menu_column_cleaner"></div>
                         <div class="menu_column">
                             <div class="menu_column_title">Povinné předměty</div>
-                            <input class="menu_column_input_text" type="text" name="com_search" placeholder="Vyhledat">
+                            <input class="menu_column_input_text menu_com_search_input hidden" type="text" placeholder="Vyhledat">
                             <div class="menu_column_conta menu_com_column"></div>
                         </div>
                         <div class="menu_column">
                             <div class="menu_column_title">Volitelné předměty</div>
-                            <input class="menu_column_input_text" type="text" name="opt_search" placeholder="Vyhledat">
+                            <input class="menu_column_input_text menu_opt_search_input hidden" type="text" placeholder="Vyhledat">
                             <div class="menu_column_conta menu_opt_column"></div>
                         </div>
                         <div class="menu_column">
                             <div class="menu_column_title">Vybrané předměty</div>
-                            <input class="menu_column_input_text" type="text" name="sel_search" placeholder="Vyhledat">
-                            <div class="menu_column_conta menu_opt_column"></div>
+                            <div class="menu_column_conta menu_sel_column"></div>
                         </div>
                         <div class="cleaner"></div>
                     </div>
                     <div class="menu_buttons">
                         <input class="menu_button menu_submit_button" type="button" value="Načíst">
-                        <div class="clean"></div>
+                        <div class="cleaner"></div>
                     </div>
                 </div>
 
@@ -337,8 +336,6 @@
             </div>
 
             <div class="parsing">
-                <div class="studies"></div>
-                <div class="subjects"></div>
                 <div class="subject"></div>
             </div>
         </div>

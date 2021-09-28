@@ -27,10 +27,12 @@ var scheduleFaded = [];                                                         
 
 
 
+
+
+
 /////////////////////////////////// Variables //////////////////////////////////
-var studies = []; // Array of loaded studies
-
-
+var studies = [];  // Array of loaded studies with subjects
+var subjects = []; // Array of selected subjects
 
 
 ///////////////////////////////////// Main /////////////////////////////////////
@@ -38,14 +40,14 @@ $(document).ready(function() {
     // Semester radio auto select
     var d = new Date();
     if(d.getMonth() === 11 || d.getMonth() < 4) {
-        $(".sem_radio[value='1']").prop("checked", true);
+        $(".menu_sem_radio[value='summer']").prop("checked", true);
     } else {
-        $(".sem_radio[value='0']").prop("checked", true);
+        $(".menu_sem_radio[value='winter']").prop("checked", true);
     }
 
     // Start menu load
-    loadStudies();
-});
+    parseStudies("");
+}); //checked
 
 //////////////////////////////////// Events ////////////////////////////////////
 // Header
@@ -56,7 +58,7 @@ $(document).on("click", ".header_menu_icon", function() {
 
     $(".menu").removeClass("hidden");
     $(".info").addClass("hidden");
-});
+}); //checked
 $(document).on("click", ".header_info_icon", function() {
     $(".header_menu_icon").addClass("hidden");
     $(".header_info_icon").addClass("hidden");
@@ -64,7 +66,7 @@ $(document).on("click", ".header_info_icon", function() {
 
     $(".menu").addClass("hidden");
     $(".info").removeClass("hidden");
-});
+}); //checked
 $(document).on("click", ".header_cross_icon", function() {
     $(".header_menu_icon").removeClass("hidden");
     $(".header_info_icon").removeClass("hidden");
@@ -72,16 +74,25 @@ $(document).on("click", ".header_cross_icon", function() {
 
     $(".menu").addClass("hidden");
     $(".info").addClass("hidden");
-});
+}); //checked
 
 // Menu
 $(document).on("click", ".menu_sem_radio", function() {
+    $(".menu_com_search_input").prop("value", "");
+    $(".menu_com_search_input").trigger("keyup");
+    $(".menu_opt_search_input").prop("value", "");
+    $(".menu_opt_search_input").trigger("keyup");
     renderSubjects();
-});
+}); //checked
 $(document).on("click", ".menu_bit_checkbox", function() {
+    $(".menu_com_search_input").prop("value", "");
+    $(".menu_com_search_input").trigger("keyup");
+    $(".menu_opt_search_input").prop("value", "");
+    $(".menu_opt_search_input").trigger("keyup");
     renderSubjects();
-});
+}); //checked
 $(document).on("click", ".menu_mit_radio", function() {
+    // Can uncheck
     if($(this).hasClass("mit_radio_checked")) {
         $(".menu_mit_radio").removeClass("mit_radio_checked");
         $(this).prop("checked", false);
@@ -90,11 +101,47 @@ $(document).on("click", ".menu_mit_radio", function() {
         $(this).addClass("mit_radio_checked");
     }
 
+    $(".menu_com_search_input").prop("value", "");
+    $(".menu_com_search_input").trigger("keyup");
+    $(".menu_opt_search_input").prop("value", "");
+    $(".menu_opt_search_input").trigger("keyup");
     renderSubjects();
-});
+}); //checked
 $(document).on("click", ".menu_grade_checkbox", function() {
+    $(".menu_com_search_input").prop("value", "");
+    $(".menu_com_search_input").trigger("keyup");
+    $(".menu_opt_search_input").prop("value", "");
+    $(".menu_opt_search_input").trigger("keyup");
     renderSubjects();
-});
+}); //checked
+$(document).on("click", ".menu_sub_checkbox", function() {
+    renderSubjects();
+}); //checked
+$(document).on("click", ".menu_sel_checkbox", function() {
+    renderSubjects();
+}); //checked
+$(document).on("keyup", ".menu_com_search_input", function() {
+    $(".mrsub_com").removeClass("hidden_search");
+    if($(".menu_com_search_input").prop("value") != "") {
+        $(".mrsub_com").addClass("hidden_search");
+        $(".mrsub_com").each(function(i, sub) {
+            if($(sub).children(".menu_column_row_text").html().toUpperCase().includes($(".menu_com_search_input").prop("value").toUpperCase())) {
+                $(sub).removeClass("hidden_search");
+            }
+        });
+    }
+}); //checked
+$(document).on("keyup", ".menu_opt_search_input", function() {
+    $(".mrsub_opt").removeClass("hidden_search");
+    if($(".menu_opt_search_input").prop("value") != "") {
+        $(".mrsub_opt").addClass("hidden_search");
+        $(".mrsub_opt").each(function(i, sub) {
+            if($(sub).children(".menu_column_row_text").html().toUpperCase().includes($(".menu_opt_search_input").prop("value").toUpperCase())) {
+                $(sub).removeClass("hidden_search");
+            }
+        });
+    }
+}); //checked
 
 // Controls
 $(document).on("click", ".menu_submit_button", function() {
@@ -162,207 +209,290 @@ $(document).on("click", ".sch_add_button", function() {
 });
 
 ///////////////////////////////////// Menu /////////////////////////////////////
-function loadStudies() {
-    $(".header_message").html("Načítám studia...");
-
-    $.ajax({
-        url: "./load.php",
-        method: "POST",
-        data: {
-            "a": "s",
-            "b": ""
-        },
-        success: parseStudies
-    });
-}
 function parseStudies(e) {
-    // Parse studies
-    var link_array = $(e).find("div#tab-bc").find("li.c-programmes__item").first().find("a.b-programme__link").prop("href").split("/");
-    link_array.pop("");
+    // Load
+    if(e === "") {
+        // Title
+        $(".header_message").html("Načítám studia...");
 
-    studies.push({
-        name: "BIT",
-        link: link_array[link_array.length - 2] + " " + link_array[link_array.length - 1],
-    });
+        // AJAX
+        $.ajax({
+            url: "./load.php",
+            method: "POST",
+            data: {
+                "a": "s",
+                "b": "",
+                "c": "",
+                "d": "",
+                "e": ""
+            },
+            success: parseStudies
+        });
+        return;
+    }
 
-    $(e).find("div#tab-mgr").find("li.c-programmes__item").first().find("li.c-branches__item").each(function(i, stud) {
-        var link_array = $(stud).find("h4.b-branch__title").children("a").prop("href").split("/");
-        link_array.pop("");
-
+    // Parse BIT
+    {
         studies.push({
-            name: "MIT " + $(stud).find("h4.b-branch__title").children("span").html(),
-            link: link_array[link_array.length - 2] + " " + link_array[link_array.length - 1],
+            "name": "BIT-BIT",
+            "link": parseLinkforLoadPHP($(e).find("div#tab-bc").find("li.c-programmes__item").first().find("a.b-programme__link").prop("href")),
+            "subjects": {
+                "com": [
+                    [], [], []
+                ],
+                "opt": [
+                    [], [], []
+                ]
+            },
+            "loaded": false
+        });
+    }
+
+    // Parse MIT
+    $(e).find("div#tab-mgr").find("li.c-programmes__item").first().find("li.c-branches__item").each(function(i, li) {
+        studies.push({
+            "name": "MIT-" + $(li).find("span").html(),
+            "link": parseLinkforLoadPHP($(li).find("a").prop("href")),
+            "subjects": {
+                "com": [
+                    [], [], []
+                ],
+                "opt": [
+                    [], [], []
+                ]
+            },
+            "loaded": false
         });
     });
 
-    $(".header_message").html("");
-    $(".header_menu_icon").removeClass("hidden");
-    $(".header_info_icon").removeClass("hidden");
-
-    console.log(studies);
-
+    // Generate
     $.each(studies, function(i, stud) {
-        if(stud.name === "BIT") {
+        if(stud.name === "BIT-BIT") {
             $(".menu_stud_column").append(` <div class="menu_column_row">
-                                                <input class="menu_column_row_checkbox menu_bit_checkbox" type="checkbox" name="bit" value="` + stud.link + `">
-                                                <div class="menu_column_row_text">BIT</div>
+                                                <input class="menu_column_row_checkbox menu_bit_checkbox" type="checkbox" value="` + stud.name + `">
+                                                <div class="menu_column_row_text">` + stud.name + `</div>
                                                 <div class="cleaner"></div>
                                             </div>`);
         } else {
             $(".menu_stud_column").append(` <div class="menu_column_row">
-                                                <input class="menu_column_row_radio menu_mit_radio" type="radio" name="mit" value="` + stud.link + `">
+                                                <input class="menu_column_row_radio menu_mit_radio" type="radio" name="mit_grade" value="` + stud.name + `">
                                                 <div class="menu_column_row_text">` + stud.name + `</div>
                                                 <div class="cleaner"></div>
                                             </div>`);
         }
     });
-}
 
-function loadSubjects() {
-    $(".header_message").html("Načítám předměty...");
+    // Load subjects
+    loadSubjects();
+} //checked
 
-    $.ajax({
-        url: "./load.php",
-        method: "POST",
-        data: {
-            "a": "a",
-            "b": "a"
-        },
-        success: parseSubjects,
-        complete: function() {
+function parseSubjects(e) {
+    // Load
+    if(e === "") {
+        // Title
+        $(".header_message").html("Načítám předměty...");
+
+        // AJAX
+        $.each(studies, function(i, stud) {
             $.ajax({
                 url: "./load.php",
                 method: "POST",
                 data: {
-                    "a": "a",
-                    "b": "b"
+                    "a": "u",
+                    "b": stud.link.split("-")[0],
+                    "c": stud.link.split("-")[1],
+                    "d": stud.name.split("-")[0],
+                    "e": stud.name.split("-")[1]
                 },
                 success: parseSubjects
             });
-        }
-    });
-}
-function parseSubjects(e) {
-    // Parse subjects
+        });
+        return;
+    }
+
     e = JSON.parse(e);
-    $(".subjects").html($(e.b).filter("div.mother").children(".main").find(".table-responsive__holder:first"));
 
+    // Parse
+    var sem = "winter";
     var grade = 0;
-    var sem = 0;
-    var planYear;
-    $.each($(".subjects table tbody"), function(i, table) {
-        if(actMonth > 6) {
-            planYear = actYear - grade;
+    // Semesters
+    $(e.a).find(".main").find("div.table-responsive").first().find("tbody").each(function(i, tbody) {
+        // Subjects
+        $(tbody).children("tr").each(function(i, tr) {
+            // Subject
+            var subject = {
+                "name": $(tr).children("th").html(),
+                "sem": sem,
+                "link": parseLinkforLoadPHP($(tr).children("td").first().children("a").prop("href"))
+            }
+
+            // Push
+            if($(tr).css("background-color") === "rgb(255, 228, 192)") {
+                studies.find(o => {return o.name === e.d}).subjects.com[grade].push(subject);
+            } else {
+                studies.find(o => {return o.name === e.d}).subjects.opt[grade].push(subject);
+            }
+        });
+
+        // Inc
+        if(sem === "winter") {
+            sem = "summer";
         } else {
-            planYear = actYear - grade - 1;
-        }
-
-        if(planYear < newPlanYear && e.a === "b" ||
-           planYear >= newPlanYear && e.a === "a") {
-            $.each($(table).children("tr"), function(i, tr) {
-                if($(tr).children("td:eq(0)").children("sup").html() != "*)") {
-                    if($(tr).css("background-color") == "rgb(255, 228, 192)") {
-                        subjectsAll[sem][grade][0].push({
-                            url: $(tr).children("td:eq(0)").children("a").attr("href").split("/")[5],
-                            name: $(tr).children("th").html(),
-                        })
-                    } else if($(tr).css("background-color") == "rgb(255, 255, 208)") {
-                        subjectsAll[sem][grade][1].push({
-                            url: $(tr).children("td:eq(0)").children("a").attr("href").split("/")[5],
-                            name: $(tr).children("th").html(),
-                        })
-                    }
-                }
-            });
-        }
-
-        if(sem == 1) {
+            sem = "winter";
             grade++;
-            sem = 0;
-        } else {
-            sem++;
         }
     });
+    // Loaded
+    studies.find(o => {return o.name === e.d}).loaded = true;
 
-    // Write subjects
-    if(e.a === "b") {
-        $(".menu_com_sub").html("");
-        for(sem = 0; sem < 2; sem++) {
-            for(grade = 0; grade < 3; grade++) {
-                $(".menu_com_sub").append(` <div class="menu_column_row ` + grade + ` ` + (sem === 0 ? "w" : "s") + ` hidden">
-                                                <div class="menu_column_row_text_split">` + (grade + 1) + `BIT</div>
-                                                <div class="cleaner"></div>
-                                            </div>`);
+    // Generate
+    var done = true;
+    $.each(studies, function(i, stud) {
+        if(stud.loaded === false) {
+            done = false;
+            return;
+        }
+    });
+    if(done) {
+        // Clear
+        $(".menu_com_column").html("");
+        $(".menu_opt_column").html("");
 
-                $.each(subjectsAll[sem][grade][0], function(i, sub) {
-                    $(".menu_com_sub").append(` <div class="menu_column_row ` + grade + ` ` + (sem === 0 ? "w" : "s") + ` hidden">
-                                                    <input class="menu_column_row_checkbox" type="checkbox" value="` + sub.url + `">
-                                                    <div class="menu_column_row_text">` + sub.name + `</div>
+        // Generate
+        $.each(studies, function(i, stud) {
+            for(var grade = 0; grade < 3; grade++) {
+                // Name
+                var name = stud.name;
+                if(grade <= 1 || name === "BIT-BIT") {
+                    name += " " + (grade + 1);
+                } else {
+                    name += " lib.";
+                }
+
+                // Com
+                $(".menu_com_column").append(`  <div class="menu_column_row mrsub_` + grade + `_` + stud.name + ` hidden">
+                                                    <div class="menu_column_row_text_split">` + name + `</div>
                                                     <div class="cleaner"></div>
                                                 </div>`);
+                $.each(stud.subjects.com[grade], function(i, sub) {
+                    $(".menu_com_column").append(`  <div class="menu_column_row mrsub_com mrsub_` + grade + `_` + stud.name + ` mrsem_` + sub.sem + ` hidden">
+                                                        <input class="menu_column_row_checkbox menu_sub_checkbox" type="checkbox" value="` + sub.link + `">
+                                                        <div class="menu_column_row_text">` + sub.name + `</div>
+                                                        <div class="cleaner"></div>
+                                                    </div>`);
+                });
+
+                // Opt
+                $(".menu_opt_column").append(`  <div class="menu_column_row mrsub_` + grade + `_` + stud.name + ` hidden">
+                                                    <div class="menu_column_row_text_split">` + name + `</div>
+                                                    <div class="cleaner"></div>
+                                                </div>`);
+                $.each(stud.subjects.opt[grade], function(i, sub) {
+                    $(".menu_opt_column").append(`  <div class="menu_column_row mrsub_opt mrsub_` + grade + `_` + stud.name + ` mrsem_` + sub.sem + ` hidden">
+                                                        <input class="menu_column_row_checkbox menu_sub_checkbox" type="checkbox" value="` + sub.link + `">
+                                                        <div class="menu_column_row_text">` + sub.name + `</div>
+                                                        <div class="cleaner"></div>
+                                                    </div>`);
                 });
             }
-        }
+        });
 
-        $(".menu_opt_sub").html("");
-        for(sem = 0; sem < 2; sem++) {
-            for(grade = 0; grade < 3; grade++) {
-                $(".menu_opt_sub").append(` <div class="menu_column_row ` + grade + ` ` + (sem === 0 ? "w" : "s") + ` hidden">
-                                                <div class="menu_column_row_text_split">` + (grade + 1) + `BIT</div>
+        // Done
+        $(".header_message").html("");
+        $(".header_menu_icon").removeClass("hidden");
+        $(".header_info_icon").removeClass("hidden");
+    }
+
+    // Render
+    renderSubjects();
+} //checked
+function renderSubjects() {
+    // Grades render
+    if($(".menu_bit_checkbox:checked").length > 0) {
+        $(".menu_grade_checkbox[value='0_BIT']").parent().removeClass("hidden");
+        $(".menu_grade_checkbox[value='1_BIT']").parent().removeClass("hidden");
+        $(".menu_grade_checkbox[value='2_BIT']").parent().removeClass("hidden");
+    } else {
+        $(".menu_grade_checkbox[value='0_BIT']").parent().addClass("hidden");
+        $(".menu_grade_checkbox[value='1_BIT']").parent().addClass("hidden");
+        $(".menu_grade_checkbox[value='2_BIT']").parent().addClass("hidden");
+    }
+    if($(".menu_mit_radio:checked").length > 0) {
+        $(".menu_grade_checkbox[value='0_MIT']").parent().removeClass("hidden");
+        $(".menu_grade_checkbox[value='1_MIT']").parent().removeClass("hidden");
+    } else {
+        $(".menu_grade_checkbox[value='0_MIT']").parent().addClass("hidden");
+        $(".menu_grade_checkbox[value='1_MIT']").parent().addClass("hidden");
+    }
+
+    // Subject groups
+    var groups = [];
+    var bitSelected = false;
+    var mitSelected = false;
+    $(".menu_grade_checkbox:checked").each(function(i, grade) {
+        if(!$(grade).parent().hasClass("hidden")) {
+            if($(grade).prop("value").includes("BIT")) {
+                bitSelected = true;
+                groups.push($(grade).prop("value").split("_")[0] + "_" + $(".menu_bit_checkbox:checked").prop("value"));
+            } else {
+                mitSelected = true;
+                groups.push($(grade).prop("value").split("_")[0] + "_" + $(".menu_mit_radio:checked").prop("value"));
+            }
+        }
+    });
+    if(mitSelected) {
+        groups.push("2_" + $(".menu_mit_radio:checked").prop("value"));
+    }
+
+    // Searches render
+    if(bitSelected || mitSelected) {
+        $(".menu_com_search_input").removeClass("hidden");
+        $(".menu_opt_search_input").removeClass("hidden");
+    } else {
+        $(".menu_com_search_input").addClass("hidden");
+        $(".menu_opt_search_input").addClass("hidden");
+    }
+
+    // Show groups
+    $(".menu_com_column .menu_column_row ").each(function(i, sub) {
+        $(sub).addClass("hidden");
+    });
+    $(".menu_opt_column .menu_column_row ").each(function(i, sub) {
+        $(sub).addClass("hidden");
+    });
+    $.each(groups, function(i, group) {
+        $(".mrsub_" + group).removeClass("hidden");
+    })
+    if($(".menu_sem_radio:checked").prop("value") == "winter") {
+        $(".mrsem_summer").addClass("hidden");
+    } else {
+        $(".mrsem_winter").addClass("hidden");
+    }
+
+    // Selected subjects
+    $(".menu_sel_checkbox:not(:checked)").each(function(i, sub) {
+        $(".menu_sub_checkbox[value='" + $(sub).prop("value") + "']").prop("checked", false);
+    });
+    $(".menu_sel_column").html("");
+    subjects = [];
+    $(".menu_sub_checkbox:checked").each(function(i, sub) {
+        if(!$(sub).parent().hasClass("hidden")) {
+            $(".menu_sel_column").append(`  <div class="menu_column_row">
+                                                <input class="menu_column_row_checkbox menu_sel_checkbox" type="checkbox" value="` + $(sub).prop("value") + `" checked="checked">
+                                                <div class="menu_column_row_text">` + $(sub).siblings(".menu_column_row_text").html() + `</div>
                                                 <div class="cleaner"></div>
                                             </div>`);
-                $.each(subjectsAll[sem][grade][1], function(i, sub) {
-                    $(".menu_opt_sub").append(`<div class="menu_column_row ` + grade + ` ` + (sem === 0 ? "w" : "s") + ` hidden">
-                                                    <input class="menu_column_row_checkbox" type="checkbox" value="` + sub.url + `">
-                                                    <div class="menu_column_row_text">` + sub.name + `</div>
-                                                    <div class="cleaner"></div>
-                                               </div>`);
-                });
-            }
+            subjects.push({
+                "name": $(sub).siblings(".menu_column_row_text").html(),
+                "link": $(sub).prop("value")
+            });
         }
-        renderSubjects();
-    }
-}
-function renderSubjects() {
-    var sem = +$(".menu_column_row_radio[name='sem']:checked").prop("value");
-
-    $.each($(".menu_com_sub .menu_column_row"), function(i, sub) {
-        $(sub).addClass("hidden");
     });
-    $.each($(".menu_opt_sub .menu_column_row"), function(i, sub) {
-        $(sub).addClass("hidden");
-    });
+} //checked
 
-    $.each($(".menu_column_row_checkbox[name='grade']:checked"), function(i, gr) {
-        var grade = $(gr).prop("value");
-
-        $.each($(".menu_com_sub .menu_column_row"), function(i, sub) {
-            if(sem === 0) {
-                if($(sub).hasClass("w") && $(sub).hasClass(grade)) {
-                    $(sub).removeClass("hidden");
-                }
-            } else {
-                if($(sub).hasClass("s") && $(sub).hasClass(grade)) {
-                    $(sub).removeClass("hidden");
-                }
-            }
-        });
-        $.each($(".menu_opt_sub .menu_column_row"), function(i, sub) {
-            if(sem === 0) {
-                if($(sub).hasClass("w") && $(sub).hasClass(grade)) {
-                    $(sub).removeClass("hidden");
-                }
-            } else {
-                if($(sub).hasClass("s") && $(sub).hasClass(grade)) {
-                    $(sub).removeClass("hidden");
-                }
-            }
-        });
-    });
-}
-function loadWorkingSubjects() {
+function loadSchedule() {
     subjectsWorking = [];
-    $.each($(".menu_com_sub .menu_column_row"), function(i, sub) {
+    $.each($(".menu_com_column .menu_column_row"), function(i, sub) {
         if($(sub).children(".menu_column_row_checkbox").length != 0) {
             if($(sub).children(".menu_column_row_checkbox")[0].checked && !$(sub).hasClass("hidden")) {
                 subjectsWorking.push({
@@ -373,7 +503,7 @@ function loadWorkingSubjects() {
             }
         }
     });
-    $.each($(".menu_opt_sub .menu_column_row"), function(i, sub) {
+    $.each($(".menu_opt_column .menu_column_row"), function(i, sub) {
         if($(sub).children(".menu_column_row_checkbox").length != 0) {
             if($(sub).children(".menu_column_row_checkbox")[0].checked && !$(sub).hasClass("hidden")) {
                 subjectsWorking.push({
@@ -392,7 +522,7 @@ function loadWorkingSubjects() {
     $(".ranges").html("");
     parseWorkingSubject("");
 }
-function parseWorkingSubject(e) {
+function parseSchedule(e) {
     if(e != "") {
         $(".subject").html($(e).filter("div.mother").find("table#schedule"));
 
@@ -943,14 +1073,14 @@ function save() {
     });
     file.sem = +$(".menu_column_row_radio[name='sem']:checked").prop("value");
 
-    $.each($(".menu_com_sub .menu_column_row"), function(i, sub) {
+    $.each($(".menu_com_column .menu_column_row"), function(i, sub) {
         if($(sub).children(".menu_column_row_checkbox").length != 0) {
             if($(sub).children(".menu_column_row_checkbox")[0].checked) {
                 file.com_sub.push($(sub).children(".menu_column_row_text").html());
             }
         }
     });
-    $.each($(".menu_opt_sub .menu_column_row"), function(i, sub) {
+    $.each($(".menu_opt_column .menu_column_row"), function(i, sub) {
         if($(sub).children(".menu_column_row_checkbox").length != 0) {
             if($(sub).children(".menu_column_row_checkbox")[0].checked) {
                 file.opt_sub.push($(sub).children(".menu_column_row_text").html());
@@ -1019,14 +1149,14 @@ function load() {
             $(".menu_column_row_radio[name='sem'][value='1']").prop("checked", true);
         }
 
-        $.each($(".menu_com_sub .menu_column_row"), function(i, sub) {
+        $.each($(".menu_com_column .menu_column_row"), function(i, sub) {
             if(file.com_sub.includes($(sub).children(".menu_column_row_text").html())) {
                 $(sub).children("input").prop("checked", true);
             } else {
                 $(sub).children("input").prop("checked", false);
             }
         });
-        $.each($(".menu_opt_sub .menu_column_row"), function(i, sub) {
+        $.each($(".menu_opt_column .menu_column_row"), function(i, sub) {
             if(file.opt_sub.includes($(sub).children(".menu_column_row_text").html())) {
                 $(sub).children("input").prop("checked", true);
             } else {
@@ -1049,6 +1179,11 @@ function load() {
 }
 
 //////////////////////////////////// Helpers ///////////////////////////////////
+function parseLinkforLoadPHP(link) {
+    var linkArray = link.split("/");
+    linkArray.pop("");
+    return linkArray[linkArray.length - 2] + "-" + linkArray[linkArray.length - 1];
+}
 function areIntervalsColide(a, b, x, y) {
     a *= 10;
     b *= 10;

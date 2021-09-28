@@ -8,21 +8,19 @@
     $context = stream_context_create($opts);
 
     if(isset($_POST)) {
-        if(isset($_POST["a"]) && isset($_POST["b"])) {
+        if(isset($_POST["a"]) && isset($_POST["b"]) && isset($_POST["c"]) && isset($_POST["d"]) && isset($_POST["e"])) {
             if($_POST["a"] === "s") {
                 echo file_get_contents("https://www.fit.vut.cz/study/programs/", false, $context);
-            } else if($_POST["a"] === "a") {
-                if($_POST["b"] === "a") {
-                    echo json_encode(array("a" => "a", "b" => file_get_contents("https://www.fit.vut.cz/study/program/18/", false, $context)));       // New
-                } else {
-                    echo json_encode(array("a" => "b", "b" => file_get_contents("https://www.fit.vut.cz/study/field/1/?plan=264", false, $context))); // Old
-                }
-            } else if($_POST["a"] === "b") {
-                if(is_numeric($_POST["b"])) {
-                    echo file_get_contents("https://www.fit.vut.cz/study/course/" . intval($_POST["b"]), false, $context);
+            } else if($_POST["a"] === "u") {
+                if(ctype_alnum($_POST["b"]) && is_numeric($_POST["c"]) && ctype_alnum($_POST["d"]) && ctype_alnum($_POST["e"])) {
+                    echo json_encode(array(
+                        "a" => file_get_contents("https://www.fit.vut.cz/study/" . urlencode($_POST["b"]) . "/" . intval($_POST["c"]), false, $context),
+                        "d" => urlencode($_POST["d"]) . "-" . urlencode($_POST["e"])
+                    ));
                 }
             }
         }
     }
+
     echo "";
 ?>
