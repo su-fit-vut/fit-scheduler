@@ -4,9 +4,9 @@ var actWorkingSubjectIndex = 0;                                                 
 var subjectsAll = [[[[], []],[[], []],[[], []]],[[[], []],[[], []],[[], []]]];  // List předmětů
 var subjectsWorking = [];                                                       // Vybrané předměty
 
-var scheduleAll = [[], [], [], [], []];                                         // Pole pracovního rozvrhu
+var schedule = [[], [], [], [], []];                                         // Pole pracovního rozvrhu
 var scheduleFin = [[], [], [], [], []];                                         // Pole výsledného rozvrhu
-var scheduleAllLayersCount = [0, 0, 0, 0, 0];                                   // Počet vrstev v pracovním rozvrhu
+var scheduleLayersCount = [0, 0, 0, 0, 0];                                   // Počet vrstev v pracovním rozvrhu
 var scheduleFinLayersCount = [0, 0, 0, 0, 0];                                   // POčet vrstev ve výsledném rozvrhu
 
 var scheduleCustom = [[], [], [], [], []];                                      // Pole vlastních hodin
@@ -31,9 +31,11 @@ var scheduleFaded = [];                                                         
 
 
 /////////////////////////////////// Variables //////////////////////////////////
-var studies = [];  // Array of loaded studies with subjects
-var subjects = []; // Array of selected subjects
-var lessons = [];  // Array of lessons of subjects
+var studies = [];                    // Array of loaded studies with subjects
+var subjects = [];                   // Array of selected subjects
+var lessons = [];                    // Array of lessons of selected subjects
+var ranges = [];                     // Array of ranges of selected subjects
+var schedule = [[], [], [], [], []]; // Array of days
 
 
 ///////////////////////////////////// Main /////////////////////////////////////
@@ -47,7 +49,7 @@ $(document).ready(function() {
     }
 
     // Start menu load
-    loadStudies("");
+    loadStudies();
 }); //checked
 
 //////////////////////////////////// Events ////////////////////////////////////
@@ -79,17 +81,13 @@ $(document).on("click", ".header_cross_icon", function() {
 
 // Menu
 $(document).on("click", ".menu_sem_radio", function() {
-    $(".menu_com_search_input").prop("value", "");
-    $(".menu_com_search_input").trigger("keyup");
-    $(".menu_opt_search_input").prop("value", "");
-    $(".menu_opt_search_input").trigger("keyup");
+    $(".menu_com_search_input").prop("value", ""); $(".menu_com_search_input").trigger("keyup");
+    $(".menu_opt_search_input").prop("value", ""); $(".menu_opt_search_input").trigger("keyup");
     renderSubjects();
 }); //checked
 $(document).on("click", ".menu_bit_checkbox", function() {
-    $(".menu_com_search_input").prop("value", "");
-    $(".menu_com_search_input").trigger("keyup");
-    $(".menu_opt_search_input").prop("value", "");
-    $(".menu_opt_search_input").trigger("keyup");
+    $(".menu_com_search_input").prop("value", ""); $(".menu_com_search_input").trigger("keyup");
+    $(".menu_opt_search_input").prop("value", ""); $(".menu_opt_search_input").trigger("keyup");
     renderSubjects();
 }); //checked
 $(document).on("click", ".menu_mit_radio", function() {
@@ -102,17 +100,13 @@ $(document).on("click", ".menu_mit_radio", function() {
         $(this).addClass("mit_radio_checked");
     }
 
-    $(".menu_com_search_input").prop("value", "");
-    $(".menu_com_search_input").trigger("keyup");
-    $(".menu_opt_search_input").prop("value", "");
-    $(".menu_opt_search_input").trigger("keyup");
+    $(".menu_com_search_input").prop("value", ""); $(".menu_com_search_input").trigger("keyup");
+    $(".menu_opt_search_input").prop("value", ""); $(".menu_opt_search_input").trigger("keyup");
     renderSubjects();
 }); //checked
 $(document).on("click", ".menu_grade_checkbox", function() {
-    $(".menu_com_search_input").prop("value", "");
-    $(".menu_com_search_input").trigger("keyup");
-    $(".menu_opt_search_input").prop("value", "");
-    $(".menu_opt_search_input").trigger("keyup");
+    $(".menu_com_search_input").prop("value", ""); $(".menu_com_search_input").trigger("keyup");
+    $(".menu_opt_search_input").prop("value", ""); $(".menu_opt_search_input").trigger("keyup");
     renderSubjects();
 }); //checked
 $(document).on("click", ".menu_sub_checkbox", function() {
@@ -122,27 +116,44 @@ $(document).on("click", ".menu_sel_checkbox", function() {
     renderSubjects();
 }); //checked
 $(document).on("keyup", ".menu_com_search_input", function() {
-    $(".mrsub_com").removeClass("hidden_search");
+    $(".menu_com_column .menu_column_row").removeClass("hidden_search");
     if($(".menu_com_search_input").prop("value") != "") {
-        $(".mrsub_com").addClass("hidden_search");
-        $(".mrsub_com").each(function(i, sub) {
-            if($(sub).children(".menu_column_row_text").html().toUpperCase().includes($(".menu_com_search_input").prop("value").toUpperCase())) {
-                $(sub).removeClass("hidden_search");
+        $(".menu_com_column .menu_column_row").addClass("hidden_search");
+        $(".menu_com_column .menu_column_row").each(function(i, sub) {
+            if($(sub).children(".menu_column_row_text").length > 0) {
+                if($(sub).children(".menu_column_row_text").html().toUpperCase().includes($(".menu_com_search_input").prop("value").toUpperCase())) {
+                    $(sub).removeClass("hidden_search");
+                }
             }
         });
     }
 }); //checked
 $(document).on("keyup", ".menu_opt_search_input", function() {
-    $(".mrsub_opt").removeClass("hidden_search");
+    $(".menu_opt_column .menu_column_row").removeClass("hidden_search");
     if($(".menu_opt_search_input").prop("value") != "") {
-        $(".mrsub_opt").addClass("hidden_search");
-        $(".mrsub_opt").each(function(i, sub) {
-            if($(sub).children(".menu_column_row_text").html().toUpperCase().includes($(".menu_opt_search_input").prop("value").toUpperCase())) {
-                $(sub).removeClass("hidden_search");
+        $(".menu_opt_column .menu_column_row").addClass("hidden_search");
+        $(".menu_opt_column .menu_column_row").each(function(i, sub) {
+            if($(sub).children(".menu_column_row_text").length > 0) {
+                if($(sub).children(".menu_column_row_text").html().toUpperCase().includes($(".menu_opt_search_input").prop("value").toUpperCase())) {
+                    $(sub).removeClass("hidden_search");
+                }
             }
         });
     }
 }); //checked
+$(document).on("click", ".content_header_elem", function() {
+    $(".content_header_elem").removeClass("content_header_elem_selected");
+    $(".sec").addClass("left-100");
+
+    $(this).addClass("content_header_elem_selected");
+    if($(this).hasClass("ch_0")) {
+        $(".se_0").removeClass("left-100");
+    } else if($(this).hasClass("ch_1")) {
+        $(".se_1").removeClass("left-100");
+    } else if($(this).hasClass("ch_2")) {
+        $(".se_2").removeClass("left-100");
+    }
+});
 
 // Controls
 $(document).on("click", ".menu_submit_button", function() {
@@ -153,8 +164,11 @@ $(document).on("click", ".menu_submit_button", function() {
     $(".menu").addClass("hidden");
     $(".info").addClass("hidden");
 
-    loadSchedule();
-});
+    $(".menu_submit_button").prop("disabled", true);
+    $(".menu_submit_button").addClass("menu_button_disabled");
+
+    loadLessons();
+}); // checked
 $(document).on("click", ".menu_save_button", function() {
     save();
 });
@@ -174,7 +188,7 @@ $(document).on("click", ".schedule_cell_star", function() {
         $(this).parent().css("border-style", "solid");
         scheduleIndexes.push($(this).siblings(".day").html() + "|" + $(this).siblings(".id").html());
     }
-    calculateFinSchedule();
+    parseFinSchedule();
 });
 $(document).on("click", ".schedule_cell_bin", function() {
     if($(this).parent().hasClass("schedule_cell_deleted")) {
@@ -186,7 +200,7 @@ $(document).on("click", ".schedule_cell_bin", function() {
 
         $(this).parent().css("border-style", "dashed");
         scheduleIndexes = arrayRemove(scheduleIndexes, $(this).siblings(".day").html() + "|" + $(this).siblings(".id").html());
-        calculateFinSchedule();
+        parseFinSchedule();
     }
 });
 $(document).on("click", ".schedule_cell_bin_cc", function() {
@@ -203,7 +217,7 @@ $(document).on("click", ".schedule_cell_bin_cc", function() {
     });
     scheduleCustom[day] = arrayRemove(scheduleCustom[day], scheduleToRemove);
 
-    calculateSchedule();
+    parseSchedule();
 });
 $(document).on("click", ".sch_add_button", function() {
     addCustomSchedule();
@@ -221,14 +235,14 @@ function loadStudies(e) {
         data: {
             "a": "s",
             "b": "",
-            "c": "",
+            "c": ""
         },
         async: false,
         success: function(e) {
             // Parse BIT
             {
                 studies.push({
-                    "name": "BIT-BIT",
+                    "name": "BIT",
                     "link": parseLinkforLoadPHP($(e).find("div#tab-bc").find("li.c-programmes__item").first().find("a.b-programme__link").prop("href")),
                     "subjects": {
                         "com": [
@@ -237,16 +251,15 @@ function loadStudies(e) {
                         "opt": [
                             [], [], []
                         ]
-                    },
-                    "loaded": false
+                    }
                 });
             }
 
             // Parse MIT
             $(e).find("div#tab-mgr").find("li.c-programmes__item").first().find("li.c-branches__item").each(function(i, li) {
                 studies.push({
-                    "name": "MIT-" + $(li).find("span").html(),
-                    "link": parseLinkforLoadPHP($(li).find("a").prop("href")),
+                    "name": "MIT-" + $(li).find("span.tag").html(),
+                    "link": parseLinkforLoadPHP($(li).find("a.b-branch__link").prop("href")),
                     "subjects": {
                         "com": [
                             [], [], []
@@ -254,14 +267,13 @@ function loadStudies(e) {
                         "opt": [
                             [], [], []
                         ]
-                    },
-                    "loaded": false
+                    }
                 });
             });
 
             // Generate
             $.each(studies, function(i, stud) {
-                if(stud.name === "BIT-BIT") {
+                if(stud.name === "BIT") {
                     $(".menu_stud_column").append(` <div class="menu_column_row">
                                                         <input class="menu_column_row_checkbox menu_bit_checkbox" type="checkbox" value="` + stud.name + `">
                                                         <div class="menu_column_row_text">` + stud.name + `</div>
@@ -283,6 +295,7 @@ function loadStudies(e) {
 } //checked
 
 function loadSubjects(e) {
+    // Parse
     $.each(studies, function(i, stud) {
         // Title
         $(".header_message").html("Načítám předměty studia " + stud.name + "...");
@@ -294,18 +307,15 @@ function loadSubjects(e) {
             data: {
                 "a": "u",
                 "b": stud.link.split("-")[0],
-                "c": stud.link.split("-")[1],
+                "c": stud.link.split("-")[1]
             },
             async: false,
             success: function(e) {
-
                 // Parse
                 var sem = "winter";
                 var grade = 0;
-                // Semesters
-                $(e).find(".main").find("div.table-responsive").first().find("tbody").each(function(i, tbody) {
-                    // Subjects
-                    $(tbody).children("tr").each(function(i, tr) {
+                $(e).find("main").first().find("div.table-responsive").first().find("tbody").each(function(o, tbody) {
+                    $(tbody).children("tr").each(function(p, tr) {
                         // Subject
                         var subject = {
                             "name": $(tr).children("th").html(),
@@ -329,72 +339,58 @@ function loadSubjects(e) {
                         grade++;
                     }
                 });
-                // Loaded
-                stud.loaded = true;
-
-                // Generate
-                var done = true;
-                $.each(studies, function(i, stud) {
-                    if(stud.loaded === false) {
-                        done = false;
-                        return;
-                    }
-                });
-                if(done) {
-                    // Clear
-                    $(".menu_com_column").html("");
-                    $(".menu_opt_column").html("");
-
-                    // Generate
-                    $.each(studies, function(i, stud) {
-                        for(var grade = 0; grade < 3; grade++) {
-                            // Name
-                            var name = stud.name;
-                            if(grade <= 1 || name === "BIT-BIT") {
-                                name += " " + (grade + 1);
-                            } else {
-                                name += " lib.";
-                            }
-
-                            // Com
-                            $(".menu_com_column").append(`  <div class="menu_column_row mrsub_` + grade + `_` + stud.name + ` hidden">
-                                                                <div class="menu_column_row_text_split">` + name + `</div>
-                                                                <div class="cleaner"></div>
-                                                            </div>`);
-                            $.each(stud.subjects.com[grade], function(i, sub) {
-                                $(".menu_com_column").append(`  <div class="menu_column_row mrsub_com mrsub_` + grade + `_` + stud.name + ` mrsem_` + sub.sem + ` hidden">
-                                                                    <input class="menu_column_row_checkbox menu_sub_checkbox" type="checkbox" value="` + sub.link + `">
-                                                                    <div class="menu_column_row_text">` + sub.name + `</div>
-                                                                    <div class="cleaner"></div>
-                                                                </div>`);
-                            });
-
-                            // Opt
-                            $(".menu_opt_column").append(`  <div class="menu_column_row mrsub_` + grade + `_` + stud.name + ` hidden">
-                                                                <div class="menu_column_row_text_split">` + name + `</div>
-                                                                <div class="cleaner"></div>
-                                                            </div>`);
-                            $.each(stud.subjects.opt[grade], function(i, sub) {
-                                $(".menu_opt_column").append(`  <div class="menu_column_row mrsub_opt mrsub_` + grade + `_` + stud.name + ` mrsem_` + sub.sem + ` hidden">
-                                                                    <input class="menu_column_row_checkbox menu_sub_checkbox" type="checkbox" value="` + sub.link + `">
-                                                                    <div class="menu_column_row_text">` + sub.name + `</div>
-                                                                    <div class="cleaner"></div>
-                                                                </div>`);
-                            });
-                        }
-                    });
-
-                    // Done
-                    $(".header_message").html("");
-                    $(".header_menu_icon").removeClass("hidden");
-                    $(".header_info_icon").removeClass("hidden");
-                }
-
-                // Render
-                renderSubjects();
             }
         });
     });
+
+    // Generate
+    $(".menu_com_column").html("");
+    $(".menu_opt_column").html("");
+    $.each(studies, function(i, stud) {
+        for(var grade = 0; grade < 3; grade++) {
+            // Name
+            var name = stud.name;
+            if(grade <= 1 || name === "BIT") {
+                name += " " + (grade + 1);
+            } else {
+                name += " lib.";
+            }
+
+            // Com
+            $(".menu_com_column").append(`  <div class="menu_column_row mrsub_` + grade + `_` + stud.name + ` hidden">
+                                                <div class="menu_column_row_text_split">` + name + `</div>
+                                                <div class="cleaner"></div>
+                                            </div>`);
+            $.each(stud.subjects.com[grade], function(o, sub) {
+                $(".menu_com_column").append(`  <div class="menu_column_row mrsub_` + grade + `_` + stud.name + ` mrsem_` + sub.sem + ` hidden">
+                                                    <input class="menu_column_row_checkbox menu_sub_checkbox" type="checkbox" value="` + sub.link + `">
+                                                    <div class="menu_column_row_text">` + sub.name + `</div>
+                                                    <div class="cleaner"></div>
+                                                </div>`);
+            });
+
+            // Opt
+            $(".menu_opt_column").append(`  <div class="menu_column_row mrsub_` + grade + `_` + stud.name + ` hidden">
+                                                <div class="menu_column_row_text_split">` + name + `</div>
+                                                <div class="cleaner"></div>
+                                            </div>`);
+            $.each(stud.subjects.opt[grade], function(o, sub) {
+                $(".menu_opt_column").append(`  <div class="menu_column_row mrsub_` + grade + `_` + stud.name + ` mrsem_` + sub.sem + ` hidden">
+                                                    <input class="menu_column_row_checkbox menu_sub_checkbox" type="checkbox" value="` + sub.link + `">
+                                                    <div class="menu_column_row_text">` + sub.name + `</div>
+                                                    <div class="cleaner"></div>
+                                                </div>`);
+            });
+        }
+    });
+
+    // Done
+    $(".header_message").html("");
+    $(".header_menu_icon").removeClass("hidden");
+    $(".header_info_icon").removeClass("hidden");
+
+    // Render
+    renderSubjects();
 } //checked
 function renderSubjects() {
     // Grades render
@@ -415,7 +411,7 @@ function renderSubjects() {
         $(".menu_grade_checkbox[value='1_MIT']").parent().addClass("hidden");
     }
 
-    // Subject groups
+    // Render groups
     var groups = [];
     var bitSelected = false;
     var mitSelected = false;
@@ -443,13 +439,9 @@ function renderSubjects() {
         $(".menu_opt_search_input").addClass("hidden");
     }
 
-    // Show groups
-    $(".menu_com_column .menu_column_row ").each(function(i, sub) {
-        $(sub).addClass("hidden");
-    });
-    $(".menu_opt_column .menu_column_row ").each(function(i, sub) {
-        $(sub).addClass("hidden");
-    });
+    // Subjects render
+    $(".menu_com_column .menu_column_row").addClass("hidden");
+    $(".menu_opt_column .menu_column_row").addClass("hidden");
     $.each(groups, function(i, group) {
         $(".mrsub_" + group).removeClass("hidden");
     })
@@ -459,12 +451,11 @@ function renderSubjects() {
         $(".mrsem_winter").addClass("hidden");
     }
 
-    // Selected subjects
+    // Selected render
     $(".menu_sel_checkbox:not(:checked)").each(function(i, sub) {
         $(".menu_sub_checkbox[value='" + $(sub).prop("value") + "']").prop("checked", false);
     });
     $(".menu_sel_column").html("");
-    subjects = [];
     $(".menu_sub_checkbox:checked").each(function(i, sub) {
         if(!$(sub).parent().hasClass("hidden")) {
             $(".menu_sel_column").append(`  <div class="menu_column_row">
@@ -472,22 +463,27 @@ function renderSubjects() {
                                                 <div class="menu_column_row_text">` + $(sub).siblings(".menu_column_row_text").html() + `</div>
                                                 <div class="cleaner"></div>
                                             </div>`);
-            subjects.push({
-                "name": $(sub).siblings(".menu_column_row_text").html(),
-                "link": $(sub).prop("value")
-            });
         }
     });
 } //checked
 
-function loadSchedule() {
-    $(".menu_submit_button").prop("disabled", true);
-    $(".menu_submit_button").addClass("menu_button_disabled");
+function loadLessons() {
+    // Load selected
+    subjects = [];
+    $(".menu_sel_checkbox").each(function(i, sub) {
+        subjects.push({
+            "name": $(sub).siblings(".menu_column_row_text").html(),
+            "link": $(sub).prop("value"),
+            "range": ""
+        });
+    });
 
-    $(".ranges").html("");
+    // Parse
+    lessons = [];
+    ranges = [];
     $.each(subjects, function(i, sub) {
         // Title
-        $(".header_message").html("Načítám " + sub.name);
+        $(".header_message").html("Načítám " + sub.name + "...");
 
         // AJAX
         $.ajax({
@@ -500,73 +496,215 @@ function loadSchedule() {
             },
             async: false,
             success: function(e) {
-                $(".subject").html();
+                // Ranges
+                sub.range = parseRange($(e).find("main").find("div.b-detail__body").find("div.grid__cell").find("p:contains('Rozsah')").parent().next().children().html());
 
-                $(e).find("table#schedule").find("tbody").find("td:contains('výuky'), td:contains('lichý'), td:contains('sudý')").each(function(i, td) {
-                    var tr = $(td).parent();
-                    var type = "c";
-                    var rooms = [];
-                    var groups = [];
+                // Lessons
+                $(e).find("table#schedule").find("tbody").find("tr").each(function(o, tr) {
+                    if($(tr).children("td").eq(0).html().includes("přednáška") || $(tr).children("td").eq(0).html().includes("poč. lab") || $(tr).children("td").eq(0).html().includes("cvičení")) {
+                        var lesson = {
+                            "id": "",
+                            "name": sub.name,
+                            "link": sub.link,
+                            "day":  parseDay($(tr).children("th").html()),
+                            "week": parseWeek($(tr).children("td").eq(1).html()),
+                            "from": parseTimeFrom($(tr).children("td").eq(3).html()),
+                            "to":   parseTimeTo($(tr).children("td").eq(4).html()),
+                            "type": "unknown",
+                            "rooms": [],
+                            "layer": 1,
+                            "selected": false,
+                            "deleted": false
+                        };
 
-                    $.each($(tr).children("td").eq(2).children("a"), function(i, room) {
-                        rooms.push($(room).html());
-                    });
-                    $.each($(tr).children("td").eq(5).children("a"), function(i, group) {
-                        groups.push($(group).html());
-                    });
-
-                    if($(tr).children("td").eq(0).html() === "přednáška") {
-                        type = "p";
-                    } else {
-                        if($(tr).attr("style") === "background: #e8ffff") {
-                            type = "d";
-                        } else {
-                            type = "c";
+                        // Type
+                        if($(tr).children("td").eq(0).html() === "přednáška") {
+                            lesson.type = "green";
+                        } else if($(tr).children("td").eq(0).html() === "poč. lab" || $(tr).children("td").eq(0).html() === "cvičení") {
+                            lesson.type = "blue";
                         }
 
-                        if(type === "d") {
-                            if((parseTimeTo($(tr).children("td").eq(4).html()) - parseTimeFrom($(tr).children("td").eq(3).html())) >= 2) {
-                                type = "c";
-                            }
-                        } else {
-                            if((parseTimeTo($(tr).children("td").eq(4).html()) - parseTimeFrom($(tr).children("td").eq(3).html())) === 1) {
-                                type = "d";
-                            }
-                        }
+                        // Rooms
+                        $.each($(tr).children("td").eq(2).children("a"), function(p, a) {
+                            lesson.rooms.push($(a).html());
+                        });
+
+                        // ID
+                        lesson.id = "LOAD_" + makeHash(lesson.name + ";" + lesson.from + ";" + lesson.to + ";" + lesson.rooms + ";" + lesson.type + ";" + lesson.week + ";" + lesson.day);
+
+                        // Push
+                        lessons.push(lesson);
                     }
-
-                    var lesson = {
-                        day: $(tr).children("th").html(),
-                        week: $(tr).children("td").eq(1).html(),
-                        type: type,
-                        from: parseTimeFrom($(tr).children("td").eq(3).html()),
-                        to: parseTimeTo($(tr).children("td").eq(4).html()),
-                        rooms: rooms,
-                        groups: groups
-                    };
-                    lessons.push(lesson);
-
-                    $(".ranges").append(`   <a target="_blank" href="https://www.fit.vut.cz/study/course/` + lesson.url + `">
-                                            <div class="range">
-                                                <div class="range_name">` + lesson.name + `</div>
-                                                <div class="range_value">` + $(e).filter("div.mother").find("div.b-detail__body").children().children().slice(0, 20).find("p:contains('Rozsah')").parent().next().children().html() + `</div>
-                                                <div class="cleaner"></div>
-                                            </div>
-                                        </a>`);
                 });
             }
         });
     });
+
+    // Sort
+    lessons.sort(function(a, b) {
+        if(a.type === "green" && b.type !== "green") {
+            return -1;
+        } else if(a.type !== "green" && b.type === "green") {
+            return 1;
+        }
+
+        return 0;
+    });
+
+    // Done
     $(".header_message").html("");
     $(".menu_submit_button").prop("disabled", false);
     $(".menu_submit_button").removeClass("menu_button_disabled");
 
-    console.log(schedule);
-
-    calculateSchedule();
-}
+    // Parse schedule
+    showRanges();
+    parseSchedule();
+    parseFinSchedule();
+} //checked
 
 ////////////////////////////////// Schledules //////////////////////////////////
+function showRanges() {
+    // Ranges
+    $.each(subjects, function(i, sub) {
+        var green_value = 0;
+        var blue_value = 0;
+        var blue_count = 0;
+        $.each(sub.range, function(o, ran) {
+            if(ran.type === "přednášky") {
+                green_value += ran.value;
+            } else if(ran.type === "pc") {
+                blue_value += ran.value;
+            } else if(ran.type === "cvičení") {
+                blue_value += ran.value;
+            }
+        });
+        green_value /= 13;
+        if(blue_value > 13) {
+            blue_count = blue_value / 2;
+        } else {
+            blue_count = blue_value / 2;
+        }
+        if(blue_value > 1) {
+            blue_value = 2
+        }
+
+        $(".ranges").append(`   <a target="_blank" href="https://www.fit.vut.cz/study/course/` + sub.link.split("-")[1] + `">
+                                    <div class="range">
+                                        <div class="range_name">` + sub.name + `</div>
+                                        <div class="range_values">
+                                            <div class="range_value">Přednášky: ` + green_value + ` hod. týdně</div>
+                                            <div class="range_value">Cvičení: ` + blue_value + ` hod. týdně, ` + blue_count + `x</div>
+                                        </div>
+                                        <div class="cleaner"></div>
+                                    </div>
+                                </a>`);
+    });
+}
+function parseSchedule() {
+    // Push lessons
+    schedule = [[], [], [], [], []];
+    $.each(lessons, function(i, les) {
+        // Collisions
+        do {
+            var collison = false;
+            $.each(schedule[les.day], function(o, lesX) {
+                if(lesX.layer === les.layer) {
+                    if(areIntervalsColide(les.from, les.to, lesX.from, lesX.to)) {
+                        collison = true;
+                        les.layer++;
+                        return false;
+                    }
+                }
+            });
+        } while(collison === true);
+
+        // Push
+        schedule[les.day].push(les);
+    });
+
+    // Render
+    showSchedule();
+}
+function showSchedule() {
+    // Layers count
+    scheduleLayersCount = [0, 0, 0, 0, 0];
+    for(d = 0; d < 5; d++) {
+        var maxLayer = 0;
+        $.each(schedule[d], function(i, les) {
+            if(les.layer > maxLayer) {
+                maxLayer = les.layer;
+            }
+        });
+        scheduleLayersCount[d] = maxLayer
+    }
+
+
+    // Připravení rozvrhu
+    for(d = 0; d < 5; d++) {
+        $(".schedule_all").find(".schedule_row").eq(d).children(".schedule_row_layers").html("");
+    }
+    for(d = 0; d < 5; d++) {
+        for(k = 0; k < scheduleLayersCount[d]; k++) {
+            $(".schedule_all").find(".schedule_row").eq(d).children(".schedule_row_layers").append(`<div class="schedule_row_layer"></div>`);
+        }
+        if(scheduleLayersCount[d] != 0) {
+            $(".schedule_all").find(".schedule_row").eq(d).children(".schedule_row_header").css("line-height", (scheduleLayersCount[d] * 72) + "px");
+        } else {
+            $(".schedule_all").find(".schedule_row").eq(d).children(".schedule_row_header").css("line-height", "72px");
+        }
+    }
+
+    // Generování buněk
+    for(d = 0; d < 5; d++) {
+        var layersDiv = $(".schedule_all").find(".schedule_row").eq(d).children(".schedule_row_layers");
+        var fullLength = +$(layersDiv).width();
+
+        $.each(schedule[d], function(i, sch) {
+            var id = sch.id;
+            var bin = "schedule_cell_bin";
+            var length = ((sch.to - sch.from) * (fullLength / 14)) - 6 - 6;
+            var left = (sch.from * (fullLength / 14)) + 3;
+            var layer = sch.layer;
+            var classes = "";
+            var rooms = "";
+            var groups = "";
+
+            if(sch.type === "cc") {
+                bin = "schedule_cell_bin_cc"
+            }
+
+            if(sch.type === "green") {
+                classes += "schedule_cell_type_p ";
+            } else if(sch.type === "blue") {
+                classes += "schedule_cell_type_d ";
+            }
+
+            if(sch.week === "lichý") {
+                classes += "schedule_cell_week_odd ";
+            } else if(sch.week === "sudý") {
+                classes += "schedule_cell_week_even ";
+            }
+
+            $.each(sch.rooms, function(i, room) {
+                rooms += room + " ";
+            });
+
+            $(layersDiv).children(".schedule_row_layer").eq(layer - 1).append(`<div class="schedule_cell ` + classes + `" style="left: ` + left + `px; width: ` + length + `px">
+                                                                                    <div class="schedule_cell_name"><a target="_blank" href="https://www.fit.vut.cz/study/course/` + sch.link + `">` + sch.name + `</a></div>
+                                                                                    <div class="schedule_cell_rooms">` + rooms + `</div>
+                                                                                    <div class="schedule_cell_desc">` + groups + `</div>
+                                                                                    <div class="schedule_cell_star"></div>
+                                                                                    <div class="` + bin + `"></div>
+                                                                                    <div class="id hidden">` + id + `</div>
+                                                                                    <div class="day hidden">` + d + `</div>
+                                                                            </div>`)
+        });
+    }
+}
+
+
+
+
 function addCustomSchedule() {
     var lesson = {
         id: Date.now(),
@@ -606,272 +744,9 @@ function addCustomSchedule() {
         scheduleCustom[4].push(lesson);
     }
 
-    calculateSchedule();
+    parseSchedule();
 }
-function calculateSchedule() {
-    var scheduleTemp;
-    scheduleAll = [[], [], [], [], []];
-    scheduleAllLayersCount = [0, 0, 0, 0, 0];
-
-    $.each(subjectsWorking, function(i, sub) {
-        $.each(sub.data, function(i, les) {
-            var lesson = {
-                id: makeHash(sub.name + ";" + les.from + ";" + les.to + ";" + les.rooms + ";" + les.groups + ";" + les.type + ";" + les.week + ";" + les.day),
-                url: sub.url,
-                name: sub.name,
-                from: les.from,
-                to: les.to,
-                groups: les.groups,
-                rooms: les.rooms,
-                type: les.type,
-                week: les.week,
-                layer: -1,
-                real: true,
-                visible: true
-            };
-
-            if(les.day === "Po") {
-                scheduleAll[0].push(lesson);
-            } else if(les.day === "Út") {
-                scheduleAll[1].push(lesson);
-            } else if(les.day === "St") {
-                scheduleAll[2].push(lesson);
-            } else if(les.day === "Čt") {
-                scheduleAll[3].push(lesson);
-            } else if(les.day === "Pá") {
-                scheduleAll[4].push(lesson);
-            }
-        });
-    });
-
-    // Rozlámání bloků
-    scheduleTemp = [[], [], [], [], []];
-    for(d = 0; d < 5; d++) {
-        $.each(scheduleAll[d], function(i, sch) {
-            if(sch.type === "c" && (sch.to - sch.from) > 3) {
-                var count = Math.floor((sch.to - sch.from) / 2);
-                var time = sch.from;
-
-                for(k = 0; k < count; k++) {
-                    var schX = {
-                        url: sch.url,
-                        name: sch.name,
-                        from: time,
-                        to: time + 2,
-                        groups: sch.groups,
-                        rooms: sch.rooms,
-                        type: sch.type,
-                        week: sch.week,
-                        layer: -1,
-                        real: false,
-                        visible: true
-                    };
-
-                    scheduleTemp[d].push(schX);
-                    time += 2;
-                }
-            } else {
-                scheduleTemp[d].push(sch);
-            }
-        });
-    }
-    scheduleAll = scheduleTemp;
-
-    // duplicity
-    scheduleTemp = [[], [], [], [], []];
-    for(d = 0; d < 5; d++) {
-        for(o = 0; o < scheduleAll[d].length; o++) {
-            if(scheduleAll[d][o].name != "null") {
-                var sch = scheduleAll[d][o];
-                for(p = o + 1; p < scheduleAll[d].length; p++) {
-                    if(scheduleAll[d][p].name != "null") {
-                        if(sch.name === scheduleAll[d][p].name &&
-                           sch.from === scheduleAll[d][p].from &&
-                           sch.to === scheduleAll[d][p].to &&
-                           sch.week === scheduleAll[d][p].week &&
-                           sch.type === scheduleAll[d][p].type &&
-                           arrayEqual(sch.rooms, scheduleAll[d][p].rooms)) {
-                            $.each(scheduleAll[d][p].groups, function(i, group) {
-                                if(!sch.groups.includes(group)) {
-                                    sch.groups.push(group);
-                                }
-                            });
-                            scheduleAll[d][p].name = "null";
-                        }
-                    }
-                }
-                sch.groups.sort();
-                scheduleTemp[d].push(sch);
-            }
-        }
-    }
-    scheduleAll = scheduleTemp;
-
-    // optimalizace skupin
-    for(d = 0; d < 5; d++) {
-        $.each(scheduleAll[d], function(i, sch) {
-            if(sch.groups.includes("1BIA") && sch.groups.includes("1BIB")) {
-                sch.groups.push("1BIT");
-                sch.groups = arrayRemove(sch.groups, "1BIA");
-                sch.groups = arrayRemove(sch.groups, "1BIB");
-            }
-            if(sch.groups.includes("2BIA") && sch.groups.includes("2BIB")) {
-                sch.groups.push("2BIT");
-                sch.groups = arrayRemove(sch.groups, "2BIA");
-                sch.groups = arrayRemove(sch.groups, "2BIB");
-            }
-            if(sch.groups.includes("3BIA") && sch.groups.includes("3BIB")) {
-                sch.groups.push("3BIT");
-                sch.groups = arrayRemove(sch.groups, "3BIA");
-                sch.groups = arrayRemove(sch.groups, "3BIB");
-            }
-            sch.groups = arrayRemove(sch.groups, "1BIT");
-            sch.groups = arrayRemove(sch.groups, "2BIT");
-            sch.groups = arrayRemove(sch.groups, "3BIT");
-            sch.groups.sort();
-        });
-    }
-
-    // vlastní hodnoty
-    for(i = 0; i < 5; i++) {
-        $.each(scheduleCustom[i], function(i, sch) {
-            sch.layer = -1;
-        });
-        scheduleAll[i] = scheduleAll[i].concat(scheduleCustom[i]);
-    }
-
-    // přednášky nahoru
-    for(d = 0; d < 5; d++) {
-        scheduleAll[d].sort(function(a, b) {
-            if(a.type === "p" && b.type !== "p") {
-                return -1;
-            } else if(a.type !== "p" && b.type === "p") {
-                return 1;
-            }
-
-            return 0;
-        });
-    }
-
-    // vrstvy
-    for(d = 0; d < 5; d++) {
-        $.each(scheduleAll[d], function(i, sch) {
-            var layer = 1;
-            var noCollison = false;
-
-            while(noCollison === false) {
-                noCollison = true;
-                $.each(scheduleAll[d], function(p, schX) {
-                    if(schX.layer === layer) {
-                        if(areIntervalsColide(sch.from, sch.to, schX.from, schX.to)) {
-                            noCollison = false;
-                            layer++;
-                            return false;
-                        }
-                    }
-                });
-            }
-            sch.layer = layer;
-        });
-    }
-
-    // počet vrstev
-    for(d = 0; d < 5; d++) {
-        var maxLayer = 0;
-
-        $.each(scheduleAll[d], function(i, sch) {
-            if(sch.layer > maxLayer) {
-                maxLayer = sch.layer;
-            }
-        });
-
-        scheduleAllLayersCount[d] = maxLayer
-    }
-
-    showSchedule();
-    calculateFinSchedule();
-}
-function showSchedule() {
-    // Připravení rozvrhu
-    for(d = 0; d < 5; d++) {
-        $(".schedule_all").find(".schedule_row").eq(d).children(".schedule_row_layers").html("");
-    }
-    for(d = 0; d < 5; d++) {
-        for(k = 0; k < scheduleAllLayersCount[d]; k++) {
-            $(".schedule_all").find(".schedule_row").eq(d).children(".schedule_row_layers").append(`<div class="schedule_row_layer"></div>`);
-        }
-        if(scheduleAllLayersCount[d] != 0) {
-            $(".schedule_all").find(".schedule_row").eq(d).children(".schedule_row_header").css("line-height", (scheduleAllLayersCount[d] * 72) + "px");
-        } else {
-            $(".schedule_all").find(".schedule_row").eq(d).children(".schedule_row_header").css("line-height", "72px");
-        }
-    }
-
-    // Generování buněk
-    for(d = 0; d < 5; d++) {
-        var layersDiv = $(".schedule_all").find(".schedule_row").eq(d).children(".schedule_row_layers");
-        var fullLength = +$(layersDiv).width();
-
-        $.each(scheduleAll[d], function(i, sch) {
-            if(sch.visible === true) {
-                var id = sch.id;
-                var bin = "schedule_cell_bin";
-                var length = ((sch.to - sch.from) * (fullLength / 14)) - 6 - 6;
-                var left = (sch.from * (fullLength / 14)) + 3;
-                var layer = sch.layer;
-                var classes = "";
-                var rooms = "";
-                var groups = "";
-
-                if(sch.type === "cc") {
-                    bin = "schedule_cell_bin_cc"
-                }
-
-                if(sch.type === "p") {
-                    classes += "schedule_cell_type_p ";
-                } else if(sch.type === "c" || sch.type === "cc") {
-                    if(sch.real === false) {
-                        classes += "schedule_cell_type_c_n ";
-                    } else {
-                        classes += "schedule_cell_type_c ";
-                    }
-                } else if(sch.type === "d") {
-                    classes += "schedule_cell_type_d ";
-                }
-
-                if(sch.week === "lichý") {
-                    classes += "schedule_cell_week_odd ";
-                } else if(sch.week === "sudý") {
-                    classes += "schedule_cell_week_even ";
-                }
-
-                $.each(sch.rooms, function(i, room) {
-                    rooms += room + " ";
-                });
-                $.each(sch.groups, function(i, group) {
-                    if(group[3] === "A") {
-                        groups += "<span class='red'>" + group + "</span> ";
-                    } else if(group[3] === "B") {
-                        groups += "<span class='blue'>" + group + "</span> ";
-                    } else {
-                        groups += group + " ";
-                    }
-                });
-
-                $(layersDiv).children(".schedule_row_layer").eq(layer - 1).append(`<div class="schedule_cell ` + classes + `" style="left: ` + left + `px; width: ` + length + `px">
-                                                                                        <div class="schedule_cell_name"><a target="_blank" href="https://www.fit.vut.cz/study/course/` + sch.url + `">` + sch.name + `</a></div>
-                                                                                        <div class="schedule_cell_rooms">` + rooms + `</div>
-                                                                                        <div class="schedule_cell_desc">` + groups + `</div>
-                                                                                        <div class="schedule_cell_star"></div>
-                                                                                        <div class="` + bin + `"></div>
-                                                                                        <div class="id hidden">` + id + `</div>
-                                                                                        <div class="day hidden">` + d + `</div>
-                                                                                </div>`)
-            }
-        });
-    }
-}
-function calculateFinSchedule() {
+function parseFinSchedule() {
     scheduleFin = [[], [], [], [], []];
     scheduleFinLayersCount = [0, 0, 0, 0, 0];
 
@@ -881,7 +756,7 @@ function calculateFinSchedule() {
         var day = +index.split("|")[0];
         var id = index.split("|")[1];
 
-        $.each(scheduleAll[day], function(i, sch) {
+        $.each(schedule[day], function(i, sch) {
             if(sch.id.toString() === id.toString()) {
                 found = true;
                 scheduleFin[day].push(sch);
@@ -904,7 +779,7 @@ function calculateFinSchedule() {
         var day = +index.split("|")[0];
         var id = index.split("|")[1];
 
-        $.each(scheduleAll[day], function(i, sch) {
+        $.each(schedule[day], function(i, sch) {
             if(sch.id.toString() === id.toString()) {
                 found = true;
                 $(".id:contains(" + id +")").parent().addClass("schedule_cell_deleted");
@@ -1058,7 +933,7 @@ function save() {
         var day = +index.split("|")[0];
         var id = index.split("|")[1];
 
-        $.each(scheduleAll[day], function(i, sch) {
+        $.each(schedule[day], function(i, sch) {
             if(sch.id.toString() === id.toString()) {
                 found = true;
                 return false;
@@ -1147,7 +1022,50 @@ function parseLinkforLoadPHP(link) {
     var linkArray = link.split("/");
     linkArray.pop("");
     return linkArray[linkArray.length - 2] + "-" + linkArray[linkArray.length - 1];
-}
+} //checked
+function parseDay(day) {
+    if(day === "Po") {
+        return 0;
+    } else if(day === "Út") {
+        return 1;
+    } else if(day === "St") {
+        return 2;
+    } else if(day === "Čt") {
+        return 3;
+    } else if(day === "Pá") {
+        return 4;
+    }
+} //checked
+function parseWeek(week) {
+    week = week.replace("výuky", "");
+    week = week.replaceAll(",", "");
+    week = week.trim();
+    return week;
+} //checked
+function parseTimeFrom(time) {
+    var hours = +time.split(":")[0];
+    return hours - 7;
+} //checked
+function parseTimeTo(time) {
+    var hours = +time.split(":")[0] + 1;
+    return hours - 7;
+} //checked
+function parseRange(rangeString) {
+    rangeString = rangeString.replaceAll("\\n", "");
+    rangeString = rangeString.replaceAll("hod. ", "");
+    rangeString = rangeString.trim();
+
+    ranges = [];
+    $.each(rangeString.split(","), function(i, rang) {
+        rang = rang.trim();
+
+        ranges.push({
+            "type": rang.split(" ")[1],
+            "value": +rang.split(" ")[0]
+        });
+    });
+    return ranges;
+} //checked
 function areIntervalsColide(a, b, x, y) {
     a *= 10;
     b *= 10;
@@ -1162,15 +1080,7 @@ function areIntervalsColide(a, b, x, y) {
         }
     }
     return false;
-}
-function parseTimeFrom(string) {
-    var hours = +string.split(":")[0];
-    return hours - 7;
-}
-function parseTimeTo(string) {
-    var hours = +string.split(":")[0] + 1;
-    return hours - 7;
-}
+} //checked
 function arrayRemove(array, value) {
     return array.filter(function(element) {
         return element != value;
@@ -1204,4 +1114,4 @@ function makeHash(string) {
         hash = Math.abs(hash);
     }
     return hash.toString();
-};
+}; //checked
