@@ -35,7 +35,7 @@ var studies = [];                    // Array of loaded studies with subjects
 var subjects = [];                   // Array of selected subjects
 var lessons = [];                    // Array of lessons of selected subjects
 var ranges = [];                     // Array of ranges of selected subjects
-var schedule = [[], [], [], [], []]; // Array of days
+var schedule = [[], [], [], [], []]; // Array of schledule days
 
 
 ///////////////////////////////////// Main /////////////////////////////////////
@@ -54,29 +54,31 @@ $(document).ready(function() {
 
 //////////////////////////////////// Events ////////////////////////////////////
 // Header
-$(document).on("click", ".header_menu_icon", function() {
-    $(".header_menu_icon").addClass("hidden");
-    $(".header_info_icon").addClass("hidden");
-    $(".header_cross_icon").removeClass("hidden");
-
-    $(".menu").removeClass("hidden");
-    $(".info").addClass("hidden");
-}); //checked
 $(document).on("click", ".header_info_icon", function() {
-    $(".header_menu_icon").addClass("hidden");
     $(".header_info_icon").addClass("hidden");
     $(".header_cross_icon").removeClass("hidden");
 
-    $(".menu").addClass("hidden");
-    $(".info").removeClass("hidden");
+    $(".secs_main").addClass("hidden");
+    $(".secs_info").removeClass("hidden");
 }); //checked
 $(document).on("click", ".header_cross_icon", function() {
-    $(".header_menu_icon").removeClass("hidden");
     $(".header_info_icon").removeClass("hidden");
     $(".header_cross_icon").addClass("hidden");
 
+    $(".secs_main").removeClass("hidden");
+    $(".secs_info").addClass("hidden");
+}); //checked
+$(document).on("click", ".menu_menu_icon", function() {
+    $(".menu_menu_icon").addClass("hidden");
+
+    $(".secs").removeClass("secs_menu_hidden");
+    $(".menu").removeClass("hidden");
+}); //checked
+$(document).on("click", ".menu_cross_icon", function() {
+    $(".menu_menu_icon").removeClass("hidden");
+
+    $(".secs").addClass("secs_menu_hidden");
     $(".menu").addClass("hidden");
-    $(".info").addClass("hidden");
 }); //checked
 
 // Menu
@@ -157,15 +159,19 @@ $(document).on("click", ".content_header_elem", function() {
 
 // Controls
 $(document).on("click", ".menu_submit_button", function() {
-    $(".header_menu_icon").removeClass("hidden");
     $(".header_info_icon").removeClass("hidden");
     $(".header_cross_icon").addClass("hidden");
+    $(".secs_main").removeClass("hidden");
+    $(".secs_info").addClass("hidden");
 
-    $(".menu").addClass("hidden");
-    $(".info").addClass("hidden");
-
+    $(".menu_column_row_checkbox").prop("disabled", true);
+    $(".menu_column_row_radio").prop("disabled", true);
     $(".menu_submit_button").prop("disabled", true);
     $(".menu_submit_button").addClass("menu_button_disabled");
+
+    $(".loading_message").html("Načítání...");
+    $(".loading_message").removeClass("hidden");
+    $(".secs").addClass("hidden");
 
     loadLessons();
 }); // checked
@@ -226,7 +232,7 @@ $(document).on("click", ".sch_add_button", function() {
 ///////////////////////////////////// Menu /////////////////////////////////////
 function loadStudies(e) {
     // Title
-    $(".header_message").html("Načítám studia...");
+    $(".loading_message").html("Načítám studia...");
 
     // AJAX
     $.ajax({
@@ -298,7 +304,7 @@ function loadSubjects(e) {
     // Parse
     $.each(studies, function(i, stud) {
         // Title
-        $(".header_message").html("Načítám předměty studia " + stud.name + "...");
+        $(".loading_message").html("Načítám předměty studia " + stud.name + "...");
 
         // AJAX
         $.ajax({
@@ -385,9 +391,11 @@ function loadSubjects(e) {
     });
 
     // Done
-    $(".header_message").html("");
-    $(".header_menu_icon").removeClass("hidden");
     $(".header_info_icon").removeClass("hidden");
+    $(".menu").removeClass("hidden");
+    $(".secs").removeClass("hidden");
+    $(".loading_message").html("");
+    $(".loading_message").addClass("hidden");
 
     // Render
     renderSubjects();
@@ -483,7 +491,7 @@ function loadLessons() {
     ranges = [];
     $.each(subjects, function(i, sub) {
         // Title
-        $(".header_message").html("Načítám " + sub.name + "...");
+        $(".loading_message").html("Načítám " + sub.name + "...");
 
         // AJAX
         $.ajax({
@@ -552,9 +560,14 @@ function loadLessons() {
     });
 
     // Done
-    $(".header_message").html("");
+    $(".menu_column_row_checkbox").prop("disabled", false);
+    $(".menu_column_row_radio").prop("disabled", false);
     $(".menu_submit_button").prop("disabled", false);
     $(".menu_submit_button").removeClass("menu_button_disabled");
+
+    $(".loading_message").html("");
+    $(".loading_message").addClass("hidden");
+    $(".secs").removeClass("hidden");
 
     // Parse schedule
     showRanges();
@@ -963,7 +976,7 @@ function save() {
 function load() {
     var file;
     if(!$(".sch_load")[0].files[0]) {
-        $(".header_message").html("Nevybrán žádný soubor");
+        $(".loading_message").html("Nevybrán žádný soubor");
     }
 
     var reader = new FileReader();
@@ -972,7 +985,7 @@ function load() {
         try {
             file = JSON.parse(e.target.result);
         } catch(e) {
-            $(".header_message").html("Chyba při parsování souboru");
+            $(".loading_message").html("Chyba při parsování souboru");
         }
 
         $.each($(".menu_column_row_checkbox[name='grade']"), function(i, gr) {
@@ -1013,7 +1026,7 @@ function load() {
         loadWorkingSubjects();
     }
     reader.onerror = function (e) {
-        $(".header_message").html("Chyba při čtení souboru");
+        $(".loading_message").html("Chyba při čtení souboru");
     }
 }
 
