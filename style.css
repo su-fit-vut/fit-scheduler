@@ -82,6 +82,7 @@ html, body, * {
             cursor: pointer;
             background-image: url(./images/menu.png);
             background-color: #000000;
+            z-index: 1000;
         }
         .menu {
             float: left;
@@ -229,283 +230,304 @@ html, body, * {
             float: left;
             width: calc(100% - 260px);
             height: 100%;
-            padding-top: 10px;
-            overflow-y: auto;
         }
-            .sub_header {
-                width: 500px;
-                margin: 0 auto;
+            .secs_menu_hidden {
+                width: 100%;
             }
-
-            .content_header {
-                width: 600px;
-                margin: 0 auto;
-                height: 55px;
+            .secs_main {
+                width: 100%;
+                height: 100%;
             }
-                .content_header_elem {
-                    float: left;
-                    width: 190px;
-                    margin: 0 5px;
-                    line-height: 50px;
-                    border-bottom: 2px #040D1F solid;
-                    color: #051221;
-                    font-size: 25px;
-                    text-align: center;
-                    cursor: pointer;
+                .secs_header {
+                    width: 600px;
+                    margin: 0 auto;
+                    height: 55px;
                 }
-                .content_header_elem:hover {
-                    border-bottom-width: 5px;
-                }
-                .content_header_elem_selected {
-                    border-bottom-width: 5px;
-                }
-
-            .sec {
-                width: calc(100% - 40px);
-                padding: 5px 20px;
-                padding-bottom: 5px;
-            }
-            .sec_half {
-                float: left;
-                width: calc(50% - 40px);
-                padding: 5px 20px;
-                padding-bottom: 5px;
-            }
-                .title {
-                    width: 100%;
-                    line-height: 40px;
-                    color: #051221;
-                    font-size: 30px;
-                    border-bottom: 2px #040D1F solid;
-                }
-                .bubble {
-                    width: calc(100% - 20px - 16px);
-                    max-width: 800px;
-                    padding: 8px;
-                    margin: 10px;
-                    font-size: 18px;
-                    background-color: rgb(255, 231, 145);
-                    border-radius: 8px;
-                }
-                .bubble_red {
-                    color: rgb(143, 25, 25);
-                    background-color: rgb(255, 176, 169);
-                }
-                .bubble_clear {
-                    background-color: transparent;
-                }
-
-            .ranges {
-                width: calc(100% - 20px);
-                padding: 20px 10px;
-            }
-                .range {
-                    width: calc(100% - 10px);
-                    background-color: #d7eed2;
-                    padding: 5px;
-                    border-radius: 5px;
-                    margin-bottom: 5px;
-                    color: #000000;
-                }
-                    .range_name {
+                    .secs_header_elem {
                         float: left;
-                        line-height: 30px;
+                        width: 190px;
+                        margin: 0 5px;
+                        line-height: 50px;
+                        border-bottom: 2px #040D1F solid;
+                        color: #051221;
                         font-size: 25px;
-                        min-width: 100px;
+                        text-align: center;
+                        cursor: pointer;
                     }
-                    .range_values {
-                        float: left;
-                        padding-left: 10px;
+                    .secs_header_elem:hover {
+                        border-bottom-width: 5px;
                     }
-                        .range_value {
-                            line-height: 30px;
-                            font-size: 20px;
+                    .secs_header_elem_selected {
+                        border-bottom-width: 5px;
+                    }
+
+                .secs_conta {
+                    position: relative;
+                    width: 100%;
+                    height: calc(100% - 55px);
+                    overflow: hidden;
+                }
+                    .sec {
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        width: calc(100% - 40px);
+                        height: calc(100% - 10px);
+                        padding: 5px 20px;
+                        overflow: auto;
+                        scrollbar-width: thin;
+                    }
+                        .sec_invisible {
+                            left: -100%;
                         }
 
-            .schedule {
-                width: 1200px;
+                        .ranges {
+                            width: calc(100% - 20px);
+                            padding: 20px 10px;
+                        }
+                            .range {
+                                width: calc(100% - 10px);
+                                background-color: #d7eed2;
+                                padding: 5px;
+                                border-radius: 5px;
+                                margin-bottom: 5px;
+                                color: #000000;
+                            }
+                                .range_name {
+                                    float: left;
+                                    line-height: 30px;
+                                    font-size: 25px;
+                                    min-width: 100px;
+                                }
+                                .range_values {
+                                    float: left;
+                                    padding-left: 10px;
+                                }
+                                    .range_value {
+                                        line-height: 30px;
+                                        font-size: 20px;
+                                    }
+
+                        .schedule {
+                            width: 1200px;
+                            padding: 10px;
+                            margin: 0 auto;
+                            padding-top: 20px;
+                            background-color: #ffffff;
+                        }
+                            .schedule_header {
+                                height: 42px;
+                                width: calc(100% - 4px);
+                                border: 2px #000000 solid;
+                                background-color: #040D1F;
+                            }
+                                .schedule_header_cell_week {
+                                    float: left;
+                                    width: 30px;
+                                    height: 40px;
+                                    background-color: #040D1F;
+                                    border: 1px #000000 solid;
+                                    border-right: 0;
+                                }
+                                .schedule_header_cell {
+                                    float: left;
+                                    width: calc(((100% - 31px - 16px) / 14) - 4px);
+                                    line-height: 20px;
+                                    padding: 0 2px;
+                                    background-color: #040D1F;
+                                    color: #ffffff;
+                                    text-align: center;
+                                    border: 1px #000000 solid;
+                                    border-left: 0;
+                                    border-right: 0;
+                                }
+                                .schedule_header_cell_divider {
+                                    float: left;
+                                    width: 1px;
+                                    height: 42px;
+                                    background-color: #000000;
+                                }
+
+                            .schedule_row {
+                                width: calc(100% - 4px);
+                                border: 2px #000000 solid;
+                                border-top: 0;
+                            }
+                                .schedule_row_header {
+                                    float: left;
+                                    width: 30px;
+                                    line-height: 72px;
+                                    background-color: #040D1F;
+                                    color: #ffffff;
+                                    text-align: center;
+                                    border: 1px #000000 solid;
+                                    border-bottom: 0;
+                                    border-top: 0;
+                                }
+                                .schedule_row_layers {
+                                    float: left;
+                                    width: calc(100% - 32px);
+                                }
+                                    .schedule_row_layer {
+                                        position: relative;
+                                        height: 66px;
+                                        padding: 3px;
+                                    }
+                                        .schedule_cell {
+                                            position: absolute;
+                                            top: 3px;
+                                            height: 60px;
+                                            border: 3px #000000 dashed;
+                                            border-radius: 3px;
+                                        }
+                                        .schedule_cell_week_odd {
+                                            border-color: #335AFF;
+                                        }
+                                        .schedule_cell_week_even {
+                                            border-color: #DB1200;
+                                        }
+                                        .schedule_cell_type_p {
+                                            background-color: #03b300;
+                                        }
+                                        .schedule_cell_type_d {
+                                            background-color: #15A2DB;
+                                        }
+                                        .schedule_cell_type_c {
+                                            background-color: #DBB21F;
+                                        }
+                                        .schedule_cell_type_c_n {
+                                            background-color: #F5EBC9;
+                                        }
+                                        .schedule_cell_selected {
+                                            border-style: solid;
+                                        }
+                                        .schedule_cell_deleted {
+                                            opacity: 0.3;
+                                        }
+                                            .schedule_cell a {
+                                                text-decoration: none;
+                                                color: #000000;
+                                            }
+                                            .schedule_cell_name {
+                                                width: 100%;
+                                                line-height: 24px;
+                                                font-size: 20px;
+                                                text-align: center;
+                                                color: #000000;
+                                            }
+                                            .schedule_cell_rooms {
+                                                width: 100%;
+                                                line-height: 18px;
+                                                font-size: 12px;
+                                                text-align: center;
+                                                color: #000000;
+                                            }
+                                            .schedule_cell_desc {
+                                                width: 100%;
+                                                line-height: 18px;
+                                                font-size: 12px;
+                                                text-align: center;
+                                                color: #000000;
+                                            }
+                                            .schedule_cell_star {
+                                                position: absolute;
+                                                top: 3px;
+                                                left: auto;
+                                                right: 3px;
+                                                height: 15px;
+                                                width: 15px;
+                                                background-color: #646464;
+                                                background-image: url(images/star.png);
+                                                background-position: 50% 50%;
+                                                background-repeat: no-repeat;
+                                                background-size: 75% 75%;
+                                                cursor: pointer;
+                                                border-radius: 2px;
+                                            }
+                                            .schedule_cell_star:hover {
+                                                background-color: #6b6b6b;
+                                            }
+                                            .schedule_cell_star:active {
+                                                background-color: #454545;
+                                            }
+                                            .schedule_cell_bin {
+                                                position: absolute;
+                                                top: 3px;
+                                                left: 3px;
+                                                right: auto;
+                                                height: 15px;
+                                                width: 15px;
+                                                background-color: #646464;
+                                                background-image: url(images/bin.png);
+                                                background-position: 50% 50%;
+                                                background-repeat: no-repeat;
+                                                background-size: 60% 60%;
+                                                cursor: pointer;
+                                                border-radius: 2px;
+                                            }
+                                            .schedule_cell_bin:hover {
+                                                background-color: #6b6b6b;
+                                            }
+                                            .schedule_cell_bin:active {
+                                                background-color: #454545;
+                                            }
+                                            .schedule_cell_bin_cc {
+                                                position: absolute;
+                                                top: 3px;
+                                                left: 3px;
+                                                right: auto;
+                                                height: 15px;
+                                                width: 15px;
+                                                background-color: #646464;
+                                                background-image: url(images/bin.png);
+                                                background-position: 50% 50%;
+                                                background-repeat: no-repeat;
+                                                background-size: 60% 60%;
+                                                cursor: pointer;
+                                                border-radius: 2px;
+                                            }
+                                            .schedule_cell_bin_cc:hover {
+                                                background-color: #6b6b6b;
+                                            }
+                                            .schedule_cell_bin_cc:active {
+                                                background-color: #454545;
+                                            }
+
+            .secs_info {
+                width: calc(100% - 20px);
+                height: 100%;
                 padding: 10px;
-                margin: 0 auto;
-                padding-top: 20px;
                 background-color: #ffffff;
             }
-                .schedule_header {
-                    height: 42px;
-                    width: calc(100% - 4px);
-                    border: 2px #000000 solid;
-                    background-color: #040D1F;
+                .sec_half {
+                    float: left;
+                    width: calc(50% - 40px);
+                    padding: 5px 20px;
+                    padding-bottom: 5px;
                 }
-                    .schedule_header_cell_week {
-                        float: left;
-                        width: 30px;
-                        height: 40px;
-                        background-color: #040D1F;
-                        border: 1px #000000 solid;
-                        border-right: 0;
+                    .title {
+                        width: 100%;
+                        line-height: 40px;
+                        color: #051221;
+                        font-size: 30px;
+                        border-bottom: 2px #040D1F solid;
                     }
-                    .schedule_header_cell {
-                        float: left;
-                        width: calc(((100% - 31px - 16px) / 14) - 4px);
-                        line-height: 20px;
-                        padding: 0 2px;
-                        background-color: #040D1F;
-                        color: #ffffff;
-                        text-align: center;
-                        border: 1px #000000 solid;
-                        border-left: 0;
-                        border-right: 0;
+                    .bubble {
+                        width: calc(100% - 20px - 16px);
+                        max-width: 800px;
+                        padding: 8px;
+                        margin: 10px;
+                        font-size: 18px;
+                        background-color: rgb(255, 231, 145);
+                        border-radius: 8px;
                     }
-                    .schedule_header_cell_divider {
-                        float: left;
-                        width: 1px;
-                        height: 42px;
-                        background-color: #000000;
+                    .bubble_red {
+                        color: rgb(143, 25, 25);
+                        background-color: rgb(255, 176, 169);
                     }
-
-                .schedule_row {
-                    width: calc(100% - 4px);
-                    border: 2px #000000 solid;
-                    border-top: 0;
-                }
-                    .schedule_row_header {
-                        float: left;
-                        width: 30px;
-                        line-height: 72px;
-                        background-color: #040D1F;
-                        color: #ffffff;
-                        text-align: center;
-                        border: 1px #000000 solid;
-                        border-bottom: 0;
-                        border-top: 0;
+                    .bubble_clear {
+                        background-color: transparent;
                     }
-                    .schedule_row_layers {
-                        float: left;
-                        width: calc(100% - 32px);
-                    }
-                        .schedule_row_layer {
-                            position: relative;
-                            height: 66px;
-                            padding: 3px;
-                        }
-                            .schedule_cell {
-                                position: absolute;
-                                top: 3px;
-                                height: 60px;
-                                border: 3px #000000 dashed;
-                                border-radius: 3px;
-                            }
-                            .schedule_cell_week_odd {
-                                border-color: #335AFF;
-                            }
-                            .schedule_cell_week_even {
-                                border-color: #DB1200;
-                            }
-                            .schedule_cell_type_p {
-                                background-color: #03b300;
-                            }
-                            .schedule_cell_type_d {
-                                background-color: #15A2DB;
-                            }
-                            .schedule_cell_type_c {
-                                background-color: #DBB21F;
-                            }
-                            .schedule_cell_type_c_n {
-                                background-color: #F5EBC9;
-                            }
-                            .schedule_cell_selected {
-                                border-style: solid;
-                            }
-                            .schedule_cell_deleted {
-                                opacity: 0.3;
-                            }
-                                .schedule_cell a {
-                                    text-decoration: none;
-                                    color: #000000;
-                                }
-                                .schedule_cell_name {
-                                    width: 100%;
-                                    line-height: 24px;
-                                    font-size: 20px;
-                                    text-align: center;
-                                    color: #000000;
-                                }
-                                .schedule_cell_rooms {
-                                    width: 100%;
-                                    line-height: 18px;
-                                    font-size: 12px;
-                                    text-align: center;
-                                    color: #000000;
-                                }
-                                .schedule_cell_desc {
-                                    width: 100%;
-                                    line-height: 18px;
-                                    font-size: 12px;
-                                    text-align: center;
-                                    color: #000000;
-                                }
-                                .schedule_cell_star {
-                                    position: absolute;
-                                    top: 3px;
-                                    left: auto;
-                                    right: 3px;
-                                    height: 15px;
-                                    width: 15px;
-                                    background-color: #646464;
-                                    background-image: url(images/star.png);
-                                    background-position: 50% 50%;
-                                    background-repeat: no-repeat;
-                                    background-size: 75% 75%;
-                                    cursor: pointer;
-                                    border-radius: 2px;
-                                }
-                                .schedule_cell_star:hover {
-                                    background-color: #6b6b6b;
-                                }
-                                .schedule_cell_star:active {
-                                    background-color: #454545;
-                                }
-                                .schedule_cell_bin {
-                                    position: absolute;
-                                    top: 3px;
-                                    left: 3px;
-                                    right: auto;
-                                    height: 15px;
-                                    width: 15px;
-                                    background-color: #646464;
-                                    background-image: url(images/bin.png);
-                                    background-position: 50% 50%;
-                                    background-repeat: no-repeat;
-                                    background-size: 60% 60%;
-                                    cursor: pointer;
-                                    border-radius: 2px;
-                                }
-                                .schedule_cell_bin:hover {
-                                    background-color: #6b6b6b;
-                                }
-                                .schedule_cell_bin:active {
-                                    background-color: #454545;
-                                }
-                                .schedule_cell_bin_cc {
-                                    position: absolute;
-                                    top: 3px;
-                                    left: 3px;
-                                    right: auto;
-                                    height: 15px;
-                                    width: 15px;
-                                    background-color: #646464;
-                                    background-image: url(images/bin.png);
-                                    background-position: 50% 50%;
-                                    background-repeat: no-repeat;
-                                    background-size: 60% 60%;
-                                    cursor: pointer;
-                                    border-radius: 2px;
-                                }
-                                .schedule_cell_bin_cc:hover {
-                                    background-color: #6b6b6b;
-                                }
-                                .schedule_cell_bin_cc:active {
-                                    background-color: #454545;
-                                }
 
     .sch_add {
         width: calc(100% - 40px - 10px - 2px);
@@ -575,11 +597,6 @@ html, body, * {
             border-bottom-width: 2px;
         }
 
-    .info {
-        width: calc(100% - 20px);
-        padding: 10px;
-        background-color: #ffffff;
-    }
 
 .cleaner {
     clear: both;
@@ -589,12 +606,6 @@ html, body, * {
 }
 .hidden_search {
     display: none;
-}
-.secs_menu_hidden {
-    width: 100%;
-}
-.left-100 {
-    left: -100%;
 }
 .red {
     font-weight: bold;

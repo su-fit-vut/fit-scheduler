@@ -143,19 +143,19 @@ $(document).on("keyup", ".menu_opt_search_input", function() {
         });
     }
 }); //checked
-$(document).on("click", ".content_header_elem", function() {
-    $(".content_header_elem").removeClass("content_header_elem_selected");
-    $(".sec").addClass("left-100");
+$(document).on("click", ".secs_header_elem", function() {
+    $(".secs_header_elem").removeClass("secs_header_elem_selected");
+    $(".sec").addClass("sec_invisible");
 
-    $(this).addClass("content_header_elem_selected");
+    $(this).addClass("secs_header_elem_selected");
     if($(this).hasClass("ch_0")) {
-        $(".se_0").removeClass("left-100");
+        $(".se_0").removeClass("sec_invisible");
     } else if($(this).hasClass("ch_1")) {
-        $(".se_1").removeClass("left-100");
+        $(".se_1").removeClass("sec_invisible");
     } else if($(this).hasClass("ch_2")) {
-        $(".se_2").removeClass("left-100");
+        $(".se_2").removeClass("sec_invisible");
     }
-});
+}); // checked
 
 // Controls
 $(document).on("click", ".menu_submit_button", function() {
