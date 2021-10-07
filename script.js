@@ -5,11 +5,6 @@ var ranges = [];                        // Array of ranges of selected subjects
 var lessons = [];                       // Array of lessons of selected subjects
 var lessonsFin = [];                    // Array of selected lessons
 
-var scheduleCustom = [[], [], [], [], []];                                      // Pole vlastních hodin
-var scheduleIndexes = [];                                                       // Indexy vybraných hodin
-var scheduleFaded = [];                                                         // Potmavené hodiny
-
-
 ///////////////////////////////////// Main /////////////////////////////////////
 $(document).ready(function() {
     // Semester radio auto select
@@ -22,7 +17,7 @@ $(document).ready(function() {
 
     // Start menu load
     loadStudies();
-}); //checked
+}); 
 
 //////////////////////////////////// Events ////////////////////////////////////
 // Icons
@@ -32,38 +27,38 @@ $(document).on("click", ".header_info_icon", function() {
 
     $(".secs_main").addClass("hidden");
     $(".secs_info").removeClass("hidden");
-}); //checked
+}); 
 $(document).on("click", ".header_cross_icon", function() {
     $(".header_info_icon").removeClass("hidden");
     $(".header_cross_icon").addClass("hidden");
 
     $(".secs_main").removeClass("hidden");
     $(".secs_info").addClass("hidden");
-}); //checked
+}); 
 $(document).on("click", ".menu_icon", function() {
     $(".menu_icon").addClass("hidden");
 
     $(".secs").removeClass("secs_menu_hidden");
     $(".menu").removeClass("hidden");
-}); //checked
+}); 
 $(document).on("click", ".menu_cross_icon", function() {
     $(".menu_icon").removeClass("hidden");
 
     $(".secs").addClass("secs_menu_hidden");
     $(".menu").addClass("hidden");
-}); //checked
+}); 
 
 // Menu
 $(document).on("click", ".menu_sem_radio", function() {
     $(".menu_com_search_input").prop("value", ""); $(".menu_com_search_input").trigger("keyup");
     $(".menu_opt_search_input").prop("value", ""); $(".menu_opt_search_input").trigger("keyup");
     renderSubjects();
-}); //checked
+}); 
 $(document).on("click", ".menu_bit_checkbox", function() {
     $(".menu_com_search_input").prop("value", ""); $(".menu_com_search_input").trigger("keyup");
     $(".menu_opt_search_input").prop("value", ""); $(".menu_opt_search_input").trigger("keyup");
     renderSubjects();
-}); //checked
+}); 
 $(document).on("click", ".menu_mit_radio", function() {
     // Can uncheck
     if($(this).hasClass("mit_radio_checked")) {
@@ -77,18 +72,18 @@ $(document).on("click", ".menu_mit_radio", function() {
     $(".menu_com_search_input").prop("value", ""); $(".menu_com_search_input").trigger("keyup");
     $(".menu_opt_search_input").prop("value", ""); $(".menu_opt_search_input").trigger("keyup");
     renderSubjects();
-}); //checked
+}); 
 $(document).on("click", ".menu_grade_checkbox", function() {
     $(".menu_com_search_input").prop("value", ""); $(".menu_com_search_input").trigger("keyup");
     $(".menu_opt_search_input").prop("value", ""); $(".menu_opt_search_input").trigger("keyup");
     renderSubjects();
-}); //checked
+}); 
 $(document).on("click", ".menu_sub_checkbox", function() {
     renderSubjects();
-}); //checked
+}); 
 $(document).on("click", ".menu_sel_checkbox", function() {
     renderSubjects();
-}); //checked
+}); 
 $(document).on("keyup", ".menu_com_search_input", function() {
     $(".menu_com_column .menu_column_row").removeClass("hidden_search");
     if($(".menu_com_search_input").prop("value") != "") {
@@ -101,7 +96,7 @@ $(document).on("keyup", ".menu_com_search_input", function() {
             }
         });
     }
-}); //checked
+}); 
 $(document).on("keyup", ".menu_opt_search_input", function() {
     $(".menu_opt_column .menu_column_row").removeClass("hidden_search");
     if($(".menu_opt_search_input").prop("value") != "") {
@@ -114,7 +109,7 @@ $(document).on("keyup", ".menu_opt_search_input", function() {
             }
         });
     }
-}); //checked
+}); 
 $(document).on("click", ".secs_header_elem", function() {
     $(".secs_header_elem").removeClass("secs_header_elem_selected");
     $(".sec").addClass("sec_invisible");
@@ -127,7 +122,7 @@ $(document).on("click", ".secs_header_elem", function() {
     } else if($(this).hasClass("ch_2")) {
         $(".se_2").removeClass("sec_invisible");
     }
-}); //checked
+}); 
 
 // Controls
 $(document).on("click", ".menu_submit_button", function() {
@@ -147,7 +142,7 @@ $(document).on("click", ".menu_submit_button", function() {
 
     // Start loading lessons
     loadLessons();
-}); //checked
+}); 
 $(document).on("click", ".menu_save_button", function() {
     save();
 });
@@ -160,14 +155,42 @@ $(document).on("change", ".sch_load", function() {
 
 // Schedule
 $(document).on("click", ".schedule_cell_star", function() {
-    if($(this).parent().css("border-left-style") === "solid") {
-        $(this).parent().css("border-style", "dashed");
-        scheduleIndexes = arrayRemove(scheduleIndexes, $(this).siblings(".day").html() + "|" +  $(this).siblings(".id").html());
+    // Update
+    if($(this).parent().hasClass("schedule_cell_selected")) {
+        lessonsFin = lessonsFin.filter(x => x.id !== $(this).siblings(".id").html());
     } else {
-        $(this).parent().css("border-style", "solid");
-        scheduleIndexes.push($(this).siblings(".day").html() + "|" + $(this).siblings(".id").html());
+        lessonsFin.push(lessons.find(x => x.id === $(this).siblings(".id").html()));
     }
-    parseFinSchedule();
+
+    // Sort
+    lessonsFin.sort(function(a, b) {
+        if(a.name < b.name) {
+            return -1;
+        } else if(a.name > b.name) {
+            return 1;
+        }
+        return 0;
+    });
+    lessonsFin.sort(function(a, b) {
+        if(a.type === "blue" && b.type !== "blue") {
+            return -1;
+        } else if(a.type !== "blue" && b.type === "blue") {
+            return 1;
+        }
+        return 0;
+    });
+    lessonsFin.sort(function(a, b) {
+        if(a.type === "green" && b.type !== "green") {
+            return -1;
+        } else if(a.type !== "green" && b.type === "green") {
+            return 1;
+        }
+
+        return 0;
+    });
+
+    // Render
+    renderAll();
 });
 $(document).on("click", ".schedule_cell_bin", function() {
     if($(this).parent().hasClass("schedule_cell_deleted")) {
@@ -276,7 +299,7 @@ function loadStudies(e) {
             $(".loading_message").html("Chyba při načítání studií...");  
         }
     });
-} //checked
+} 
 function loadSubjects(e) {
     // Parse
     $.each(studies, function(i, stud) {
@@ -380,7 +403,7 @@ function loadSubjects(e) {
 
     // Render
     renderSubjects();
-} //checked
+} 
 function renderSubjects() {
     // Grades render
     if($(".menu_bit_checkbox:checked").length > 0) {
@@ -454,7 +477,7 @@ function renderSubjects() {
                                             </div>`);
         }
     });
-} //checked
+} 
 
 /////////////////////////////////// Schledule //////////////////////////////////
 function loadLessons() {
@@ -522,6 +545,24 @@ function loadLessons() {
                         $.each($(tr).children("td").eq(2).children("a"), function(p, a) {
                             lesson.rooms.push($(a).html());
                         });
+                        if(lesson.rooms.includes("E112") && lesson.rooms.includes("E104") && lesson.rooms.includes("E105")) {
+                            lesson.rooms = ["E112+4,5"];
+                        }
+                        if(lesson.rooms.includes("E112") && lesson.rooms.includes("E104")) {
+                            lesson.rooms = ["E112+4"];
+                        }
+                        if(lesson.rooms.includes("E112") && lesson.rooms.includes("E105")) {
+                            lesson.rooms = ["E112+5"];
+                        }
+                        if(lesson.rooms.includes("D105") && lesson.rooms.includes("D0206") && lesson.rooms.includes("D0207")) {
+                            lesson.rooms = ["D105+6,7"];
+                        }
+                        if(lesson.rooms.includes("D105") && lesson.rooms.includes("D0206")) {
+                            lesson.rooms = ["D105+6"];
+                        }
+                        if(lesson.rooms.includes("D105") && lesson.rooms.includes("D0207")) {
+                            lesson.rooms = ["D105+7"];
+                        }
 
                         // ID
                         lesson.id = "LOAD_" + makeHash(lesson.name + ";" + lesson.from + ";" + lesson.to + ";" + lesson.type + ";" + lesson.week + ";" + lesson.day);
@@ -535,6 +576,23 @@ function loadLessons() {
     });
 
     // Sort
+    lessons.sort(function(a, b) {
+        if(a.name < b.name) {
+            return -1;
+        } else if(a.name > b.name) {
+            return 1;
+        }
+        return 0;
+    });
+    lessons.sort(function(a, b) {
+        if(a.type === "blue" && b.type !== "blue") {
+            return -1;
+        } else if(a.type !== "blue" && b.type === "blue") {
+            return 1;
+        }
+
+        return 0;
+    });
     lessons.sort(function(a, b) {
         if(a.type === "green" && b.type !== "green") {
             return -1;
@@ -627,13 +685,13 @@ function loadLessons() {
 
     // Parse schedule
     renderAll();
-} //checked
+} 
 
 function renderAll() {
     renderRanges();
     renderSchedule();
     renderScheduleFin();
-} //checked
+} 
 function renderRanges() {
     $(".ranges").html("");
     $.each(ranges, function(i, rang) {
@@ -729,7 +787,7 @@ function renderRanges() {
                                     <div class="cleaner"></div>
                                 </div>`);
     })
-} //checked
+} 
 function renderSchedule() {
     // Push lessons
     var schedule = [[], [], [], [], []];
@@ -773,7 +831,7 @@ function renderSchedule() {
         for(k = 0; k < scheduleLayersCount[d]; k++) {
             $(".schedule_all").find(".schedule_row").eq(d).children(".schedule_row_layers").append(`<div class="schedule_row_layer"></div>`);
         }
-        $(".schedule_all").find(".schedule_row").eq(d).children(".schedule_row_header").css("line-height", (scheduleLayersCount[d] * 72) + "px");
+        $(".schedule_all").find(".schedule_row").eq(d).children(".schedule_row_header").css("line-height", (scheduleLayersCount[d] * 72 + 6) + "px");
     }
 
     // Generation of cells
@@ -786,184 +844,126 @@ function renderSchedule() {
             var left = (les.from * (fullLength / 14)) + 3;
             
             var bin = "schedule_cell_bin";
-            if(sch.type === "cc") {
+            if(les.type === "cc") {
                 bin = "schedule_cell_bin_cc"
             }
             
             var classes = "";
-            if(sch.type === "green") {
+            if(les.type === "green") {
                 classes += "schedule_cell_type_green ";
-            } else if(sch.type === "blue") {
+            } else if(les.type === "blue") {
                 classes += "schedule_cell_type_blue ";
-            } else if(sch.type === "yellow") {
+            } else if(les.type === "yellow") {
                 classes += "schedule_cell_type_yellow ";
             }
-            if(sch.week.incudes("lichý")) {
+            if(les.week.includes("lichý")) {
                 classes += "schedule_cell_week_odd ";
-            } else if(sch.week.includes("sudý")) {
+            } else if(les.week.includes("sudý")) {
                 classes += "schedule_cell_week_even ";
+            }
+            if(lessonsFin.includes(les)) {
+                classes += "schedule_cell_selected ";
             }
             
             var rooms = "";
-            $.each(sch.rooms, function(i, room) {
+            $.each(les.rooms, function(i, room) {
                 rooms += room + " ";
             });
 
             $(layersDiv).children(".schedule_row_layer").eq(les.layer - 1).append(` <div class="schedule_cell ` + classes + `" style="left: ` + left + `px; width: ` + length + `px">
-                                                                                        <div class="schedule_cell_name"><a target="_blank" href="https://www.fit.vut.cz/study/course/` + sch.link + `">` + sch.name + `</a></div>
+                                                                                        <div class="schedule_cell_name"><a target="_blank" href="https://www.fit.vut.cz/study/course/` + les.link + `">` + les.name + `</a></div>
                                                                                         <div class="schedule_cell_rooms">` + rooms + `</div>
-                                                                                        <div class="schedule_cell_desc">` + sch.week + `</div>
+                                                                                        <div class="schedule_cell_desc">` + les.week + `</div>
                                                                                         <div class="schedule_cell_star"></div>
                                                                                         <div class="` + bin + `"></div>
                                                                                         <div class="id hidden">` + les.id + `</div>
-                                                                                        <div class="day hidden">` + d + `</div>
                                                                                     </div>`);
         });
     }
 }
 function renderScheduleFin() {
-    var scheduleFin = [[], [], [], [], []];
-    var scheduleFinLayersCount = [0, 0, 0, 0, 0];
-
-    var scheduleToRemove = [];
-    $.each(scheduleIndexes, function(i, index) {
-        var found = false;
-        var day = +index.split("|")[0];
-        var id = index.split("|")[1];
-
-        $.each(schedule[day], function(i, sch) {
-            if(sch.id.toString() === id.toString()) {
-                found = true;
-                scheduleFin[day].push(sch);
-                $(".id:contains(" + id +")").parent().css("border-style", "solid");
-
-                return false;
-            }
-        });
-        if(!found) {
-            scheduleToRemove.push(index);
-        }
-    });
-    $.each(scheduleToRemove, function(i, index) {
-        scheduleIndexes = arrayRemove(scheduleIndexes, index);
-    });
-
-    scheduleToRemove = [];
-    $.each(scheduleFaded, function(i, index) {
-        var found = false;
-        var day = +index.split("|")[0];
-        var id = index.split("|")[1];
-
-        $.each(schedule[day], function(i, sch) {
-            if(sch.id.toString() === id.toString()) {
-                found = true;
-                $(".id:contains(" + id +")").parent().addClass("schedule_cell_deleted");
-
-                return false;
-            }
-        });
-        if(!found) {
-            scheduleToRemove.push(index);
-        }
-    });
-    $.each(scheduleToRemove, function(i, index) {
-        scheduleFaded = arrayRemove(scheduleFaded, index);
-    });
-
-    // vrstvy
-    for(d = 0; d < 5; d++) {
-        $.each(scheduleFin[d], function(i, sch) {
-            sch.layer = -1;
-            var layer = 1;
-            var noCollison = false;
-
-            while(noCollison === false) {
-                noCollison = true;
-                $.each(scheduleFin[d], function(p, schX) {
-                    if(schX.layer === layer) {
-                        if(areIntervalsColide(sch.from, sch.to, schX.from, schX.to)) {
-                            noCollison = false;
-                            layer++;
-                            return false;
-                        }
+    // Push lessons
+    var schedule = [[], [], [], [], []];
+    $.each(lessonsFin, function(i, les) {
+        // Collisions
+        les.layer = 1;
+        do {
+            var collison = false;
+            $.each(schedule[les.day], function(o, lesX) {
+                if(lesX.layer === les.layer) {
+                    if(areIntervalsColide(les.from, les.to, lesX.from, lesX.to)) {
+                        collison = true;
+                        les.layer++;
+                        return false;
                     }
-                });
-            }
-            sch.layer = layer;
-        });
-    }
+                }
+            });
+        } while(collison === true);
 
-    // počet vrstev
+        // Push
+        schedule[les.day].push(les);
+    });
+
+    // Layers count
+    var scheduleLayersCount = [1, 1, 1, 1, 1];
     for(d = 0; d < 5; d++) {
-        var maxLayer = 0;
-
-        $.each(scheduleFin[d], function(i, sch) {
-            if(sch.layer > maxLayer) {
-                maxLayer = sch.layer;
+        var maxLayer = 1;
+        $.each(schedule[d], function(o, les) {
+            if(les.layer > maxLayer) {
+                maxLayer = les.layer;
             }
         });
-
-        scheduleFinLayersCount[d] = maxLayer;
+        scheduleLayersCount[d] = maxLayer
     }
 
-
+    // Prepare schedule rows
     for(d = 0; d < 5; d++) {
         $(".schedule_fin").find(".schedule_row").eq(d).children(".schedule_row_layers").html("");
     }
     for(d = 0; d < 5; d++) {
-        for(k = 0; k < scheduleFinLayersCount[d]; k++) {
+        for(k = 0; k < scheduleLayersCount[d]; k++) {
             $(".schedule_fin").find(".schedule_row").eq(d).children(".schedule_row_layers").append(`<div class="schedule_row_layer"></div>`);
         }
-        if(scheduleFinLayersCount[d] != 0) {
-            $(".schedule_fin").find(".schedule_row").eq(d).children(".schedule_row_header").css("line-height", (scheduleFinLayersCount[d] * 72) + "px");
-        } else {
-            $(".schedule_fin").find(".schedule_row").eq(d).children(".schedule_row_header").css("line-height", "72px");
-        }
+        $(".schedule_fin").find(".schedule_row").eq(d).children(".schedule_row_header").css("line-height", (scheduleLayersCount[d] * 72 + 6) + "px");
     }
 
+    // Generation of cells
     for(d = 0; d < 5; d++) {
         var layersDiv = $(".schedule_fin").find(".schedule_row").eq(d).children(".schedule_row_layers");
         var fullLength = +$(layersDiv).width();
 
-        $.each(scheduleFin[d], function(k, sch) {
-            var length = ((sch.to - sch.from) * (fullLength / 14)) - 6 - 6;
-            var left = (sch.from * (fullLength / 14)) + 3;
-            var layer = sch.layer;
-            var classes = "";
-            var rooms = "";
-            var groups = "";
-
-            if(sch.type === "p") {
-                classes += "schedule_cell_type_p ";
-            } else if(sch.type === "c" || sch.type === "cc") {
-                classes += "schedule_cell_type_c ";
-            } else if(sch.type === "d") {
-                classes += "schedule_cell_type_d ";
+        $.each(schedule[d], function(i, les) {
+            var length = ((les.to - les.from) * (fullLength / 14)) - 6 - 6;
+            var left = (les.from * (fullLength / 14)) + 3;
+            
+            var bin = "schedule_cell_bin";
+            if(les.type === "cc") {
+                bin = "schedule_cell_bin_cc"
             }
-
-            if(sch.week === "lichý") {
+            
+            var classes = "";
+            if(les.type === "green") {
+                classes += "schedule_cell_type_green ";
+            } else if(les.type === "blue") {
+                classes += "schedule_cell_type_blue ";
+            } else if(les.type === "yellow") {
+                classes += "schedule_cell_type_yellow ";
+            }
+            if(les.week.includes("lichý")) {
                 classes += "schedule_cell_week_odd ";
-            } else if(sch.week === "sudý") {
+            } else if(les.week.includes("sudý")) {
                 classes += "schedule_cell_week_even ";
             }
-
-            $.each(sch.rooms, function(i, room) {
+            
+            var rooms = "";
+            $.each(les.rooms, function(i, room) {
                 rooms += room + " ";
             });
-            $.each(sch.groups, function(i, group) {
-                if(group[3] === "A") {
-                    groups += "<span class='red'>" + group + "</span> ";
-                } else if(group[3] === "B") {
-                    groups += "<span class='blue'>" + group + "</span> ";
-                } else {
-                    groups += group + " ";
-                }
-            });
 
-            $(layersDiv).children(".schedule_row_layer").eq(layer - 1).append(`<div class="schedule_cell schedule_cell_selected ` + classes + `" style="left: ` + left + `px; width: ` + length + `px">
-                                                                                    <div class="schedule_cell_name">` + sch.name + `</div>
+            $(layersDiv).children(".schedule_row_layer").eq(les.layer - 1).append(`<div class="schedule_cell schedule_cell_selected ` + classes + `" style="left: ` + left + `px; width: ` + length + `px">
+                                                                                    <div class="schedule_cell_name">` + les.name + `</div>
                                                                                     <div class="schedule_cell_rooms">` + rooms + `</div>
-                                                                                    <div class="schedule_cell_desc">` + groups + `</div>
+                                                                                    <div class="schedule_cell_desc">` + les.week + `</div>
                                                                                </div>`)
         });
     }
@@ -1149,7 +1149,7 @@ function parseLinkforLoadPHP(link) {
     var linkArray = link.split("/");
     linkArray.pop("");
     return linkArray[linkArray.length - 2] + "-" + linkArray[linkArray.length - 1];
-} //checked
+} 
 function parseDay(day) {
     if(day === "Po") {
         return 0;
@@ -1162,21 +1162,21 @@ function parseDay(day) {
     } else if(day === "Pá") {
         return 4;
     }
-} //checked
+} 
 function parseWeek(week) {
     week = week.replace("výuky", "");
     week = week.replaceAll(",", "");
     week = week.trim();
     return week;
-} //checked
+} 
 function parseTimeFrom(time) {
     var hours = +time.split(":")[0];
     return hours - 7;
-} //checked
+} 
 function parseTimeTo(time) {
     var hours = +time.split(":")[0] + 1;
     return hours - 7;
-} //checked
+} 
 function areIntervalsColide(a, b, x, y) {
     a *= 10;
     b *= 10;
@@ -1191,7 +1191,7 @@ function areIntervalsColide(a, b, x, y) {
         }
     }
     return false;
-} //checked
+} 
 function arrayRemove(array, value) {
     return array.filter(function(element) {
         return element != value;
@@ -1225,4 +1225,4 @@ function makeHash(string) {
         hash = Math.abs(hash);
     }
     return hash.toString();
-}; //checked
+}; 
