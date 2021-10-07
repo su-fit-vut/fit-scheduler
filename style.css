@@ -366,28 +366,41 @@ html, body, * {
                                 height: 42px;
                                 width: calc(100% - 4px);
                                 border: 2px #000000 solid;
-                                background-color: #040D1F;
+                                background-color: #132448;
                             }
                                 .schedule_header_cell_week {
                                     float: left;
                                     width: 30px;
                                     height: 40px;
-                                    background-color: #040D1F;
+                                    background-color: #132448;
                                     border: 1px #000000 solid;
                                     border-right: 0;
                                 }
                                 .schedule_header_cell {
                                     float: left;
                                     width: calc(((100% - 31px - 16px) / 14) - 4px);
-                                    line-height: 20px;
+                                    height: 40px;
                                     padding: 0 2px;
-                                    background-color: #040D1F;
-                                    color: #ffffff;
-                                    text-align: center;
+                                    background-color: #132448;
                                     border: 1px #000000 solid;
                                     border-left: 0;
                                     border-right: 0;
                                 }
+                                    .schedule_header_cell_top {
+                                        width: cal(100% - 5px);
+                                        padding-left: 5px;
+                                        line-height: 20px;
+                                        color: #ffffff;
+                                        text-align: left;
+                                    }
+                                    .schedule_header_cell_bottom {
+                                        width: calc(100% - 5px);
+                                        padding-right: 5px;
+                                        line-height: 20px;
+                                        color: #ffffff;
+                                        text-align: right;
+                                    }
+
                                 .schedule_header_cell_divider {
                                     float: left;
                                     width: 1px;
@@ -404,7 +417,7 @@ html, body, * {
                                     float: left;
                                     width: 30px;
                                     line-height: 72px;
-                                    background-color: #040D1F;
+                                    background-color: #132448;
                                     color: #ffffff;
                                     text-align: center;
                                     border: 1px #000000 solid;
@@ -433,17 +446,14 @@ html, body, * {
                                         .schedule_cell_week_even {
                                             border-color: #DB1200;
                                         }
-                                        .schedule_cell_type_p {
+                                        .schedule_cell_type_green {
                                             background-color: #03b300;
                                         }
-                                        .schedule_cell_type_d {
+                                        .schedule_cell_type_blue {
                                             background-color: #15A2DB;
                                         }
-                                        .schedule_cell_type_c {
+                                        .schedule_cell_type_yellow {
                                             background-color: #DBB21F;
-                                        }
-                                        .schedule_cell_type_c_n {
-                                            background-color: #F5EBC9;
                                         }
                                         .schedule_cell_selected {
                                             border-style: solid;

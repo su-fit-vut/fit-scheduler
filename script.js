@@ -1,9 +1,9 @@
 /////////////////////////////////// Variables //////////////////////////////////
-var studies = [];                       // Array of loaded studies with subjects
-var subjects = [];                      // Array of loaded selected subjects
+var studies = [];                       // Array of loaded studies
+var subjects = [];                      // Array of selected subjects
 var ranges = [];                        // Array of ranges of selected subjects
-var lessons = [];                       // Array of lessons
-var lessonsFin = [];                    // Array of final lessons
+var lessons = [];                       // Array of lessons of selected subjects
+var lessonsFin = [];                    // Array of selected lessons
 
 var scheduleCustom = [[], [], [], [], []];                                      // Pole vlastních hodin
 var scheduleIndexes = [];                                                       // Indexy vybraných hodin
@@ -781,44 +781,43 @@ function renderSchedule() {
         var layersDiv = $(".schedule_all").find(".schedule_row").eq(d).children(".schedule_row_layers");
         var fullLength = +$(layersDiv).width();
 
-        $.each(schedule[d], function(i, sch) {
-            var id = sch.id;
+        $.each(schedule[d], function(i, les) {
+            var length = ((les.to - les.from) * (fullLength / 14)) - 6 - 6;
+            var left = (les.from * (fullLength / 14)) + 3;
+            
             var bin = "schedule_cell_bin";
-            var length = ((sch.to - sch.from) * (fullLength / 14)) - 6 - 6;
-            var left = (sch.from * (fullLength / 14)) + 3;
-            var layer = sch.layer;
-            var classes = "";
-            var rooms = "";
-
             if(sch.type === "cc") {
                 bin = "schedule_cell_bin_cc"
             }
-
+            
+            var classes = "";
             if(sch.type === "green") {
-                classes += "schedule_cell_type_p ";
+                classes += "schedule_cell_type_green ";
             } else if(sch.type === "blue") {
-                classes += "schedule_cell_type_d ";
+                classes += "schedule_cell_type_blue ";
+            } else if(sch.type === "yellow") {
+                classes += "schedule_cell_type_yellow ";
             }
-
-            if(sch.week === "lichý") {
+            if(sch.week.incudes("lichý")) {
                 classes += "schedule_cell_week_odd ";
-            } else if(sch.week === "sudý") {
+            } else if(sch.week.includes("sudý")) {
                 classes += "schedule_cell_week_even ";
             }
-
+            
+            var rooms = "";
             $.each(sch.rooms, function(i, room) {
                 rooms += room + " ";
             });
 
-            $(layersDiv).children(".schedule_row_layer").eq(layer - 1).append(` <div class="schedule_cell ` + classes + `" style="left: ` + left + `px; width: ` + length + `px">
-                                                                                    <div class="schedule_cell_name"><a target="_blank" href="https://www.fit.vut.cz/study/course/` + sch.link + `">` + sch.name + `</a></div>
-                                                                                    <div class="schedule_cell_rooms">` + rooms + `</div>
-                                                                                    <div class="schedule_cell_desc">` + sch.week + `</div>
-                                                                                    <div class="schedule_cell_star"></div>
-                                                                                    <div class="` + bin + `"></div>
-                                                                                    <div class="id hidden">` + id + `</div>
-                                                                                    <div class="day hidden">` + d + `</div>
-                                                                                </div>`)
+            $(layersDiv).children(".schedule_row_layer").eq(les.layer - 1).append(` <div class="schedule_cell ` + classes + `" style="left: ` + left + `px; width: ` + length + `px">
+                                                                                        <div class="schedule_cell_name"><a target="_blank" href="https://www.fit.vut.cz/study/course/` + sch.link + `">` + sch.name + `</a></div>
+                                                                                        <div class="schedule_cell_rooms">` + rooms + `</div>
+                                                                                        <div class="schedule_cell_desc">` + sch.week + `</div>
+                                                                                        <div class="schedule_cell_star"></div>
+                                                                                        <div class="` + bin + `"></div>
+                                                                                        <div class="id hidden">` + les.id + `</div>
+                                                                                        <div class="day hidden">` + d + `</div>
+                                                                                    </div>`);
         });
     }
 }
