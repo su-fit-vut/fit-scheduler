@@ -1,42 +1,13 @@
-var newPlanYear = 2019;                                                         // První rok nového plánu
-
-var actWorkingSubjectIndex = 0;                                                 // Aktuálně parsovaný předmět
-var subjectsAll = [[[[], []],[[], []],[[], []]],[[[], []],[[], []],[[], []]]];  // List předmětů
-var subjectsWorking = [];                                                       // Vybrané předměty
-
-var schedule = [[], [], [], [], []];                                         // Pole pracovního rozvrhu
-var scheduleFin = [[], [], [], [], []];                                         // Pole výsledného rozvrhu
-var scheduleLayersCount = [0, 0, 0, 0, 0];                                   // Počet vrstev v pracovním rozvrhu
-var scheduleFinLayersCount = [0, 0, 0, 0, 0];                                   // POčet vrstev ve výsledném rozvrhu
+/////////////////////////////////// Variables //////////////////////////////////
+var studies = [];                       // Array of loaded studies with subjects
+var subjects = [];                      // Array of loaded selected subjects
+var ranges = [];                        // Array of ranges of selected subjects
+var lessons = [];                       // Array of lessons
+var lessonsFin = [];                    // Array of final lessons
 
 var scheduleCustom = [[], [], [], [], []];                                      // Pole vlastních hodin
 var scheduleIndexes = [];                                                       // Indexy vybraných hodin
 var scheduleFaded = [];                                                         // Potmavené hodiny
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/////////////////////////////////// Variables //////////////////////////////////
-var studies = [];                    // Array of loaded studies with subjects
-var subjects = [];                   // Array of selected subjects
-var lessons = [];                    // Array of lessons of selected subjects
-var ranges = [];                     // Array of ranges of selected subjects
-var schedule = [[], [], [], [], []]; // Array of schledule days
-var scheduleFin = [];                // Array of final schedule lessons
 
 
 ///////////////////////////////////// Main /////////////////////////////////////
@@ -176,7 +147,7 @@ $(document).on("click", ".menu_submit_button", function() {
 
     // Start loading lessons
     loadLessons();
-}); // checked
+}); //checked
 $(document).on("click", ".menu_save_button", function() {
     save();
 });
@@ -237,6 +208,7 @@ function loadStudies(e) {
     $(".loading_message").html("Načítám studia...");
 
     // AJAX
+    studies = [];
     $.ajax({
         url: "./load.php",
         method: "POST",
@@ -280,6 +252,7 @@ function loadStudies(e) {
             });
 
             // Generate
+            $(".menu_stud_column").html("");
             $.each(studies, function(i, stud) {
                 if(stud.name === "BIT") {
                     $(".menu_stud_column").append(` <div class="menu_column_row">
@@ -298,10 +271,12 @@ function loadStudies(e) {
 
             // Start load subjects
             loadSubjects();
+        },
+        error: function() {
+            $(".loading_message").html("Chyba při načítání studií...");  
         }
     });
 } //checked
-
 function loadSubjects(e) {
     // Parse
     $.each(studies, function(i, stud) {
@@ -309,6 +284,8 @@ function loadSubjects(e) {
         $(".loading_message").html("Načítám předměty studia " + stud.name + "...");
 
         // AJAX
+        stud.subjects.com = [[],[],[]];
+        stud.subjects.opt = [[],[],[]];
         $.ajax({
             url: "./load.php",
             method: "POST",
@@ -479,6 +456,7 @@ function renderSubjects() {
     });
 } //checked
 
+/////////////////////////////////// Schledule //////////////////////////////////
 function loadLessons() {
     // Load selected
     subjects = [];
@@ -490,9 +468,8 @@ function loadLessons() {
         });
     });
 
-    // Parse
+    // Parse lessons
     lessons = [];
-    ranges = [];
     $.each(subjects, function(i, sub) {
         // Title
         $(".loading_message").html("Načítám " + sub.name + "...");
@@ -547,7 +524,7 @@ function loadLessons() {
                         });
 
                         // ID
-                        lesson.id = "LOAD_" + makeHash(lesson.name + ";" + lesson.from + ";" + lesson.to + ";" + lesson.rooms + ";" + lesson.type + ";" + lesson.week + ";" + lesson.day);
+                        lesson.id = "LOAD_" + makeHash(lesson.name + ";" + lesson.from + ";" + lesson.to + ";" + lesson.type + ";" + lesson.week + ";" + lesson.day);
 
                         // Push
                         lessons.push(lesson);
@@ -568,24 +545,8 @@ function loadLessons() {
         return 0;
     });
 
-    // Done
-    $(".menu_column_row_checkbox").prop("disabled", false);
-    $(".menu_column_row_radio").prop("disabled", false);
-    $(".menu_submit_button").prop("disabled", false);
-    $(".menu_submit_button").removeClass("menu_button_disabled");
-
-    $(".loading_message").html("");
-    $(".loading_message").addClass("hidden");
-    $(".secs").removeClass("hidden");
-
-    // Parse schedule
-    parseRanges();
-    parseSchedule();
-    parseFinSchedule();
-} //checked
-
-////////////////////////////////// Schledules //////////////////////////////////
-function parseRanges() {
+    // Parse ranges
+    ranges = [];
     $.each(subjects, function(i, sub) {
         // Split ranges
         var rangeRaw = sub.range;
@@ -654,9 +615,26 @@ function parseRanges() {
         ranges.push(range);
     });
 
-    showRanges();
-}
-function showRanges() {
+    // Done
+    $(".menu_column_row_checkbox").prop("disabled", false);
+    $(".menu_column_row_radio").prop("disabled", false);
+    $(".menu_submit_button").prop("disabled", false);
+    $(".menu_submit_button").removeClass("menu_button_disabled");
+
+    $(".loading_message").html("");
+    $(".loading_message").addClass("hidden");
+    $(".secs").removeClass("hidden");
+
+    // Parse schedule
+    renderAll();
+} //checked
+
+function renderAll() {
+    renderRanges();
+    renderSchedule();
+    renderScheduleFin();
+} //checked
+function renderRanges() {
     $(".ranges").html("");
     $.each(ranges, function(i, rang) {
         var greenOK = false;
@@ -666,21 +644,21 @@ function showRanges() {
 
         // Check selected
         sumValue = 0;
-        $.each(scheduleFin.filter(x => x.name == rang.name && x.type == "green"), function(o, les) {
+        $.each(lessonsFin.filter(x => x.name == rang.name && x.type == "green"), function(o, les) {
             sumValue += les.to - les.from;
         });
         if(sumValue === rang.greenLength) {
             greenOK = true;
         }
         sumValue = 0;
-        $.each(scheduleFin.filter(x => x.name == rang.name && x.type == "blue"), function(o, les) {
+        $.each(lessonsFin.filter(x => x.name == rang.name && x.type == "blue"), function(o, les) {
             sumValue += les.to - les.from;
         });
         if(sumValue === rang.blueLength) {
             blueOK = true;
         }
         sumValue = 0;
-        $.each(scheduleFin.filter(x => x.name == rang.name && x.type == "yellow"), function(o, les) {
+        $.each(lessonsFin.filter(x => x.name == rang.name && x.type == "yellow"), function(o, les) {
             sumValue += les.to - les.from;
         });
         if(sumValue === rang.yellowLength) {
@@ -751,12 +729,13 @@ function showRanges() {
                                     <div class="cleaner"></div>
                                 </div>`);
     })
-}
-function parseSchedule() {
+} //checked
+function renderSchedule() {
     // Push lessons
-    schedule = [[], [], [], [], []];
+    var schedule = [[], [], [], [], []];
     $.each(lessons, function(i, les) {
         // Collisions
+        les.layer = 1;
         do {
             var collison = false;
             $.each(schedule[les.day], function(o, lesX) {
@@ -774,15 +753,11 @@ function parseSchedule() {
         schedule[les.day].push(les);
     });
 
-    // Render
-    showSchedule();
-}
-function showSchedule() {
     // Layers count
-    scheduleLayersCount = [0, 0, 0, 0, 0];
+    var scheduleLayersCount = [1, 1, 1, 1, 1];
     for(d = 0; d < 5; d++) {
-        var maxLayer = 0;
-        $.each(schedule[d], function(i, les) {
+        var maxLayer = 1;
+        $.each(schedule[d], function(o, les) {
             if(les.layer > maxLayer) {
                 maxLayer = les.layer;
             }
@@ -790,8 +765,7 @@ function showSchedule() {
         scheduleLayersCount[d] = maxLayer
     }
 
-
-    // Připravení rozvrhu
+    // Prepare schedule rows
     for(d = 0; d < 5; d++) {
         $(".schedule_all").find(".schedule_row").eq(d).children(".schedule_row_layers").html("");
     }
@@ -799,14 +773,10 @@ function showSchedule() {
         for(k = 0; k < scheduleLayersCount[d]; k++) {
             $(".schedule_all").find(".schedule_row").eq(d).children(".schedule_row_layers").append(`<div class="schedule_row_layer"></div>`);
         }
-        if(scheduleLayersCount[d] != 0) {
-            $(".schedule_all").find(".schedule_row").eq(d).children(".schedule_row_header").css("line-height", (scheduleLayersCount[d] * 72) + "px");
-        } else {
-            $(".schedule_all").find(".schedule_row").eq(d).children(".schedule_row_header").css("line-height", "72px");
-        }
+        $(".schedule_all").find(".schedule_row").eq(d).children(".schedule_row_header").css("line-height", (scheduleLayersCount[d] * 72) + "px");
     }
 
-    // Generování buněk
+    // Generation of cells
     for(d = 0; d < 5; d++) {
         var layersDiv = $(".schedule_all").find(".schedule_row").eq(d).children(".schedule_row_layers");
         var fullLength = +$(layersDiv).width();
@@ -819,7 +789,6 @@ function showSchedule() {
             var layer = sch.layer;
             var classes = "";
             var rooms = "";
-            var groups = "";
 
             if(sch.type === "cc") {
                 bin = "schedule_cell_bin_cc"
@@ -841,66 +810,21 @@ function showSchedule() {
                 rooms += room + " ";
             });
 
-            $(layersDiv).children(".schedule_row_layer").eq(layer - 1).append(`<div class="schedule_cell ` + classes + `" style="left: ` + left + `px; width: ` + length + `px">
+            $(layersDiv).children(".schedule_row_layer").eq(layer - 1).append(` <div class="schedule_cell ` + classes + `" style="left: ` + left + `px; width: ` + length + `px">
                                                                                     <div class="schedule_cell_name"><a target="_blank" href="https://www.fit.vut.cz/study/course/` + sch.link + `">` + sch.name + `</a></div>
                                                                                     <div class="schedule_cell_rooms">` + rooms + `</div>
-                                                                                    <div class="schedule_cell_desc">` + groups + `</div>
+                                                                                    <div class="schedule_cell_desc">` + sch.week + `</div>
                                                                                     <div class="schedule_cell_star"></div>
                                                                                     <div class="` + bin + `"></div>
                                                                                     <div class="id hidden">` + id + `</div>
                                                                                     <div class="day hidden">` + d + `</div>
-                                                                            </div>`)
+                                                                                </div>`)
         });
     }
 }
-
-
-
-
-function addCustomSchedule() {
-    var lesson = {
-        id: Date.now(),
-        url: "",
-        name: $(".sch_add_name").val(),
-        from: +$(".sch_add_from").val(),
-        to: +$(".sch_add_to").val(),
-        groups: [],
-        rooms: [$(".sch_add_room").val()],
-        type: "cc",
-        week: $(".sch_add_weeks").val(),
-        layer: -1,
-        real: true,
-        visible: true
-    };
-
-    if(lesson.from >= lesson.to) {
-        return;
-    }
-    if(typeof lesson.name === "undefined" || lesson.name === "") {
-        return;
-    }
-    if(typeof lesson.rooms[0] === "undefined" || lesson.rooms[0] === "") {
-        return;
-    }
-
-
-    if(+$(".sch_add_day").val() === 1) {
-        scheduleCustom[0].push(lesson);
-    } else if(+$(".sch_add_day").val() === 2) {
-        scheduleCustom[1].push(lesson);
-    } else if(+$(".sch_add_day").val() === 3) {
-        scheduleCustom[2].push(lesson);
-    } else if(+$(".sch_add_day").val() === 4) {
-        scheduleCustom[3].push(lesson);
-    } else if(+$(".sch_add_day").val() === 5) {
-        scheduleCustom[4].push(lesson);
-    }
-
-    parseSchedule();
-}
-function parseFinSchedule() {
-    scheduleFin = [[], [], [], [], []];
-    scheduleFinLayersCount = [0, 0, 0, 0, 0];
+function renderScheduleFin() {
+    var scheduleFin = [[], [], [], [], []];
+    var scheduleFinLayersCount = [0, 0, 0, 0, 0];
 
     var scheduleToRemove = [];
     $.each(scheduleIndexes, function(i, index) {
@@ -983,9 +907,7 @@ function parseFinSchedule() {
         scheduleFinLayersCount[d] = maxLayer;
     }
 
-    showFinSchedule();
-}
-function showFinSchedule() {
+
     for(d = 0; d < 5; d++) {
         $(".schedule_fin").find(".schedule_row").eq(d).children(".schedule_row_layers").html("");
     }
@@ -1047,6 +969,60 @@ function showFinSchedule() {
         });
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+function addCustomSchedule() {
+    var lesson = {
+        id: Date.now(),
+        url: "",
+        name: $(".sch_add_name").val(),
+        from: +$(".sch_add_from").val(),
+        to: +$(".sch_add_to").val(),
+        groups: [],
+        rooms: [$(".sch_add_room").val()],
+        type: "cc",
+        week: $(".sch_add_weeks").val(),
+        layer: -1,
+        real: true,
+        visible: true
+    };
+
+    if(lesson.from >= lesson.to) {
+        return;
+    }
+    if(typeof lesson.name === "undefined" || lesson.name === "") {
+        return;
+    }
+    if(typeof lesson.rooms[0] === "undefined" || lesson.rooms[0] === "") {
+        return;
+    }
+
+
+    if(+$(".sch_add_day").val() === 1) {
+        scheduleCustom[0].push(lesson);
+    } else if(+$(".sch_add_day").val() === 2) {
+        scheduleCustom[1].push(lesson);
+    } else if(+$(".sch_add_day").val() === 3) {
+        scheduleCustom[2].push(lesson);
+    } else if(+$(".sch_add_day").val() === 4) {
+        scheduleCustom[3].push(lesson);
+    } else if(+$(".sch_add_day").val() === 5) {
+        scheduleCustom[4].push(lesson);
+    }
+
+    parseSchedule();
+}
+
 
 //////////////////////////////////// SAVING ////////////////////////////////////
 function save() {
