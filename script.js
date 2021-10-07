@@ -36,6 +36,7 @@ var subjects = [];                   // Array of selected subjects
 var lessons = [];                    // Array of lessons of selected subjects
 var ranges = [];                     // Array of ranges of selected subjects
 var schedule = [[], [], [], [], []]; // Array of schledule days
+var scheduleFin = [];                // Array of final schedule lessons
 
 
 ///////////////////////////////////// Main /////////////////////////////////////
@@ -53,7 +54,7 @@ $(document).ready(function() {
 }); //checked
 
 //////////////////////////////////// Events ////////////////////////////////////
-// Header
+// Icons
 $(document).on("click", ".header_info_icon", function() {
     $(".header_info_icon").addClass("hidden");
     $(".header_cross_icon").removeClass("hidden");
@@ -68,14 +69,14 @@ $(document).on("click", ".header_cross_icon", function() {
     $(".secs_main").removeClass("hidden");
     $(".secs_info").addClass("hidden");
 }); //checked
-$(document).on("click", ".menu_menu_icon", function() {
-    $(".menu_menu_icon").addClass("hidden");
+$(document).on("click", ".menu_icon", function() {
+    $(".menu_icon").addClass("hidden");
 
     $(".secs").removeClass("secs_menu_hidden");
     $(".menu").removeClass("hidden");
 }); //checked
 $(document).on("click", ".menu_cross_icon", function() {
-    $(".menu_menu_icon").removeClass("hidden");
+    $(".menu_icon").removeClass("hidden");
 
     $(".secs").addClass("secs_menu_hidden");
     $(".menu").addClass("hidden");
@@ -155,7 +156,7 @@ $(document).on("click", ".secs_header_elem", function() {
     } else if($(this).hasClass("ch_2")) {
         $(".se_2").removeClass("sec_invisible");
     }
-}); // checked
+}); //checked
 
 // Controls
 $(document).on("click", ".menu_submit_button", function() {
@@ -173,6 +174,7 @@ $(document).on("click", ".menu_submit_button", function() {
     $(".loading_message").removeClass("hidden");
     $(".secs").addClass("hidden");
 
+    // Start loading lessons
     loadLessons();
 }); // checked
 $(document).on("click", ".menu_save_button", function() {
@@ -281,8 +283,8 @@ function loadStudies(e) {
             $.each(studies, function(i, stud) {
                 if(stud.name === "BIT") {
                     $(".menu_stud_column").append(` <div class="menu_column_row">
-                                                        <input class="menu_column_row_checkbox menu_bit_checkbox" type="checkbox" value="` + stud.name + `">
-                                                        <div class="menu_column_row_text">` + stud.name + `</div>
+                                                        <input class="menu_column_row_checkbox menu_bit_checkbox" type="checkbox" value="BIT">
+                                                        <div class="menu_column_row_text">BIT</div>
                                                         <div class="cleaner"></div>
                                                     </div>`);
                 } else {
@@ -294,7 +296,7 @@ function loadStudies(e) {
                 }
             });
 
-            // Load subjects
+            // Start load subjects
             loadSubjects();
         }
     });
@@ -364,8 +366,9 @@ function loadSubjects(e) {
 
             // Com
             $(".menu_com_column").append(`  <div class="menu_column_row mrsub_` + grade + `_` + stud.name + ` hidden">
-                                                <div class="menu_column_row_text_split">` + name + `</div>
-                                                <div class="cleaner"></div>
+                                                <div class="menu_column_row_text_split">
+                                                    <div class="menu_column_row_text_split_inner">` + name + `</div>
+                                                </div>
                                             </div>`);
             $.each(stud.subjects.com[grade], function(o, sub) {
                 $(".menu_com_column").append(`  <div class="menu_column_row mrsub_` + grade + `_` + stud.name + ` mrsem_` + sub.sem + ` hidden">
@@ -377,8 +380,9 @@ function loadSubjects(e) {
 
             // Opt
             $(".menu_opt_column").append(`  <div class="menu_column_row mrsub_` + grade + `_` + stud.name + ` hidden">
-                                                <div class="menu_column_row_text_split">` + name + `</div>
-                                                <div class="cleaner"></div>
+                                                <div class="menu_column_row_text_split">
+                                                    <div class="menu_column_row_text_split_inner">` + name + `</div>
+                                                </div>
                                             </div>`);
             $.each(stud.subjects.opt[grade], function(o, sub) {
                 $(".menu_opt_column").append(`  <div class="menu_column_row mrsub_` + grade + `_` + stud.name + ` mrsem_` + sub.sem + ` hidden">
@@ -505,11 +509,12 @@ function loadLessons() {
             async: false,
             success: function(e) {
                 // Ranges
-                sub.range = parseRange($(e).find("main").find("div.b-detail__body").find("div.grid__cell").find("p:contains('Rozsah')").parent().next().children().html());
+                sub.range = $(e).find("main").find("div.b-detail__body").find("div.grid__cell").find("p:contains('Rozsah')").parent().next().children().html();
 
                 // Lessons
                 $(e).find("table#schedule").find("tbody").find("tr").each(function(o, tr) {
-                    if($(tr).children("td").eq(0).html().includes("přednáška") || $(tr).children("td").eq(0).html().includes("poč. lab") || $(tr).children("td").eq(0).html().includes("cvičení")) {
+                    if(($(tr).children("td").eq(0).html().includes("přednáška") || $(tr).children("td").eq(0).html().includes("poč. lab") || $(tr).children("td").eq(0).html().includes("cvičení") || $(tr).children("td").eq(0).html().includes("laboratoř")) &&
+                       ($(tr).children("td").eq(1).html().includes("výuky") || $(tr).children("td").eq(1).html().includes("sudý") || $(tr).children("td").eq(1).html().includes("lichý"))) {
                         var lesson = {
                             "id": "",
                             "name": sub.name,
@@ -528,8 +533,12 @@ function loadLessons() {
                         // Type
                         if($(tr).children("td").eq(0).html() === "přednáška") {
                             lesson.type = "green";
-                        } else if($(tr).children("td").eq(0).html() === "poč. lab" || $(tr).children("td").eq(0).html() === "cvičení") {
+                        } else if($(tr).children("td").eq(0).html() === "cvičení") {
                             lesson.type = "blue";
+                        } else if($(tr).children("td").eq(0).html() === "poč. lab") {
+                            lesson.type = "yellow";
+                        } else if($(tr).children("td").eq(0).html() === "laboratoř") {
+                            lesson.type = "yellow";
                         }
 
                         // Rooms
@@ -570,48 +579,178 @@ function loadLessons() {
     $(".secs").removeClass("hidden");
 
     // Parse schedule
-    showRanges();
+    parseRanges();
     parseSchedule();
     parseFinSchedule();
 } //checked
 
 ////////////////////////////////// Schledules //////////////////////////////////
-function showRanges() {
-    // Ranges
+function parseRanges() {
     $.each(subjects, function(i, sub) {
-        var green_value = 0;
-        var blue_value = 0;
-        var blue_count = 0;
-        $.each(sub.range, function(o, ran) {
-            if(ran.type === "přednášky") {
-                green_value += ran.value;
-            } else if(ran.type === "pc") {
-                blue_value += ran.value;
-            } else if(ran.type === "cvičení") {
-                blue_value += ran.value;
+        // Split ranges
+        var rangeRaw = sub.range;
+        var greenRange = 0;
+        var blueRange = 0;
+        var yellowRange = 0;
+
+        rangeRaw = rangeRaw.replaceAll("\\n", "");
+        rangeRaw = rangeRaw.replaceAll("hod. ", "");
+        rangeRaw = rangeRaw.trim();
+        $.each(rangeRaw.split(","), function(i, rang) {
+            rang = rang.trim();
+
+            if(rang.split(" ")[1].trim() === "přednášky") {
+                greenRange = +rang.split(" ")[0].trim();
+            } else if(rang.split(" ")[1].trim() === "cvičení") {
+                blueRange = +rang.split(" ")[0].trim();
+            } else if(rang.split(" ")[1].trim() === "pc") {
+                yellowRange = +rang.split(" ")[0].trim();
+            } else if(rang.split(" ")[1].trim() === "laboratoře") {
+                yellowRange = +rang.split(" ")[0].trim();
             }
         });
-        green_value /= 13;
-        if(blue_value > 13) {
-            blue_count = blue_value / 2;
-        } else {
-            blue_count = blue_value / 2;
+
+        // Find lengths
+        var greenLength = 0;
+        var blueLength = 0;
+        var yellowLength = 0;
+        
+        greenLength = greenRange / 13;
+        var blueLesson = lessons.find(x => x.name === sub.name && x.type === "blue");
+        if(typeof blueLesson != "undefined" && blueRange > 0) {
+            blueLength = blueLesson.to - blueLesson.from;
         }
-        if(blue_value > 1) {
-            blue_value = 2
+        var yellowLesson = lessons.find(x => x.name === sub.name && x.type === "yellow");
+        if(typeof yellowLesson != "undefined" && yellowRange > 0) {
+            yellowLength = yellowLesson.to - yellowLesson.from;
         }
 
-        $(".ranges").append(`   <a target="_blank" href="https://www.fit.vut.cz/study/course/` + sub.link.split("-")[1] + `">
-                                    <div class="range">
-                                        <div class="range_name">` + sub.name + `</div>
-                                        <div class="range_values">
-                                            <div class="range_value">Přednášky: ` + green_value + ` hod. týdně</div>
-                                            <div class="range_value">Cvičení: ` + blue_value + ` hod. týdně, ` + blue_count + `x</div>
-                                        </div>
-                                        <div class="cleaner"></div>
-                                    </div>
-                                </a>`);
+        // Calculate ranges
+        var greenCount = 0;
+        var blueCount = 0
+        var yellowCount = 0
+        if(greenLength > 0) {
+            greenCount = 13;
+        }
+        if(blueLength > 0) {
+            blueCount = blueRange / blueLength;
+        }
+        if(yellowLength > 0) {
+            yellowCount = yellowRange / yellowLength;
+        }
+
+        // Push
+        var range = {
+            "name": sub.name,
+            "link": sub.link,
+            "raw": sub.range.replaceAll("\\n", "").trim(),
+            "greenLength": greenLength,
+            "blueLength": blueLength,
+            "yellowLength": yellowLength,
+            "greenCount": greenCount,
+            "blueCount": blueCount,
+            "yellowCount": yellowCount
+        };
+        ranges.push(range);
     });
+
+    showRanges();
+}
+function showRanges() {
+    $(".ranges").html("");
+    $.each(ranges, function(i, rang) {
+        var greenOK = false;
+        var blueOK = false;
+        var yellowOK = false;
+        var sumValue = 0;
+
+        // Check selected
+        sumValue = 0;
+        $.each(scheduleFin.filter(x => x.name == rang.name && x.type == "green"), function(o, les) {
+            sumValue += les.to - les.from;
+        });
+        if(sumValue === rang.greenLength) {
+            greenOK = true;
+        }
+        sumValue = 0;
+        $.each(scheduleFin.filter(x => x.name == rang.name && x.type == "blue"), function(o, les) {
+            sumValue += les.to - les.from;
+        });
+        if(sumValue === rang.blueLength) {
+            blueOK = true;
+        }
+        sumValue = 0;
+        $.each(scheduleFin.filter(x => x.name == rang.name && x.type == "yellow"), function(o, les) {
+            sumValue += les.to - les.from;
+        });
+        if(sumValue === rang.yellowLength) {
+            yellowOK = true;
+        }
+
+        $(".ranges").append(`   <div class="range">
+                                    <a target="_blank" href="https://www.fit.vut.cz/study/course/` + rang.link.split("-")[1] + `">
+                                        <div class="range_name">` + rang.name + `</div>
+                                    </a>
+                                    <div class="range_content">
+                                        <div class="range_raw">` + rang.raw + `</div>
+                                        <div class="range_columns">
+                                            <div class="range_column">
+                                                <div class="range_column_title">Počet hodin lekce týdně:</div>` + 
+                                                (rang.greenLength > 0 ? 
+                                                    `<div class="range_row">
+                                                        <div class="range_row_name">Přednášky:</div>
+                                                        <div class="range_row_value">` + rang.greenLength + ` hod. týdně</div>
+                                                        ` + (greenOK ? `<div class="range_row_icon range_row_icon_check"></div>` : `<div class="range_row_icon range_row_icon_cross"></div><div class="range_row_mes_red">nevybráno</div>`) + `
+                                                        <div class="cleaner"></div>
+                                                    </div>`
+                                                : "") + 
+                                                (rang.blueLength > 0 ? 
+                                                    `<div class="range_row">
+                                                        <div class="range_row_name">Cvičení:</div>
+                                                        <div class="range_row_value">` + rang.blueLength + ` hod. týdně</div>
+                                                        ` + (blueOK ? `<div class="range_row_icon range_row_icon_check"></div>` : `<div class="range_row_icon range_row_icon_cross"></div><div class="range_row_mes_red">nevybráno</div>`) + `
+                                                        <div class="cleaner"></div>
+                                                    </div>`
+                                                : "") + 
+                                                (rang.yellowLength > 0 ? 
+                                                    `<div class="range_row">
+                                                        <div class="range_row_name">Laboratoře:</div>
+                                                        <div class="range_row_value">` + rang.yellowLength + ` hod. týdně</div>
+                                                        ` + (yellowOK ? `<div class="range_row_icon range_row_icon_check"></div>` : `<div class="range_row_icon range_row_icon_cross"></div><div class="range_row_mes_red">nevybráno</div>`) + `
+                                                        <div class="cleaner"></div>
+                                                    </div>`
+                                                : "") +
+                                            `</div>
+                                            <div class="range_column">
+                                                <div class="range_column_title">Odhad počtu lekcí za semestr:</div>` + 
+                                                (rang.greenCount > 0 ? 
+                                                    `<div class="range_row">
+                                                        <div class="range_row_name">Přednášky:</div>
+                                                        <div class="range_row_value">` + rang.greenCount + `x</div>
+                                                        <div class="cleaner"></div>
+                                                    </div>`
+                                                : "") + 
+                                                (rang.blueCount > 0 ? 
+                                                    `<div class="range_row">
+                                                        <div class="range_row_name">Cvičení:</div>
+                                                        <div class="range_row_value">` + rang.blueCount + `x</div>
+                                                        <div class="cleaner"></div>
+                                                    </div>`
+                                                : "") + 
+                                                (rang.yellowCount > 0 ? 
+                                                    `<div class="range_row">
+                                                        <div class="range_row_name">Laboratoře:</div>
+                                                        <div class="range_row_value">` + rang.yellowCount + `x</div>
+                                                        <div class="cleaner"></div>
+                                                    </div>`
+                                                : "") +
+                                            `</div>
+                                            <div class="cleaner"></div>
+                                        </div>
+                                    </div>
+                                    <div class="cleaner"></div>
+                                </div>`);
+    })
 }
 function parseSchedule() {
     // Push lessons
@@ -1062,22 +1201,6 @@ function parseTimeFrom(time) {
 function parseTimeTo(time) {
     var hours = +time.split(":")[0] + 1;
     return hours - 7;
-} //checked
-function parseRange(rangeString) {
-    rangeString = rangeString.replaceAll("\\n", "");
-    rangeString = rangeString.replaceAll("hod. ", "");
-    rangeString = rangeString.trim();
-
-    ranges = [];
-    $.each(rangeString.split(","), function(i, rang) {
-        rang = rang.trim();
-
-        ranges.push({
-            "type": rang.split(" ")[1],
-            "value": +rang.split(" ")[0]
-        });
-    });
-    return ranges;
 } //checked
 function areIntervalsColide(a, b, x, y) {
     a *= 10;

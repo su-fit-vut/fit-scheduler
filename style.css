@@ -34,8 +34,8 @@ html, body, * {
         .header_version {
             float: left;
             line-height: 40px;
-            padding-left: 10px;
             padding-top: 10px;
+            padding-left: 10px;
             color: #ffffff;
             font-size: 15px;
         }
@@ -63,25 +63,18 @@ html, body, * {
         width: 100%;
         height: calc(100% - 55px);
     }
-        .loading_message {
-            float: left;
-            line-height: 70px;
-            padding-left: 30px;
-            color: #333333;
-            font-size: 25px;
-        }
-        .menu_menu_icon {
+        .menu_icon {
             position: absolute;
-            height: 50px;
             width: 50px;
+            height: 50px;
             top: 0;
             left: 0;
+            background-image: url(./images/menu.png);
             background-position: 50% 50%;
             background-repeat: no-repeat;
             background-size: 50% 50%;
-            cursor: pointer;
-            background-image: url(./images/menu.png);
             background-color: #000000;
+            cursor: pointer;
             z-index: 1000;
         }
         .menu {
@@ -96,15 +89,14 @@ html, body, * {
             .menu_conta {
                 float: left;
                 width: calc(100% - 30px);
+                height: 100%;
             }
                 .menu_columns {
                     width: 100%;
                 }
                     .menu_column {
                         width: calc(100% - 10px);
-                        padding: 5px;
-                        padding-top: 0;
-                        margin-bottom: 10px;
+                        padding: 0px 5px 10px 5px;
                     }
                         .menu_column_title {
                             width: 100%;
@@ -121,10 +113,10 @@ html, body, * {
                             line-height: 15px;
                             padding: 5px;
                             margin: 5px 0;
-                            background-color: #333333;
-                            border: none;
+                            border: 0;
                             border-radius: 6px;
                             outline: none;
+                            background-color: #333333;
                             color: #ffffff;
                             font-size: 16px;
                         }
@@ -161,14 +153,18 @@ html, body, * {
                                 }
                                 .menu_column_row_text_split {
                                     width: calc(100% - 10px);
-                                    line-height: 22px;
-                                    margin: 5px;
-                                    border-top: 1px #ffffff solid;
-                                    border-bottom: 1px #ffffff solid;
-                                    color: #ffffff;
-                                    font-size: 15px;
-                                    text-align: center;
+                                    line-height: 24px;
+                                    padding: 3px 5px;
                                 }
+                                    .menu_column_row_text_split_inner {
+                                        width: 100%;
+                                        line-height: 22px;
+                                        border-top: 1px #ffffff solid;
+                                        border-bottom: 1px #ffffff solid;
+                                        color: #ffffff;
+                                        font-size: 15px;
+                                        text-align: center;
+                                    }
 
                 .menu_buttons {
                     width: calc(100% - 10px);
@@ -193,8 +189,8 @@ html, body, * {
                         background-color: #04AD00;
                     }
                     .menu_button:active {
-                        margin-top: 2px;
                         height: 28px;
+                        margin-top: 2px;
                         border-bottom-width: 2px;
                     }
 
@@ -207,23 +203,24 @@ html, body, * {
                         background-color: #454545;
                     }
                     .menu_button_disabled:active {
-                        margin-top: 0px;
                         height: 30px;
+                        margin-top: 0px;
                         border-bottom-width: 4px;
                     }
 
             .menu_icons {
                 float: left;
                 width: 30px;
+                height: 100%;
             }
                 .menu_cross_icon {
                     height: 30px;
                     width: 30px;
+                    background-image: url(./images/cross.png);
                     background-position: 50% 50%;
                     background-repeat: no-repeat;
                     background-size: 60% 60%;
                     cursor: pointer;
-                    background-image: url(./images/cross.png);
                 }
 
         .secs {
@@ -231,9 +228,6 @@ html, body, * {
             width: calc(100% - 260px);
             height: 100%;
         }
-            .secs_menu_hidden {
-                width: 100%;
-            }
             .secs_main {
                 width: 100%;
                 height: 100%;
@@ -246,8 +240,8 @@ html, body, * {
                     .secs_header_elem {
                         float: left;
                         width: 190px;
-                        margin: 0 5px;
                         line-height: 50px;
+                        margin: 0 5px;
                         border-bottom: 2px #040D1F solid;
                         color: #051221;
                         font-size: 25px;
@@ -277,36 +271,88 @@ html, body, * {
                         overflow: auto;
                         scrollbar-width: thin;
                     }
-                        .sec_invisible {
-                            left: -100%;
-                        }
-
                         .ranges {
-                            width: calc(100% - 20px);
-                            padding: 20px 10px;
+                            width: 100%;
+                            padding-bottom: 30px;
                         }
                             .range {
-                                width: calc(100% - 10px);
-                                background-color: #d7eed2;
-                                padding: 5px;
-                                border-radius: 5px;
+                                width: calc(100% - 20px);
+                                padding: 10px;
                                 margin-bottom: 5px;
+                                border-radius: 5px;
+                                background-color: #d7eed2;
                                 color: #000000;
                             }
                                 .range_name {
                                     float: left;
+                                    width: 80px;
                                     line-height: 30px;
                                     font-size: 25px;
-                                    min-width: 100px;
+                                    font-weight: bold;
+                                    color: #000000;
                                 }
-                                .range_values {
+                                .range_content {
                                     float: left;
-                                    padding-left: 10px;
+                                    width: calc(100% - 100px);
                                 }
-                                    .range_value {
+                                    .range_raw {
+                                        width: 100%;
                                         line-height: 30px;
                                         font-size: 20px;
                                     }
+                                    .range_columns {
+                                        width: 100%;
+                                        margin-top: 10px;
+                                        border-top: 1px #000000 solid;
+                                    }
+                                        .range_column {
+                                            float: left;
+                                            width: 50%;
+                                        }
+                                            .range_column_title {
+                                                line-height: 20px;
+                                                padding: 15px 0;
+                                                font-size: 18px;
+                                                font-weight: bold;
+                                            }
+                                            .range_row {
+                                                height: 30px;
+                                                font-size: 18px;
+                                            }
+                                                .range_row_name {
+                                                    float: left;
+                                                    width: 100px;
+                                                    line-height: 30px;
+                                                    font-size: 18px;
+                                                }
+                                                .range_row_value {
+                                                    float: left;
+                                                    line-height: 30px;
+                                                    font-size: 18px;
+                                                }
+                                                .range_row_icon {
+                                                    float: left;
+                                                    height: 30px;
+                                                    width: 30px;
+                                                    margin-left: 5px;
+                                                    background-position: 50% 60%;
+                                                    background-repeat: no-repeat;
+                                                    background-size: 70% 70%;
+                                                }
+                                                    .range_row_icon_cross {
+                                                        background-image: url(./images/cross_mark.png);
+                                                    }
+                                                    .range_row_icon_check {
+                                                        background-image: url(./images/check_mark.png);
+                                                    }
+
+                                                .range_row_mes_red {
+                                                    float: left;
+                                                    width: 100px;
+                                                    line-height: 30px;
+                                                    font-size: 16px;
+                                                    color: #DB1200;
+                                                }
 
                         .schedule {
                             width: 1200px;
@@ -494,10 +540,8 @@ html, body, * {
                                             }
 
             .secs_info {
-                width: calc(100% - 20px);
+                width: 100%;
                 height: 100%;
-                padding: 10px;
-                background-color: #ffffff;
             }
                 .sec_half {
                     float: left;
@@ -528,6 +572,20 @@ html, body, * {
                     .bubble_clear {
                         background-color: transparent;
                     }
+
+        .loading_message {
+            float: left;
+            line-height: 70px;
+            padding-left: 30px;
+            color: #333333;
+            font-size: 25px;
+        }
+
+
+
+
+
+
 
     .sch_add {
         width: calc(100% - 40px - 10px - 2px);
@@ -607,11 +665,9 @@ html, body, * {
 .hidden_search {
     display: none;
 }
-.red {
-    font-weight: bold;
-    color: rgb(134, 11, 0);
+.sec_invisible {
+    left: -100%;
 }
-.blue {
-    font-weight: bold;
-    color: #101A85;
+.secs_menu_hidden {
+    width: 100%;
 }
