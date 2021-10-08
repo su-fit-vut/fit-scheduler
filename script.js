@@ -3,7 +3,6 @@ var studies = [];                       // Array of loaded studies
 var subjects = [];                      // Array of selected subjects
 var ranges = [];                        // Array of ranges of selected subjects
 var lessons = [];                       // Array of lessons of selected subjects
-var lessonsFin = [];                    // Array of selected lessons
 
 ///////////////////////////////////// Main /////////////////////////////////////
 $(document).ready(function() {
@@ -17,7 +16,7 @@ $(document).ready(function() {
 
     // Start menu load
     loadStudies();
-}); 
+}); // checked
 
 //////////////////////////////////// Events ////////////////////////////////////
 // Icons
@@ -27,63 +26,62 @@ $(document).on("click", ".header_info_icon", function() {
 
     $(".secs_main").addClass("hidden");
     $(".secs_info").removeClass("hidden");
-}); 
+}); // checked
 $(document).on("click", ".header_cross_icon", function() {
     $(".header_info_icon").removeClass("hidden");
     $(".header_cross_icon").addClass("hidden");
 
     $(".secs_main").removeClass("hidden");
     $(".secs_info").addClass("hidden");
-}); 
+}); // checked
 $(document).on("click", ".menu_icon", function() {
     $(".menu_icon").addClass("hidden");
 
     $(".secs").removeClass("secs_menu_hidden");
     $(".menu").removeClass("hidden");
-}); 
+}); // checked
 $(document).on("click", ".menu_cross_icon", function() {
     $(".menu_icon").removeClass("hidden");
 
     $(".secs").addClass("secs_menu_hidden");
     $(".menu").addClass("hidden");
-}); 
+}); // checked
 
 // Menu
 $(document).on("click", ".menu_sem_radio", function() {
     $(".menu_com_search_input").prop("value", ""); $(".menu_com_search_input").trigger("keyup");
     $(".menu_opt_search_input").prop("value", ""); $(".menu_opt_search_input").trigger("keyup");
     renderSubjects();
-}); 
+}); // checked
 $(document).on("click", ".menu_bit_checkbox", function() {
     $(".menu_com_search_input").prop("value", ""); $(".menu_com_search_input").trigger("keyup");
     $(".menu_opt_search_input").prop("value", ""); $(".menu_opt_search_input").trigger("keyup");
     renderSubjects();
-}); 
+}); // checked
 $(document).on("click", ".menu_mit_radio", function() {
     // Can uncheck
     if($(this).hasClass("mit_radio_checked")) {
         $(".menu_mit_radio").removeClass("mit_radio_checked");
         $(this).prop("checked", false);
     } else {
-        $(".menu_mit_radio").removeClass("mit_radio_checked");
         $(this).addClass("mit_radio_checked");
     }
 
     $(".menu_com_search_input").prop("value", ""); $(".menu_com_search_input").trigger("keyup");
     $(".menu_opt_search_input").prop("value", ""); $(".menu_opt_search_input").trigger("keyup");
     renderSubjects();
-}); 
+}); // checked
 $(document).on("click", ".menu_grade_checkbox", function() {
     $(".menu_com_search_input").prop("value", ""); $(".menu_com_search_input").trigger("keyup");
     $(".menu_opt_search_input").prop("value", ""); $(".menu_opt_search_input").trigger("keyup");
     renderSubjects();
-}); 
+}); // checked
 $(document).on("click", ".menu_sub_checkbox", function() {
     renderSubjects();
-}); 
+}); // checked
 $(document).on("click", ".menu_sel_checkbox", function() {
     renderSubjects();
-}); 
+}); // checked
 $(document).on("keyup", ".menu_com_search_input", function() {
     $(".menu_com_column .menu_column_row").removeClass("hidden_search");
     if($(".menu_com_search_input").prop("value") != "") {
@@ -96,7 +94,7 @@ $(document).on("keyup", ".menu_com_search_input", function() {
             }
         });
     }
-}); 
+}); // checked
 $(document).on("keyup", ".menu_opt_search_input", function() {
     $(".menu_opt_column .menu_column_row").removeClass("hidden_search");
     if($(".menu_opt_search_input").prop("value") != "") {
@@ -109,7 +107,7 @@ $(document).on("keyup", ".menu_opt_search_input", function() {
             }
         });
     }
-}); 
+}); // checked
 $(document).on("click", ".secs_header_elem", function() {
     $(".secs_header_elem").removeClass("secs_header_elem_selected");
     $(".sec").addClass("sec_invisible");
@@ -122,11 +120,11 @@ $(document).on("click", ".secs_header_elem", function() {
     } else if($(this).hasClass("ch_2")) {
         $(".se_2").removeClass("sec_invisible");
     }
-}); 
+}); // checked
 
 // Controls
 $(document).on("click", ".menu_submit_button", function() {
-    $(".header_info_icon").removeClass("hidden");
+    $(".header_info_icon").addClass("hidden");
     $(".header_cross_icon").addClass("hidden");
     $(".secs_main").removeClass("hidden");
     $(".secs_info").addClass("hidden");
@@ -142,7 +140,7 @@ $(document).on("click", ".menu_submit_button", function() {
 
     // Start loading lessons
     loadLessons();
-}); 
+}); // checked
 $(document).on("click", ".menu_save_button", function() {
     save();
 });
@@ -156,71 +154,32 @@ $(document).on("change", ".sch_load", function() {
 // Schedule
 $(document).on("click", ".schedule_cell_star", function() {
     // Update
-    if($(this).parent().hasClass("schedule_cell_selected")) {
-        lessonsFin = lessonsFin.filter(x => x.id !== $(this).siblings(".id").html());
+    var les = lessons.find(x => x.id === $(this).siblings(".id").html());
+    if(les.selected === true) {
+        les.selected = false;
     } else {
-        lessonsFin.push(lessons.find(x => x.id === $(this).siblings(".id").html()));
+        les.selected = true;
     }
-
-    // Sort
-    lessonsFin.sort(function(a, b) {
-        if(a.name < b.name) {
-            return -1;
-        } else if(a.name > b.name) {
-            return 1;
-        }
-        return 0;
-    });
-    lessonsFin.sort(function(a, b) {
-        if(a.type === "blue" && b.type !== "blue") {
-            return -1;
-        } else if(a.type !== "blue" && b.type === "blue") {
-            return 1;
-        }
-        return 0;
-    });
-    lessonsFin.sort(function(a, b) {
-        if(a.type === "green" && b.type !== "green") {
-            return -1;
-        } else if(a.type !== "green" && b.type === "green") {
-            return 1;
-        }
-
-        return 0;
-    });
 
     // Render
     renderAll();
-});
+}); // checked
 $(document).on("click", ".schedule_cell_bin", function() {
-    if($(this).parent().hasClass("schedule_cell_deleted")) {
-        $(this).parent().removeClass("schedule_cell_deleted");
-        scheduleFaded = arrayRemove(scheduleFaded, $(this).siblings(".day").html() + "|" + $(this).siblings(".id").html());
+    // Update
+    var les = lessons.find(x => x.id === $(this).siblings(".id").html());
+    if(les.type === "custom") {
+        lessons = lessons.filter(x => x.id !== $(this).siblings(".id").html());
     } else {
-        $(this).parent().addClass("schedule_cell_deleted");
-        scheduleFaded.push($(this).siblings(".day").html() + "|" + $(this).siblings(".id").html());
-
-        $(this).parent().css("border-style", "dashed");
-        scheduleIndexes = arrayRemove(scheduleIndexes, $(this).siblings(".day").html() + "|" + $(this).siblings(".id").html());
-        parseFinSchedule();
-    }
-});
-$(document).on("click", ".schedule_cell_bin_cc", function() {
-    $(this).parent().remove();
-
-    var scheduleToRemove;
-    var id = $(this).siblings(".id").html();
-    var day = +$(this).siblings(".day").html();
-    $.each(scheduleCustom[day], function(i, sch) {
-        if(sch.id === id) {
-            scheduleToRemove = sch;
-            return false;
+        if(les.deleted === true) {
+            les.deleted = false;
+        } else {
+            les.deleted = true;
         }
-    });
-    scheduleCustom[day] = arrayRemove(scheduleCustom[day], scheduleToRemove);
+    }
 
-    parseSchedule();
-});
+    // Render
+    renderAll();
+}); // checked
 $(document).on("click", ".sch_add_button", function() {
     addCustomSchedule();
 });
@@ -296,10 +255,10 @@ function loadStudies(e) {
             loadSubjects();
         },
         error: function() {
-            $(".loading_message").html("Chyba při načítání studií...");  
+            $(".loading_message").html("Chyba při načítání studií...");
         }
     });
-} 
+}
 function loadSubjects(e) {
     // Parse
     $.each(studies, function(i, stud) {
@@ -403,7 +362,7 @@ function loadSubjects(e) {
 
     // Render
     renderSubjects();
-} 
+}
 function renderSubjects() {
     // Grades render
     if($(".menu_bit_checkbox:checked").length > 0) {
@@ -477,7 +436,7 @@ function renderSubjects() {
                                             </div>`);
         }
     });
-} 
+}
 
 /////////////////////////////////// Schledule //////////////////////////////////
 function loadLessons() {
@@ -633,7 +592,7 @@ function loadLessons() {
         var greenLength = 0;
         var blueLength = 0;
         var yellowLength = 0;
-        
+
         greenLength = greenRange / 13;
         var blueLesson = lessons.find(x => x.name === sub.name && x.type === "blue");
         if(typeof blueLesson != "undefined" && blueRange > 0) {
@@ -685,13 +644,13 @@ function loadLessons() {
 
     // Parse schedule
     renderAll();
-} 
+}
 
 function renderAll() {
     renderRanges();
     renderSchedule();
     renderScheduleFin();
-} 
+}
 function renderRanges() {
     $(".ranges").html("");
     $.each(ranges, function(i, rang) {
@@ -731,24 +690,24 @@ function renderRanges() {
                                         <div class="range_raw">` + rang.raw + `</div>
                                         <div class="range_columns">
                                             <div class="range_column">
-                                                <div class="range_column_title">Počet hodin lekce týdně:</div>` + 
-                                                (rang.greenLength > 0 ? 
+                                                <div class="range_column_title">Počet hodin lekce týdně:</div>` +
+                                                (rang.greenLength > 0 ?
                                                     `<div class="range_row">
                                                         <div class="range_row_name">Přednášky:</div>
                                                         <div class="range_row_value">` + rang.greenLength + ` hod. týdně</div>
                                                         ` + (greenOK ? `<div class="range_row_icon range_row_icon_check"></div>` : `<div class="range_row_icon range_row_icon_cross"></div><div class="range_row_mes_red">nevybráno</div>`) + `
                                                         <div class="cleaner"></div>
                                                     </div>`
-                                                : "") + 
-                                                (rang.blueLength > 0 ? 
+                                                : "") +
+                                                (rang.blueLength > 0 ?
                                                     `<div class="range_row">
                                                         <div class="range_row_name">Cvičení:</div>
                                                         <div class="range_row_value">` + rang.blueLength + ` hod. týdně</div>
                                                         ` + (blueOK ? `<div class="range_row_icon range_row_icon_check"></div>` : `<div class="range_row_icon range_row_icon_cross"></div><div class="range_row_mes_red">nevybráno</div>`) + `
                                                         <div class="cleaner"></div>
                                                     </div>`
-                                                : "") + 
-                                                (rang.yellowLength > 0 ? 
+                                                : "") +
+                                                (rang.yellowLength > 0 ?
                                                     `<div class="range_row">
                                                         <div class="range_row_name">Laboratoře:</div>
                                                         <div class="range_row_value">` + rang.yellowLength + ` hod. týdně</div>
@@ -758,22 +717,22 @@ function renderRanges() {
                                                 : "") +
                                             `</div>
                                             <div class="range_column">
-                                                <div class="range_column_title">Odhad počtu lekcí za semestr:</div>` + 
-                                                (rang.greenCount > 0 ? 
+                                                <div class="range_column_title">Odhad počtu lekcí za semestr:</div>` +
+                                                (rang.greenCount > 0 ?
                                                     `<div class="range_row">
                                                         <div class="range_row_name">Přednášky:</div>
                                                         <div class="range_row_value">` + rang.greenCount + `x</div>
                                                         <div class="cleaner"></div>
                                                     </div>`
-                                                : "") + 
-                                                (rang.blueCount > 0 ? 
+                                                : "") +
+                                                (rang.blueCount > 0 ?
                                                     `<div class="range_row">
                                                         <div class="range_row_name">Cvičení:</div>
                                                         <div class="range_row_value">` + rang.blueCount + `x</div>
                                                         <div class="cleaner"></div>
                                                     </div>`
-                                                : "") + 
-                                                (rang.yellowCount > 0 ? 
+                                                : "") +
+                                                (rang.yellowCount > 0 ?
                                                     `<div class="range_row">
                                                         <div class="range_row_name">Laboratoře:</div>
                                                         <div class="range_row_value">` + rang.yellowCount + `x</div>
@@ -787,7 +746,7 @@ function renderRanges() {
                                     <div class="cleaner"></div>
                                 </div>`);
     })
-} 
+}
 function renderSchedule() {
     // Push lessons
     var schedule = [[], [], [], [], []];
@@ -842,12 +801,12 @@ function renderSchedule() {
         $.each(schedule[d], function(i, les) {
             var length = ((les.to - les.from) * (fullLength / 14)) - 6 - 6;
             var left = (les.from * (fullLength / 14)) + 3;
-            
+
             var bin = "schedule_cell_bin";
             if(les.type === "cc") {
                 bin = "schedule_cell_bin_cc"
             }
-            
+
             var classes = "";
             if(les.type === "green") {
                 classes += "schedule_cell_type_green ";
@@ -861,10 +820,10 @@ function renderSchedule() {
             } else if(les.week.includes("sudý")) {
                 classes += "schedule_cell_week_even ";
             }
-            if(lessonsFin.includes(les)) {
+            if(les.selected === true) {
                 classes += "schedule_cell_selected ";
             }
-            
+
             var rooms = "";
             $.each(les.rooms, function(i, room) {
                 rooms += room + " ";
@@ -885,23 +844,52 @@ function renderScheduleFin() {
     // Push lessons
     var schedule = [[], [], [], [], []];
     $.each(lessonsFin, function(i, les) {
-        // Collisions
-        les.layer = 1;
-        do {
-            var collison = false;
-            $.each(schedule[les.day], function(o, lesX) {
-                if(lesX.layer === les.layer) {
-                    if(areIntervalsColide(les.from, les.to, lesX.from, lesX.to)) {
-                        collison = true;
-                        les.layer++;
-                        return false;
+        if(les.selected === true) {
+            // Collisions
+            les.layer = 1;
+            do {
+                var collison = false;
+                $.each(schedule[les.day], function(o, lesX) {
+                    if(lesX.layer === les.layer) {
+                        if(areIntervalsColide(les.from, les.to, lesX.from, lesX.to)) {
+                            collison = true;
+                            les.layer++;
+                            return false;
+                        }
                     }
-                }
-            });
-        } while(collison === true);
+                });
+            } while(collison === true);
 
-        // Push
-        schedule[les.day].push(les);
+            // Push
+            schedule[les.day].push(les);
+        }
+    });
+
+    // Sort
+    lessonsFin.sort(function(a, b) {
+        if(a.name < b.name) {
+            return -1;
+        } else if(a.name > b.name) {
+            return 1;
+        }
+        return 0;
+    });
+    lessonsFin.sort(function(a, b) {
+        if(a.type === "blue" && b.type !== "blue") {
+            return -1;
+        } else if(a.type !== "blue" && b.type === "blue") {
+            return 1;
+        }
+        return 0;
+    });
+    lessonsFin.sort(function(a, b) {
+        if(a.type === "green" && b.type !== "green") {
+            return -1;
+        } else if(a.type !== "green" && b.type === "green") {
+            return 1;
+        }
+
+        return 0;
     });
 
     // Layers count
@@ -935,12 +923,12 @@ function renderScheduleFin() {
         $.each(schedule[d], function(i, les) {
             var length = ((les.to - les.from) * (fullLength / 14)) - 6 - 6;
             var left = (les.from * (fullLength / 14)) + 3;
-            
+
             var bin = "schedule_cell_bin";
             if(les.type === "cc") {
                 bin = "schedule_cell_bin_cc"
             }
-            
+
             var classes = "";
             if(les.type === "green") {
                 classes += "schedule_cell_type_green ";
@@ -954,7 +942,7 @@ function renderScheduleFin() {
             } else if(les.week.includes("sudý")) {
                 classes += "schedule_cell_week_even ";
             }
-            
+
             var rooms = "";
             $.each(les.rooms, function(i, room) {
                 rooms += room + " ";
@@ -1149,7 +1137,7 @@ function parseLinkforLoadPHP(link) {
     var linkArray = link.split("/");
     linkArray.pop("");
     return linkArray[linkArray.length - 2] + "-" + linkArray[linkArray.length - 1];
-} 
+}
 function parseDay(day) {
     if(day === "Po") {
         return 0;
@@ -1162,21 +1150,21 @@ function parseDay(day) {
     } else if(day === "Pá") {
         return 4;
     }
-} 
+}
 function parseWeek(week) {
     week = week.replace("výuky", "");
     week = week.replaceAll(",", "");
     week = week.trim();
     return week;
-} 
+}
 function parseTimeFrom(time) {
     var hours = +time.split(":")[0];
     return hours - 7;
-} 
+}
 function parseTimeTo(time) {
     var hours = +time.split(":")[0] + 1;
     return hours - 7;
-} 
+}
 function areIntervalsColide(a, b, x, y) {
     a *= 10;
     b *= 10;
@@ -1191,7 +1179,7 @@ function areIntervalsColide(a, b, x, y) {
         }
     }
     return false;
-} 
+}
 function arrayRemove(array, value) {
     return array.filter(function(element) {
         return element != value;
@@ -1225,4 +1213,4 @@ function makeHash(string) {
         hash = Math.abs(hash);
     }
     return hash.toString();
-}; 
+};
