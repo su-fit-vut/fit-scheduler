@@ -1158,7 +1158,7 @@ function loadJSON() {
         }, 2000);
     }
 } // checked
-function exportIcal() {
+function exportICal() {
     var contents = "";
     var createdDatetime = getIcalDatetime(new Date);
 
@@ -1170,9 +1170,9 @@ function exportIcal() {
     // Export all events from final schedule
     $.each(lessons, function(j, les) {
         // Calculate correct datetimes from les object
-        var fromDatetime = getDatetimeFromHourNumber(les.from, less.day);
+        var fromDatetime = getDatetimeFromHourNumber(les.from, les.day);
         var fromDatetimeIcal = getIcalDatetime(fromDatetime);
-        var toDatetime = getDatetimeFromHourNumber(les.to, less.day);
+        var toDatetime = getDatetimeFromHourNumber(les.to, les.day);
         toDatetime = new Date(toDatetime.getTime() - 10 * 1000 * 60);
         var toDatetimeIcal = getIcalDatetime(toDatetime);
 
@@ -1207,7 +1207,7 @@ function exportIcal() {
     document.body.appendChild(element);
     element.click();
     document.body.removeChild(element);
-}
+} // checked
 function storeLocalStorage() {
     // Makefile
     makeFile();
