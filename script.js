@@ -1078,10 +1078,14 @@ function restoreFile() {
         lessons.push(les);
     });
     $.each(file.selected, function(i, les) {
-        lessons.find(x => x.id === les).selected = true;
+        if(typeof lessons.find(x => x.id === les) != "undefined") {
+            lessons.find(x => x.id === les).selected = true;
+        }
     });
     $.each(file.deleted, function(i, les) {
-        lessons.find(x => x.id === les).deleted = true;
+        if(typeof lessons.find(x => x.id === les) != "undefined") {
+            lessons.find(x => x.id === les).deleted = true;
+        }
     });
     renderAll();
 } // checked
