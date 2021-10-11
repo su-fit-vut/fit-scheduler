@@ -1158,6 +1158,56 @@ function loadJSON() {
         }, 2000);
     }
 } // checked
+function exportIcal() {
+    var contents = "";
+    var createdDatetime = getIcalDatetime(new Date);
+
+    // iCalendar header
+    contents += "BEGIN:VCALENDAR\r\n";
+    contents += "VERSION:2.0\r\n";
+    contents += "PRODID:-//kubosh/fitsch//NONSGML v1.0//EN\r\n";
+
+    // Export all events from final schedule
+    $.each(lessons, function(j, les) {
+        // Calculate correct datetimes from les object
+        var fromDatetime = getDatetimeFromHourNumber(les.from, less.day);
+        var fromDatetimeIcal = getIcalDatetime(fromDatetime);
+        var toDatetime = getDatetimeFromHourNumber(les.to, less.day);
+        toDatetime = new Date(toDatetime.getTime() - 10 * 1000 * 60);
+        var toDatetimeIcal = getIcalDatetime(toDatetime);
+
+        var typeString = getTypeString(les.type);
+
+        // Event header
+        contents += "BEGIN:VEVENT\r\n";
+        contents += "UID:" + createdDatetime + "-" + les.id + "\r\n";
+        contents += "DTSTAMP:" + createdDatetime + "\r\n";
+
+        // Datetimes
+        contents += "DTSTART:" + fromDatetimeIcal + "\r\n";
+        contents += "DTEND:" + toDatetimeIcal + "\r\n";
+        contents += "RRULE:FREQ=WEEKLY\r\n";
+
+        // Additional info
+        contents += "SUMMARY:" + les.name + " " + typeString + "\r\n";
+        contents += "LOCATION:" + les.rooms.join(" ") + "\r\n";
+        contents += "URL:https://www.fit.vut.cz/study/course/" + les.url + "\r\n";
+
+        // Event footer
+        contents += "END:VEVENT\r\n";
+    })
+
+    // iCalendar footer
+    contents += "END:VCALENDAR";
+
+    var element = document.createElement('a');
+    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(contents));
+    element.setAttribute('download', "schedule.ics");
+    element.style.display = 'none';
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+}
 function storeLocalStorage() {
     // Makefile
     makeFile();
@@ -1242,3 +1292,43 @@ function makeHash(string) {
     }
     return hash.toString();
 }; // checked
+function padNumber(number) {
+    return (number < 10) ? ("0" + number) : number;
+} // checked
+function getIcalDatetime(date) {
+    var buffer = "";
+    buffer += date.getUTCFullYear();
+    buffer += padNumber(date.getUTCMonth() + 1);
+    buffer += padNumber(date.getUTCDate());
+    buffer += "T";
+    buffer += padNumber(date.getUTCHours());
+    buffer += padNumber(date.getUTCMinutes());
+    buffer += padNumber(date.getUTCSeconds());
+    buffer += "Z";
+    return buffer;
+} // checked
+function getDatetimeFromHourNumber(hour, dayIndex) {
+    hour += 7; // Convert to actual hour
+
+    var date = new Date;
+    var currentDay = date.getDay();
+    var distance = (dayIndex + 1) - currentDay;
+    date.setDate(date.getDate() + distance);
+    date.setHours(hour, 0, 0, 0);
+
+    return date;
+} // checked
+function getTypeString(type) {
+    switch(type) {
+        case "green":
+            return "Přednáška";
+        case "blue":
+            return "Cvičení";
+        case "yellow":
+            return "Laboratoř";
+        case "custom":
+            return "Vlastní hodina";
+        default:
+            return "Jiný typ";
+    }
+} // checked
