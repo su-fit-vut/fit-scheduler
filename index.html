@@ -191,40 +191,22 @@
                                     </div>
                                 </div>
 
-                                <div class="sch_add">
-                                    <div class="sch_add_cell">
-                                        <div class="sch_add_cell_text">Den:</div>
-                                        <select class="sch_add_day sch_add_cell_select" name="day">
-                                            <option value="1">Po</option>
-                                            <option value="2">Út</option>
-                                            <option value="3">St</option>
-                                            <option value="4">Čt</option>
-                                            <option value="5">Pá</option>
+                                <div class="lesson_add_card">
+                                    <div class="lesson_add_card_title">Vlastní hodina</div>
+                                    <div class="lesson_add_card_row">
+                                        <div class="lesson_add_card_row_text">Den:</div>
+                                        <select class="lesson_add_card_row_select lesson_add_card_day" name="les_add_day">
+                                            <option value="0">Po</option>
+                                            <option value="1">Út</option>
+                                            <option value="2">St</option>
+                                            <option value="3">Čt</option>
+                                            <option value="4">Pá</option>
                                         </select>
                                         <div class="cleaner"></div>
                                     </div>
-                                    <div class="sch_add_cell">
-                                        <div class="sch_add_cell_text">Týdny:</div>
-                                        <select class="sch_add_weeks sch_add_cell_select" name="weeks">
-                                            <option value="výuky" selected>Oba</option>
-                                            <option value="sudý">Sudý</option>
-                                            <option value="lichý">Lichý</option>
-                                        </select>
-                                        <div class="cleaner"></div>
-                                    </div>
-                                    <div class="sch_add_cell">
-                                        <div class="sch_add_cell_text">Název:</div>
-                                        <input class="sch_add_name sch_add_cell_inpu_text" type="text" name="name">
-                                        <div class="cleaner"></div>
-                                    </div>
-                                    <div class="sch_add_cell">
-                                        <div class="sch_add_cell_text">Místnost:</div>
-                                        <input class="sch_add_room sch_add_cell_inpu_text" type="text" name="room">
-                                        <div class="cleaner"></div>
-                                    </div>
-                                    <div class="sch_add_cell">
-                                        <div class="sch_add_cell_text">Od:</div>
-                                        <select class="sch_add_from sch_add_cell_select" name="from">
+                                    <div class="lesson_add_card_row">
+                                        <div class="lesson_add_card_row_text">Od:</div>
+                                        <select class="lesson_add_card_row_select lesson_add_card_from" name="les_add_from">
                                             <option value="0" selected>07:00</option>
                                             <option value="1">08:00</option>
                                             <option value="2">09:00</option>
@@ -242,9 +224,9 @@
                                         </select>
                                         <div class="cleaner"></div>
                                     </div>
-                                    <div class="sch_add_cell">
-                                        <div class="sch_add_cell_text">Do:</div>
-                                        <select class="sch_add_to sch_add_cell_select" name="to">
+                                    <div class="lesson_add_card_row">
+                                        <div class="lesson_add_card_row_text">Do:</div>
+                                        <select class="lesson_add_card_row_select lesson_add_card_to" name="les_add_to">
                                             <option value="1" selected>07:50</option>
                                             <option value="2">08:50</option>
                                             <option value="3">09:50</option>
@@ -262,8 +244,23 @@
                                         </select>
                                         <div class="cleaner"></div>
                                     </div>
-                                    <input class="sch_add_button" type="submit" value="Přidat">
-                                    <div class="cleaner"></div>
+                                    <div class="lesson_add_card_row">
+                                        <div class="lesson_add_card_row_text">Název:</div>
+                                        <input class="lesson_add_card_row_input_text lesson_add_card_name" type="text" name="les_add_name">
+                                        <div class="cleaner"></div>
+                                    </div>
+                                    <div class="lesson_add_card_row">
+                                        <div class="lesson_add_card_row_text">Místnost:</div>
+                                        <input class="lesson_add_card_row_input_text lesson_add_card_room" type="text" name="les_add_room">
+                                        <div class="cleaner"></div>
+                                    </div>
+                                    <div class="lesson_add_card_row">
+                                        <div class="lesson_add_card_row_text">Týdny:</div>
+                                        <input class="lesson_add_card_row_input_text lesson_add_card_week" type="text" name="les_add_week">
+                                        <div class="cleaner"></div>
+                                    </div>
+
+                                    <input class="lesson_add_card_button" type="submit" value="Přidat">
                                 </div>
                             </div>
 

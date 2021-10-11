@@ -18,6 +18,9 @@ $(document).ready(function() {
 
     // Start menu load
     loadStudies();
+
+    // Load local storage
+    loadLocalStorage();
 }); // checked
 
 //////////////////////////////////// Events ////////////////////////////////////
@@ -128,6 +131,7 @@ $(document).on("click", ".secs_header_elem", function() {
 // Controls
 $(document).on("click", ".menu_submit_button", function() {
     loadLessons();
+    storeLocalStorage();
 }); // checked
 $(document).on("click", ".menu_save_ical_button", function() {
     exportICal();
@@ -153,6 +157,7 @@ $(document).on("click", ".schedule_cell_star", function() {
     }
 
     // Render
+    storeLocalStorage();
     renderAll();
 }); // checked
 $(document).on("click", ".schedule_cell_bin", function() {
@@ -169,24 +174,27 @@ $(document).on("click", ".schedule_cell_bin", function() {
     }
 
     // Render
+    storeLocalStorage();
     renderAll();
 }); // checked
-$(document).on("click", ".sch_add_button", function() {
+$(document).on("click", ".lesson_add_card_button", function() {
+    // New lesson
     var lesson = {
-        id: Date.now(),
-        url: "",
-        name: $(".sch_add_name").val(),
-        from: +$(".sch_add_from").val(),
-        to: +$(".sch_add_to").val(),
-        groups: [],
-        rooms: [$(".sch_add_room").val()],
-        type: "cc",
-        week: $(".sch_add_weeks").val(),
-        layer: -1,
-        real: true,
-        visible: true
+        "id": "CUST_" + makeHash("custom" + Date.now()),
+        "name": $(".lesson_add_card_name").val(),
+        "link": "0-" + $(".lesson_add_card_name").val(),
+        "day":  +$(".lesson_add_card_day").val(),
+        "week": $(".lesson_add_card_week").val(),
+        "from": +$(".lesson_add_card_from").val(),
+        "to": +$(".lesson_add_card_to").val(),
+        "type": "custom",
+        "rooms": [$(".lesson_add_card_room").val()],
+        "layer": 1,
+        "selected": false,
+        "deleted": false
     };
 
+    // Check
     if(lesson.from >= lesson.to) {
         return;
     }
@@ -197,20 +205,10 @@ $(document).on("click", ".sch_add_button", function() {
         return;
     }
 
-
-    if(+$(".sch_add_day").val() === 1) {
-        scheduleCustom[0].push(lesson);
-    } else if(+$(".sch_add_day").val() === 2) {
-        scheduleCustom[1].push(lesson);
-    } else if(+$(".sch_add_day").val() === 3) {
-        scheduleCustom[2].push(lesson);
-    } else if(+$(".sch_add_day").val() === 4) {
-        scheduleCustom[3].push(lesson);
-    } else if(+$(".sch_add_day").val() === 5) {
-        scheduleCustom[4].push(lesson);
-    }
-
-    parseSchedule();
+    // Push
+    lessons.push(lesson);
+    storeLocalStorage();
+    renderAll();
 });
 
 ///////////////////////////////////// Menu /////////////////////////////////////
@@ -469,19 +467,21 @@ function renderSubjects() {
 /////////////////////////////////// Schledule //////////////////////////////////
 function loadLessons() {
     // Info
-    $(".header_info_icon").addClass("hidden");
-    $(".header_cross_icon").addClass("hidden");
-    $(".secs_main").removeClass("hidden");
-    $(".secs_info").addClass("hidden");
+    {
+        $(".header_info_icon").addClass("hidden");
+        $(".header_cross_icon").addClass("hidden");
+        $(".secs_main").removeClass("hidden");
+        $(".secs_info").addClass("hidden");
 
-    $(".menu_column_row_checkbox").prop("disabled", true);
-    $(".menu_column_row_radio").prop("disabled", true);
-    $(".menu_button").prop("disabled", true);
-    $(".menu_button").addClass("menu_button_disabled");
+        $(".menu_column_row_checkbox").prop("disabled", true);
+        $(".menu_column_row_radio").prop("disabled", true);
+        $(".menu_button").prop("disabled", true);
+        $(".menu_button").addClass("menu_button_disabled");
 
-    $(".loading_message").html("Načítání...");
-    $(".loading_message").removeClass("hidden");
-    $(".secs").addClass("hidden");
+        $(".loading_message").html("Načítání...");
+        $(".loading_message").removeClass("hidden");
+        $(".secs").addClass("hidden");
+    }
 
     // Make file
     {
@@ -1060,14 +1060,14 @@ function restoreFile() {
     loadLessons();
 
     // Lessons
+    $.each(file.custom, function(i, les) {
+        lessons.push(les);
+    });
     $.each(file.selected, function(i, les) {
         lessons.find(x => x.id === les).selected = true;
     });
     $.each(file.deleted, function(i, les) {
         lessons.find(x => x.id === les).deleted = true;
-    });
-    $.each(file.custom, function(i, les) {
-        lessons.push(les);
     });
     renderAll();
 } // checked
@@ -1110,6 +1110,7 @@ function loadJSON() {
         try {
             file = JSON.parse(e.target.result);
             restoreFile();
+            storeLocalStorage();
         } catch(e) {
             // Parse error
             $(".secs").addClass("hidden");
@@ -1142,6 +1143,24 @@ function loadJSON() {
             $(".menu_button").prop("disabled", false);
             $(".menu_button").removeClass("menu_button_disabled");
         }, 2000);
+    }
+} // checked
+function storeLocalStorage() {
+    // Makefile
+    makeFile();
+
+    // Store
+    localStorage.setItem("schedule", JSON.stringify(file));
+} // checked
+function loadLocalStorage() {
+    if(localStorage.getItem("schedule") != null) {
+        // Load
+        try {
+            file = JSON.parse(localStorage.getItem("schedule"));
+        } catch {}
+
+        // Restore
+        restoreFile();
     }
 } // checked
 
