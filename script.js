@@ -1,8 +1,10 @@
 /////////////////////////////////// Variables //////////////////////////////////
-var studies = [];  // Array of loaded studies
-var subjects = []; // Array of selected subjects
-var ranges = [];   // Array of ranges of selected subjects
-var lessons = [];  // Array of lessons of selected subjects
+var studies = [];                                                           // Array of loaded studies
+var subjects = [];                                                          // Array of selected subjects
+var ranges = [];                                                            // Array of ranges of selected subjects
+var lessons = [];                                                           // Array of lessons of selected subjects
+var file = { "sem": "", "studies": [], "grades": [],
+             "subjects": [], "custom": [], "selected": [], "deleted": [] }; // File cache
 
 ///////////////////////////////////// Main /////////////////////////////////////
 $(document).ready(function() {
@@ -125,32 +127,20 @@ $(document).on("click", ".secs_header_elem", function() {
 
 // Controls
 $(document).on("click", ".menu_submit_button", function() {
-    $(".header_info_icon").addClass("hidden");
-    $(".header_cross_icon").addClass("hidden");
-    $(".secs_main").removeClass("hidden");
-    $(".secs_info").addClass("hidden");
-
-    $(".menu_column_row_checkbox").prop("disabled", true);
-    $(".menu_column_row_radio").prop("disabled", true);
-    $(".menu_submit_button").prop("disabled", true);
-    $(".menu_submit_button").addClass("menu_button_disabled");
-
-    $(".loading_message").html("Načítání...");
-    $(".loading_message").removeClass("hidden");
-    $(".secs").addClass("hidden");
-
-    // Start loading lessons
     loadLessons();
 }); // checked
-$(document).on("click", ".menu_save_button", function() {
-    save();
-});
-$(document).on("click", ".menu_load_button", function() {
-    $(".sch_load").trigger("click");
-});
-$(document).on("change", ".sch_load", function() {
-    load();
-});
+$(document).on("click", ".menu_save_ical_button", function() {
+    exportICal();
+}); // checked
+$(document).on("click", ".menu_save_json_button", function() {
+    downloadJSON();
+}); // checked
+$(document).on("click", ".menu_load_json_button", function() {
+    $(".json_load_input").trigger("click");
+}); // checked
+$(document).on("change", ".json_load_input", function() {
+    loadJSON();
+}); // checked
 
 // Schedule
 $(document).on("click", ".schedule_cell_star", function() {
@@ -182,7 +172,45 @@ $(document).on("click", ".schedule_cell_bin", function() {
     renderAll();
 }); // checked
 $(document).on("click", ".sch_add_button", function() {
-    addCustomSchedule();
+    var lesson = {
+        id: Date.now(),
+        url: "",
+        name: $(".sch_add_name").val(),
+        from: +$(".sch_add_from").val(),
+        to: +$(".sch_add_to").val(),
+        groups: [],
+        rooms: [$(".sch_add_room").val()],
+        type: "cc",
+        week: $(".sch_add_weeks").val(),
+        layer: -1,
+        real: true,
+        visible: true
+    };
+
+    if(lesson.from >= lesson.to) {
+        return;
+    }
+    if(typeof lesson.name === "undefined" || lesson.name === "") {
+        return;
+    }
+    if(typeof lesson.rooms[0] === "undefined" || lesson.rooms[0] === "") {
+        return;
+    }
+
+
+    if(+$(".sch_add_day").val() === 1) {
+        scheduleCustom[0].push(lesson);
+    } else if(+$(".sch_add_day").val() === 2) {
+        scheduleCustom[1].push(lesson);
+    } else if(+$(".sch_add_day").val() === 3) {
+        scheduleCustom[2].push(lesson);
+    } else if(+$(".sch_add_day").val() === 4) {
+        scheduleCustom[3].push(lesson);
+    } else if(+$(".sch_add_day").val() === 5) {
+        scheduleCustom[4].push(lesson);
+    }
+
+    parseSchedule();
 });
 
 ///////////////////////////////////// Menu /////////////////////////////////////
@@ -440,6 +468,48 @@ function renderSubjects() {
 
 /////////////////////////////////// Schledule //////////////////////////////////
 function loadLessons() {
+    // Info
+    $(".header_info_icon").addClass("hidden");
+    $(".header_cross_icon").addClass("hidden");
+    $(".secs_main").removeClass("hidden");
+    $(".secs_info").addClass("hidden");
+
+    $(".menu_column_row_checkbox").prop("disabled", true);
+    $(".menu_column_row_radio").prop("disabled", true);
+    $(".menu_button").prop("disabled", true);
+    $(".menu_button").addClass("menu_button_disabled");
+
+    $(".loading_message").html("Načítání...");
+    $(".loading_message").removeClass("hidden");
+    $(".secs").addClass("hidden");
+
+    // Make file
+    {
+        // Sem
+        file.sem = $(".menu_sem_radio:checked").prop("value");
+
+        // Study
+        file.studies = [];
+        if($(".menu_bit_checkbox:checked").length > 0) {
+            file.studies.push($(".menu_bit_checkbox:checked").prop("value"));
+        }
+        if($(".menu_mit_radio:checked").length > 0) {
+            file.studies.push($(".menu_mit_radio:checked").prop("value"));
+        }
+
+        // Grades
+        file.grades = [];
+        $.each($(".menu_grade_checkbox:checked"), function(i, grade) {
+            file.grades.push($(grade).prop("value"));
+        });
+
+        // Subjects
+        file.subjects = [];
+        $.each($(".menu_sel_checkbox"), function(i, sub) {
+            file.subjects.push($(sub).siblings(".menu_column_row_text").html());
+        });
+    }
+
     // Subjects fill
     subjects = [];
     $(".menu_sel_checkbox").each(function(i, sub) {
@@ -628,8 +698,8 @@ function loadLessons() {
 
     $(".menu_column_row_checkbox").prop("disabled", false);
     $(".menu_column_row_radio").prop("disabled", false);
-    $(".menu_submit_button").prop("disabled", false);
-    $(".menu_submit_button").removeClass("menu_button_disabled");
+    $(".menu_button").prop("disabled", false);
+    $(".menu_button").removeClass("menu_button_disabled");
 
     $(".loading_message").html("");
     $(".loading_message").addClass("hidden");
@@ -930,186 +1000,157 @@ function renderRanges() {
     });
 } // checked
 
-
-
-
-
-
-
-
-
-
-
-function addCustomSchedule() {
-    var lesson = {
-        id: Date.now(),
-        url: "",
-        name: $(".sch_add_name").val(),
-        from: +$(".sch_add_from").val(),
-        to: +$(".sch_add_to").val(),
-        groups: [],
-        rooms: [$(".sch_add_room").val()],
-        type: "cc",
-        week: $(".sch_add_weeks").val(),
-        layer: -1,
-        real: true,
-        visible: true
-    };
-
-    if(lesson.from >= lesson.to) {
-        return;
-    }
-    if(typeof lesson.name === "undefined" || lesson.name === "") {
-        return;
-    }
-    if(typeof lesson.rooms[0] === "undefined" || lesson.rooms[0] === "") {
-        return;
-    }
-
-
-    if(+$(".sch_add_day").val() === 1) {
-        scheduleCustom[0].push(lesson);
-    } else if(+$(".sch_add_day").val() === 2) {
-        scheduleCustom[1].push(lesson);
-    } else if(+$(".sch_add_day").val() === 3) {
-        scheduleCustom[2].push(lesson);
-    } else if(+$(".sch_add_day").val() === 4) {
-        scheduleCustom[3].push(lesson);
-    } else if(+$(".sch_add_day").val() === 5) {
-        scheduleCustom[4].push(lesson);
-    }
-
-    parseSchedule();
-}
-
-
 //////////////////////////////////// SAVING ////////////////////////////////////
-function save() {
-    var file = {
-        grades: [],
-        sem: undefined,
-        com_sub: [],
-        opt_sub: [],
-        custom: [],
-        faded: [],
-        indexes: []
-    }
-    $.each($(".menu_column_row_checkbox[name='grade']:checked"), function(i, gr) {
-        file.grades.push($(gr).prop("value"));
+function makeFile() {
+    // Lessons
+    file.custom = [];
+    file.selected = [];
+    file.deleted = [];
+    $.each(lessons, function(i, les) {
+        if(les.type === "custom") {
+            file.custom.push(les);
+        }
+        if(les.selected) {
+            file.selected.push(les.id);
+        }
+        if(les.deleted) {
+            file.deleted.push(les.id);
+        }
     });
-    file.sem = +$(".menu_column_row_radio[name='sem']:checked").prop("value");
+} // checked
+function restoreFile() {
+    // Sem
+    $(".menu_sem_radio[value='" + file.sem +"']").prop("checked", true);
 
-    $.each($(".menu_com_column .menu_column_row"), function(i, sub) {
-        if($(sub).children(".menu_column_row_checkbox").length != 0) {
-            if($(sub).children(".menu_column_row_checkbox")[0].checked) {
-                file.com_sub.push($(sub).children(".menu_column_row_text").html());
+    // Study
+    $(".menu_bit_checkbox").prop("checked", false);
+    $(".menu_mit_radio").prop("checked", false);
+    $.each(file.studies, function(i, stud) {
+        $(".menu_bit_checkbox[value='" + stud +"']").prop("checked", true);
+        $(".menu_mit_radio[value='" + stud +"']").prop("checked", true);
+    });
+
+    // Grades
+    $(".menu_grade_checkbox").prop("checked", false);
+    $.each(file.grades, function(i, grade) {
+        $(".menu_grade_checkbox[value='" + grade +"']").prop("checked", true);
+    });
+
+    // Subjects
+    $(".menu_sub_checkbox").prop("checked", false);
+    $(".menu_com_column .menu_column_row").each(function(i, sub) {
+        if($(sub).children(".menu_column_row_text").length > 0) {
+            if(file.subjects.includes($(sub).children(".menu_column_row_text").html())) {
+                $(sub).children(".menu_sub_checkbox").prop("checked", true);
             }
         }
     });
-    $.each($(".menu_opt_column .menu_column_row"), function(i, sub) {
-        if($(sub).children(".menu_column_row_checkbox").length != 0) {
-            if($(sub).children(".menu_column_row_checkbox")[0].checked) {
-                file.opt_sub.push($(sub).children(".menu_column_row_text").html());
+    $(".menu_opt_column .menu_column_row").each(function(i, sub) {
+        if($(sub).children(".menu_column_row_text").length > 0) {
+            if(file.subjects.includes($(sub).children(".menu_column_row_text").html())) {
+                $(sub).children(".menu_sub_checkbox").prop("checked", true);
             }
         }
     });
 
-    var scheduleToRemove = [];
-    $.each(scheduleFaded, function(i, index) {
-        var found = false;
-        var day = +index.split("|")[0];
-        var id = index.split("|")[1];
+    // Menu
+    $(".menu_com_search_input").prop("value", ""); $(".menu_com_search_input").trigger("keyup");
+    $(".menu_opt_search_input").prop("value", ""); $(".menu_opt_search_input").trigger("keyup");
+    renderSubjects();
+    loadLessons();
 
-        $.each(schedule[day], function(i, sch) {
-            if(sch.id.toString() === id.toString()) {
-                found = true;
-                return false;
-            }
-        });
-        if(!found) {
-            scheduleToRemove.push(index);
-        }
+    // Lessons
+    $.each(file.selected, function(i, les) {
+        lessons.find(x => x.id === les).selected = true;
     });
-    $.each(scheduleToRemove, function(i, index) {
-        scheduleFaded = arrayRemove(scheduleFaded, index);
+    $.each(file.deleted, function(i, les) {
+        lessons.find(x => x.id === les).deleted = true;
     });
+    $.each(file.custom, function(i, les) {
+        lessons.push(les);
+    });
+    renderAll();
+} // checked
 
-    file.custom = scheduleCustom;
-    file.faded = scheduleFaded;
-    file.indexes = scheduleIndexes;
+function downloadJSON() {
+    // MakeFile
+    makeFile();
 
-    file = JSON.stringify(file);
+    // Save
+    var fileJSON = JSON.stringify(file);
     var element = document.createElement('a');
-    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(file));
-    element.setAttribute('download', "schledule.json");
+    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(fileJSON));
+    element.setAttribute('download', "schedule.json");
     element.style.display = 'none';
     document.body.appendChild(element);
     element.click();
     document.body.removeChild(element);
-}
-function load() {
-    var file;
-    if(!$(".sch_load")[0].files[0]) {
+} // checked
+function loadJSON() {
+    // No file
+    if(!$(".json_load_input")[0].files[0]) {
+        $(".secs").addClass("hidden");
+        $(".loading_message").removeClass("hidden");
         $(".loading_message").html("Nevybrán žádný soubor");
+        $(".menu_button").prop("disabled", true);
+        $(".menu_button").addClass("menu_button_disabled");
+
+        setTimeout(function() {
+            $(".loading_message").html("");
+            $(".loading_message").addClass("hidden");
+            $(".secs").removeClass("hidden");
+            $(".menu_button").prop("disabled", false);
+            $(".menu_button").removeClass("menu_button_disabled");
+        }, 2000);
     }
 
     var reader = new FileReader();
-    reader.readAsText($(".sch_load")[0].files[0], "UTF-8");
-    reader.onload = function (e) {
+    reader.readAsText($(".json_load_input")[0].files[0], "UTF-8");
+    reader.onload = function(e) {
         try {
             file = JSON.parse(e.target.result);
+            restoreFile();
         } catch(e) {
+            // Parse error
+            $(".secs").addClass("hidden");
+            $(".loading_message").removeClass("hidden");
             $(".loading_message").html("Chyba při parsování souboru");
+            $(".menu_button").prop("disabled", true);
+            $(".menu_button").addClass("menu_button_disabled");
+
+            setTimeout(function() {
+                $(".loading_message").html("");
+                $(".loading_message").addClass("hidden");
+                $(".secs").removeClass("hidden");
+                $(".menu_button").prop("disabled", false);
+                $(".menu_button").removeClass("menu_button_disabled");
+            }, 2000);
         }
-
-        $.each($(".menu_column_row_checkbox[name='grade']"), function(i, gr) {
-            if(file.grades.includes($(gr).prop("value"))) {
-                $(gr).prop("checked", true);
-            } else {
-                $(gr).prop("checked", false);
-            }
-        });
-        if(file.sem === 0) {
-            $(".menu_column_row_radio[name='sem'][value='0']").prop("checked", true);
-        } else {
-            $(".menu_column_row_radio[name='sem'][value='1']").prop("checked", true);
-        }
-
-        $.each($(".menu_com_column .menu_column_row"), function(i, sub) {
-            if(file.com_sub.includes($(sub).children(".menu_column_row_text").html())) {
-                $(sub).children("input").prop("checked", true);
-            } else {
-                $(sub).children("input").prop("checked", false);
-            }
-        });
-        $.each($(".menu_opt_column .menu_column_row"), function(i, sub) {
-            if(file.opt_sub.includes($(sub).children(".menu_column_row_text").html())) {
-                $(sub).children("input").prop("checked", true);
-            } else {
-                $(sub).children("input").prop("checked", false);
-            }
-        });
-
-        scheduleCustom = file.custom;
-        scheduleFaded = file.faded;
-        scheduleIndexes = file.indexes;
-
-        $(".header_menu_icon").css("background-image", "url(./images/menu.png)")
-        $(".menu").addClass("hidden");
-        renderSubjects();
-        loadWorkingSubjects();
     }
     reader.onerror = function (e) {
+        // Read error
+        $(".secs").addClass("hidden");
+        $(".loading_message").removeClass("hidden");
         $(".loading_message").html("Chyba při čtení souboru");
+        $(".menu_button").prop("disabled", true);
+        $(".menu_button").addClass("menu_button_disabled");
+
+        setTimeout(function() {
+            $(".loading_message").html("");
+            $(".loading_message").addClass("hidden");
+            $(".secs").removeClass("hidden");
+            $(".menu_button").prop("disabled", false);
+            $(".menu_button").removeClass("menu_button_disabled");
+        }, 2000);
     }
-}
+} // checked
 
 //////////////////////////////////// Helpers ///////////////////////////////////
 function parseLinkforLoadPHP(link) {
     var linkArray = link.split("/");
-    linkArray.pop("");
+    linkArray = linkArray.filter(x => x != "");
     return linkArray[linkArray.length - 2] + "-" + linkArray[linkArray.length - 1];
-}
+} // checked
 function parseDay(day) {
     if(day === "Po") {
         return 0;
@@ -1122,21 +1163,21 @@ function parseDay(day) {
     } else if(day === "Pá") {
         return 4;
     }
-}
+} // checked
 function parseWeek(week) {
     week = week.replace("výuky", "");
     week = week.replaceAll(",", "");
     week = week.trim();
     return week;
-}
+} // checked
 function parseTimeFrom(time) {
     var hours = +time.split(":")[0];
     return hours - 7;
-}
+} // checked
 function parseTimeTo(time) {
     var hours = +time.split(":")[0] + 1;
     return hours - 7;
-}
+} // checked
 function doLessonsCollide(a, b, x, y) {
     a *= 10;
     b *= 10;
@@ -1151,24 +1192,7 @@ function doLessonsCollide(a, b, x, y) {
         }
     }
     return false;
-}
-function arrayRemove(array, value) {
-    return array.filter(function(element) {
-        return element != value;
-    });
-}
-function arrayEqual(arrayA, arrayB) {
-    if(arrayA.length != arrayB.length) {
-        return false;
-    }
-
-    for(i = 0; i < arrayA.length; i++) {
-        if(!arrayB.includes(arrayA[i])) {
-            return false;
-        }
-    }
-    return true;
-}
+} // checked
 function makeHash(string) {
     var hash = 0, i, chr;
 
@@ -1185,4 +1209,4 @@ function makeHash(string) {
         hash = Math.abs(hash);
     }
     return hash.toString();
-};
+}; // checked

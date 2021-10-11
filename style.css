@@ -168,7 +168,6 @@ html, body, * {
 
                 .menu_buttons {
                     width: calc(100% - 10px);
-                    height: 30px;
                     padding: 30px 5px;
                 }
                     .menu_buttons_line {
