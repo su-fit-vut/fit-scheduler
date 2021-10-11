@@ -171,42 +171,59 @@ html, body, * {
                     height: 30px;
                     padding: 30px 5px;
                 }
-                    .menu_button {
-                        display: block;
-                        float: right;
+                    .menu_buttons_line {
+                        height: 1px;
+                        background-color: #ffffff;
                         width: 100%;
-                        height: 30px;
-                        background-color: #038C00;
-                        border-radius: 0;
-                        border: 0;
-                        border-bottom: 4px #025C00 solid;
-                        color: #ffffff;
-                        font-size: 16px;
-                        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-                        cursor: pointer;
+                        margin-bottom: 10px;
                     }
-                    .menu_button:hover {
-                        background-color: #04AD00;
+                    .menu_buttons_row {
+                        width: 100%;
+                        padding-bottom: 10px;
                     }
-                    .menu_button:active {
-                        height: 28px;
-                        margin-top: 2px;
-                        border-bottom-width: 2px;
-                    }
+                        .menu_button {
+                            display: block;
+                            float: left;
+                            width: 100%;
+                            height: 30px;
+                            background-color: #038C00;
+                            border-radius: 0;
+                            border: 0;
+                            border-bottom: 4px #025C00 solid;
+                            color: #ffffff;
+                            font-size: 16px;
+                            font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+                            cursor: pointer;
+                        }
+                        .menu_button:hover {
+                            background-color: #04AD00;
+                        }
+                        .menu_button:active {
+                            height: 28px;
+                            margin-top: 2px;
+                            border-bottom-width: 2px;
+                        }
+                        .menu_button_half_l {
+                            width: calc(50% - 5px);
+                            margin-right: 10px;
+                        }
+                        .menu_button_half_r {
+                            width: calc(50% - 5px);
+                        }
 
-                    .menu_button_disabled {
-                        border-bottom: 4px #242424 solid;
-                        background-color: #454545;
-                        cursor: default;
-                    }
-                    .menu_button_disabled:hover {
-                        background-color: #454545;
-                    }
-                    .menu_button_disabled:active {
-                        height: 30px;
-                        margin-top: 0px;
-                        border-bottom-width: 4px;
-                    }
+                        .menu_button_disabled {
+                            border-bottom: 4px #242424 solid;
+                            background-color: #454545;
+                            cursor: default;
+                        }
+                        .menu_button_disabled:hover {
+                            background-color: #454545;
+                        }
+                        .menu_button_disabled:active {
+                            height: 30px;
+                            margin-top: 0px;
+                            border-bottom-width: 4px;
+                        }
 
             .menu_icons {
                 float: left;
@@ -516,26 +533,6 @@ html, body, * {
                                                 background-color: #6b6b6b;
                                             }
                                             .schedule_cell_bin:active {
-                                                background-color: #454545;
-                                            }
-                                            .schedule_cell_bin_cc {
-                                                position: absolute;
-                                                top: 3px;
-                                                left: 3px;
-                                                height: 15px;
-                                                width: 15px;
-                                                background-color: #646464;
-                                                background-image: url(images/bin.png);
-                                                background-position: 50% 50%;
-                                                background-repeat: no-repeat;
-                                                background-size: 60% 60%;
-                                                cursor: pointer;
-                                                border-radius: 2px;
-                                            }
-                                            .schedule_cell_bin_cc:hover {
-                                                background-color: #6b6b6b;
-                                            }
-                                            .schedule_cell_bin_cc:active {
                                                 background-color: #454545;
                                             }
 

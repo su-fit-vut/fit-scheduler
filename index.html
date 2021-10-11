@@ -94,8 +94,23 @@
                         </div>
 
                         <div class="menu_buttons">
-                            <input class="menu_button menu_submit_button" type="button" value="Načíst">
-                            <div class="cleaner"></div>
+                            <div class="menu_buttons_row">
+                                <input class="menu_button menu_submit_button" type="button" value="Načíst předměty"/>
+                                <div class="cleaner"></div>
+                            </div>
+                            <div class="menu_buttons_line"></div>
+                            <div class="menu_buttons_row">
+                                <input class="menu_button menu_button_half_l menu_load_json_button" type="button" value="Uložit JSON"/>
+                                <input class="menu_button menu_button_half_r menu_save_json_button" type="button" value="Otevřít JSON"/>
+                                <div class="cleaner"></div>
+                            </div>
+                            <div class="menu_buttons_row">
+                                <input class="menu_button menu_save_ical_button" type="button" value="Exportovat iCalendar"/>
+                                <div class="cleaner"></div>
+                            </div>
+
+                            <input class="json_load_input hidden" type="file" name="json_load_input"/>
+                            <input class="ical_load_input hidden" type="file" name="ical_load_input"/>
                         </div>
                     </div>
 
@@ -251,9 +266,6 @@
                                     <input class="sch_add_button" type="submit" value="Přidat">
                                     <div class="cleaner"></div>
                                 </div>
-                                <input class="sch_load hidden" type="file" name="sch_load">
-                                <input class="menu_button menu_button_l menu_load_button" type="button" value="Otevřít">
-                                <input class="menu_button menu_button_l menu_save_button" type="button" value="Uložit">
                             </div>
 
                             <div class="sec se_1 sec_invisible">
