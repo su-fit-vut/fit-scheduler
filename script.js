@@ -624,7 +624,7 @@ function loadLessons() {
                         }
 
                         // ID
-                        lesson.id = "LOAD_" + makeHash(lesson.name + ";" + lesson.from + ";" + lesson.to + ";" + lesson.type + ";" + lesson.week + ";" + lesson.day);
+                        lesson.id = "LOAD_" + makeHash(lesson.name + ";" + lesson.day + ";" + lesson.week + ";" + lesson.from + ";" + lesson.to + ";" + lesson.type + ";" + JSON.stringify(lesson.rooms));
 
                         // Push
                         lessons.push(lesson);
