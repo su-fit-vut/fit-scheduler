@@ -1070,6 +1070,7 @@ function restoreFile() {
     $(".menu_opt_search_input").prop("value", ""); $(".menu_opt_search_input").trigger("keyup");
     renderSubjects();
     lastLoadedSubjects = [];
+    lessons = [];
     loadLessons();
 
     // Lessons
