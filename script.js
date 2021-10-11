@@ -1,6 +1,7 @@
 /////////////////////////////////// Variables //////////////////////////////////
 var studies = [];                                                           // Array of loaded studies
 var subjects = [];                                                          // Array of selected subjects
+var lastLoadedSubjects = [];                                                // Array of last loaded subjects
 var ranges = [];                                                            // Array of ranges of selected subjects
 var lessons = [];                                                           // Array of lessons of selected subjects
 var file = { "sem": "", "studies": [], "grades": [],
@@ -521,7 +522,12 @@ function loadLessons() {
     });
 
     // Load
-    lessons = [];
+    var tempLessons = [];
+    $.each(subjects, function(i, sub) {
+        tempLessons = tempLessons.concat(lessons.filter(x => x.name === sub.name));
+    });
+    tempLessons = tempLessons.concat(lessons.filter(x => x.type === "custom"));
+    lessons = tempLessons;
     $.each(subjects, function(i, sub) {
         // Title
         $(".loading_message").html("Načítám " + sub.name + "...");
@@ -539,6 +545,11 @@ function loadLessons() {
             success: function(e) {
                 // Range
                 sub.range = $(e).find("main").find("div.b-detail__body").find("div.grid__cell").find("p:contains('Rozsah')").parent().next().children().html();
+
+                // Already loaded
+                if(typeof lastLoadedSubjects.find(x => x.name === sub.name) !== "undefined") {
+                    return;
+                }
 
                 // Lessons
                 $(e).find("table#schedule").find("tbody").find("tr").each(function(o, tr) {
@@ -622,6 +633,7 @@ function loadLessons() {
             }
         });
     });
+    lastLoadedSubjects = subjects;
 
     // Parse ranges
     ranges = [];
@@ -1057,6 +1069,7 @@ function restoreFile() {
     $(".menu_com_search_input").prop("value", ""); $(".menu_com_search_input").trigger("keyup");
     $(".menu_opt_search_input").prop("value", ""); $(".menu_opt_search_input").trigger("keyup");
     renderSubjects();
+    lastLoadedSubjects = [];
     loadLessons();
 
     // Lessons
