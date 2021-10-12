@@ -189,6 +189,7 @@ $(document).on("click", ".lesson_add_card_button", function() {
         "from": +$(".lesson_add_card_from").val(),
         "to": +$(".lesson_add_card_to").val(),
         "type": "custom",
+        "custom_color": $(".lesson_add_card_color").val(),
         "rooms": [$(".lesson_add_card_room").val()],
         "layer": 1,
         "selected": false,
@@ -812,7 +813,7 @@ function renderSchedule() {
             } else if(les.type === "yellow") {
                 classes += "schedule_cell_type_yellow ";
             } else if(les.type === "custom") {
-                classes += "schedule_cell_type_yellow ";
+                classes += "schedule_cell_type_" + les.custom_color + " ";
             }
             if(les.week.includes("lichý")) {
                 classes += "schedule_cell_week_odd ";
@@ -907,7 +908,7 @@ function renderScheduleFin() {
             } else if(les.type === "yellow") {
                 classes += "schedule_cell_type_yellow ";
             } else if(les.type === "custom") {
-                classes += "schedule_cell_type_yellow ";
+                classes += "schedule_cell_type_" + les.custom_color + " ";
             }
             if(les.week.includes("lichý")) {
                 classes += "schedule_cell_week_odd ";
