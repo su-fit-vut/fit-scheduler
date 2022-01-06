@@ -233,7 +233,7 @@ function loadStudies(e) {
             // Parse BIT
             studies.push({
                 "name": "BIT",
-                "link": parseLinkforLoadPHP($(e).find("div#tab-bc").find("li.c-programmes__item").first().find("a.b-programme__link").prop("href")),
+                "link": parseLinkforLoadPHP($(e).find("div#bc").find("li.c-programmes__item").first().find("a.b-programme__link").prop("href")),
                 "subjects": {
                     "com": [
                         [], [], []
@@ -245,7 +245,7 @@ function loadStudies(e) {
             });
 
             // Parse MIT
-            $(e).find("div#tab-mgr").find("li.c-programmes__item").first().find("li.c-branches__item").each(function(i, li) {
+            $(e).find("div#mgr").find("li.c-programmes__item").first().find("li.c-branches__item").each(function(i, li) {
                 studies.push({
                     "name": "MIT-" + $(li).find("span.tag").html(),
                     "link": parseLinkforLoadPHP($(li).find("a.b-branch__link").prop("href")),
