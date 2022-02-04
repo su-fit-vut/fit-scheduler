@@ -525,7 +525,7 @@ function loadLessons() {
     // Load
     var tempLessons = [];
     $.each(subjects, function(i, sub) {
-        tempLessons = tempLessons.concat(lessons.filter(x => x.name === sub.name));
+        tempLessons = tempLessons.concat(lessons.filter(x => x.name === sub.name && x.type != "custom"));
     });
     tempLessons = tempLessons.concat(lessons.filter(x => x.type === "custom"));
     lessons = tempLessons;
