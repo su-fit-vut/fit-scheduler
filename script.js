@@ -1267,17 +1267,17 @@ function parseTimeTo(time) {
     return hours - 7;
 } // checked
 function doLessonsCollide(a, b, x, y) {
-    a *= 10;
-    b *= 10;
-    x *= 10;
-    y *= 10;
-
-    for(o = a + 5; o < b; o += 10) {
-        for(p = x + 5; p < y; p += 10) {
-            if(o === p) {
-                return true;
-            }
-        }
+    if(x > a && x < b) {
+        return true;
+    }
+    if(y > a && y < b) {
+        return true;
+    }
+    if(a > x && a < y) {
+        return true;
+    }
+    if(b > x && b < y) {
+        return true;
     }
     return false;
 } // checked
