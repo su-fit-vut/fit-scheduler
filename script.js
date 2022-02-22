@@ -1279,6 +1279,9 @@ function doLessonsCollide(a, b, x, y) {
     if(b > x && b < y) {
         return true;
     }
+    if(a == x && b == y) {
+        return true;
+    }
     return false;
 } // checked
 function makeHash(string) {
