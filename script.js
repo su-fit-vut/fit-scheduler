@@ -6,6 +6,8 @@ var ranges = [];                                                            // A
 var lessons = [];                                                           // Array of lessons of selected subjects
 var file = { "sem": "", "studies": [], "grades": [],
              "subjects": [], "custom": [], "selected": [], "deleted": [] }; // File cache
+var year = (new Date()).getMonth()+1 >= 8  ? (new Date()).getFullYear() : (new Date()).getFullYear() - 1; // ac. year (from august display next ac. year)
+
 
 ///////////////////////////////////// Main /////////////////////////////////////
 $(document).ready(function() {
@@ -54,6 +56,14 @@ $(document).on("click", ".menu_cross_icon", function() {
 }); // checked
 
 // Menu
+$(document).on("change", ".menu_years", function(e) {
+    year = Number($(this).val());
+    studies = subjects = lastLoadedSubjects = ranges = lessons = [];
+    file = { "sem": "", "studies": [], "grades": [],
+        "subjects": [], "custom": [], "selected": [], "deleted": [] }; // File cache
+    loadStudies();
+    loadLessons();
+});
 $(document).on("click", ".menu_sem_radio", function() {
     $(".menu_com_search_input").prop("value", ""); $(".menu_com_search_input").trigger("keyup");
     $(".menu_opt_search_input").prop("value", ""); $(".menu_opt_search_input").trigger("keyup");
@@ -214,6 +224,24 @@ $(document).on("click", ".lesson_add_card_button", function() {
 });
 
 ///////////////////////////////////// Menu /////////////////////////////////////
+function loadYears(e) {
+    if ($(".menu_years").find("option").length)
+        return;
+
+    let years = [];
+    $(e).find("select#year").find("option").each(function (i, opt) {
+        years.push({value: Number($(opt).prop('value')), name: $(opt).text()});
+    });
+
+    // Generate
+    $(".menu_years").html("");
+    if (years.length === 0)
+        $(".menu_years").append(` <option value="` + year + `" selected>` + year + `/` + (year+1) + `</option>`);
+    else
+        $.each(years, function(i, y) {
+            $(".menu_years").append(` <option value="` + y.value + `" ` + (year === y.value ? "selected" : "") + `>` + y.name + `</option>`);
+        });
+}
 function loadStudies(e) {
     // Title
     $(".loading_message").html("Načítám studia...");
@@ -226,7 +254,8 @@ function loadStudies(e) {
         data: {
             "a": "s",
             "b": "",
-            "c": ""
+            "c": "",
+            "y": year,
         },
         async: false,
         success: function(e) {
@@ -245,7 +274,12 @@ function loadStudies(e) {
             });
 
             // Parse MIT
-            $(e).find("div#mgr").find("li.c-programmes__item").first().find("li.c-branches__item").each(function(i, li) {
+            $(e).find("div#mgr").find("li.c-programmes__item").find("li.c-branches__item").each(function(i, li) {
+
+                // only new mgr program
+                if (!$(li).find("span.tag").html().startsWith('N'))
+                    return;
+
                 studies.push({
                     "name": "MIT-" + $(li).find("span.tag").html(),
                     "link": parseLinkforLoadPHP($(li).find("a.b-branch__link").prop("href")),
@@ -277,6 +311,9 @@ function loadStudies(e) {
                                                     </div>`);
                 }
             });
+
+            // Load academic years
+            loadYears(e);
 
             // Start load subjects
             loadSubjects();
@@ -487,6 +524,9 @@ function loadLessons() {
 
     // Make file
     {
+        // Year
+        file.year = year;
+
         // Sem
         file.sem = $(".menu_sem_radio:checked").prop("value");
 
@@ -1032,6 +1072,11 @@ function makeFile() {
     });
 } // checked
 function restoreFile() {
+    // Year
+    if (file.year)
+        year = file.year;
+    $(".menu_years").val(year);
+
     // Sem
     $(".menu_sem_radio[value='" + file.sem +"']").prop("checked", true);
 
