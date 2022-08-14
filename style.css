@@ -130,6 +130,14 @@ html, body, * {
                                 width: 100%;
                                 height: 30px;
                             }
+                                .menu_column_row_select {
+                                    width: 100%;
+                                    height: 30px;
+                                    margin: 5px 0;
+                                    color: #fff;
+                                    border: 2px solid #fff;
+                                    background-color: #051221;
+                                }
                                 .menu_column_row_checkbox {
                                     display: block;
                                     float: left;

@@ -1,13 +1,12 @@
 /////////////////////////////////// Variables //////////////////////////////////
-var studies = [];                                                           // Array of loaded studies
-var subjects = [];                                                          // Array of selected subjects
-var lastLoadedSubjects = [];                                                // Array of last loaded subjects
-var ranges = [];                                                            // Array of ranges of selected subjects
-var lessons = [];                                                           // Array of lessons of selected subjects
+var studies = [];                                                                                          // Array of loaded studies
+var subjects = [];                                                                                         // Array of selected subjects
+var lastLoadedSubjects = [];                                                                               // Array of last loaded subjects
+var ranges = [];                                                                                           // Array of ranges of selected subjects
+var lessons = [];                                                                                          // Array of lessons of selected subjects
 var file = { "sem": "", "studies": [], "grades": [],
-             "subjects": [], "custom": [], "selected": [], "deleted": [] }; // File cache
-var year = (new Date()).getMonth()+1 >= 8  ? (new Date()).getFullYear() : (new Date()).getFullYear() - 1; // ac. year (from august display next ac. year)
-
+             "subjects": [], "custom": [], "selected": [], "deleted": [] };                                // File cache
+var year = (new Date()).getMonth() + 1 >= 8 ? (new Date()).getFullYear() : (new Date()).getFullYear() - 1; // Academic year (from august display next ac. year)
 
 ///////////////////////////////////// Main /////////////////////////////////////
 $(document).ready(function() {
@@ -56,11 +55,11 @@ $(document).on("click", ".menu_cross_icon", function() {
 }); // checked
 
 // Menu
-$(document).on("change", ".menu_years", function(e) {
+$(document).on("change", ".menu_column_row_select", function(e) {
     year = Number($(this).val());
     studies = subjects = lastLoadedSubjects = ranges = lessons = [];
     file = { "sem": "", "studies": [], "grades": [],
-        "subjects": [], "custom": [], "selected": [], "deleted": [] }; // File cache
+             "subjects": [], "custom": [], "selected": [], "deleted": [] };
     loadStudies();
     loadLessons();
 });
@@ -224,24 +223,6 @@ $(document).on("click", ".lesson_add_card_button", function() {
 });
 
 ///////////////////////////////////// Menu /////////////////////////////////////
-function loadYears(e) {
-    if ($(".menu_years").find("option").length)
-        return;
-
-    let years = [];
-    $(e).find("select#year").find("option").each(function (i, opt) {
-        years.push({value: Number($(opt).prop('value')), name: $(opt).text()});
-    });
-
-    // Generate
-    $(".menu_years").html("");
-    if (years.length === 0)
-        $(".menu_years").append(` <option value="` + year + `" selected>` + year + `/` + (year+1) + `</option>`);
-    else
-        $.each(years, function(i, y) {
-            $(".menu_years").append(` <option value="` + y.value + `" ` + (year === y.value ? "selected" : "") + `>` + y.name + `</option>`);
-        });
-}
 function loadStudies(e) {
     // Title
     $(".loading_message").html("Načítám studia...");
@@ -312,8 +293,20 @@ function loadStudies(e) {
                 }
             });
 
-            // Load academic years
-            loadYears(e);
+            // Parse years
+            let years = [];
+            $(e).find("select#year").find("option").each(function (i, opt) {
+                years.push({value: Number($(opt).prop('value')), name: $(opt).text()});
+            });
+
+            // Generate
+            $(".menu_column_row_select").html("");
+            if (years.length === 0)
+                $(".menu_column_row_select").append(` <option value="` + year + `" selected>` + year + `/` + (year+1) + `</option>`);
+            else
+                $.each(years, function(i, y) {
+                    $(".menu_column_row_select").append(` <option value="` + y.value + `" ` + (year === y.value ? "selected" : "") + `>` + y.name + `</option>`);
+                });
 
             // Start load subjects
             loadSubjects();
@@ -1073,9 +1066,10 @@ function makeFile() {
 } // checked
 function restoreFile() {
     // Year
-    if (file.year)
+    if(file.year) {
         year = file.year;
-    $(".menu_years").val(year);
+        $(".menu_column_row_select").val(year);
+    }
 
     // Sem
     $(".menu_sem_radio[value='" + file.sem +"']").prop("checked", true);
