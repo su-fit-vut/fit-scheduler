@@ -7,7 +7,8 @@ var lessons = [];                                                               
 var file = { "sem": "", "studies": [], "grades": [],
              "subjects": [], "custom": [], "selected": [], "deleted": [] };                                // File cache
 var year = (new Date()).getMonth() + 1 >= 8 ? (new Date()).getFullYear() : (new Date()).getFullYear() - 1; // Academic year (from august display next ac. year)
-
+var fakeHtml = document.implementation.createHTMLDocument('virtual');                                      // https://stackoverflow.com/a/50194774/7361496
+var loadUrl = "./load.php";
 ///////////////////////////////////// Main /////////////////////////////////////
 $(document).ready(function() {
     // Semester radio auto select
@@ -230,7 +231,7 @@ function loadStudies(e) {
     // AJAX
     studies = [];
     $.ajax({
-        url: "./load.php",
+        url: loadUrl,
         method: "POST",
         data: {
             "a": "s",
@@ -243,7 +244,7 @@ function loadStudies(e) {
             // Parse BIT
             studies.push({
                 "name": "BIT",
-                "link": parseLinkforLoadPHP($(e).find("div#bc").find("li.c-programmes__item").first().find("a.b-programme__link").prop("href")),
+                "link": parseLinkforLoadPHP($(e, fakeHtml).find("div#bc").find("li.c-programmes__item").first().find("a.b-programme__link").prop("href")),
                 "subjects": {
                     "com": [
                         [], [], []
@@ -255,7 +256,7 @@ function loadStudies(e) {
             });
 
             // Parse MIT
-            $(e).find("div#mgr").find("li.c-programmes__item").find("li.c-branches__item").each(function(i, li) {
+            $(e, fakeHtml).find("div#mgr").find("li.c-programmes__item").find("li.c-branches__item").each(function(i, li) {
 
                 // only new mgr program
                 if (!$(li).find("span.tag").html().startsWith('N'))
@@ -295,7 +296,7 @@ function loadStudies(e) {
 
             // Parse years
             let years = [];
-            $(e).find("select#year").find("option").each(function (i, opt) {
+            $(e, fakeHtml).find("select#year").find("option").each(function (i, opt) {
                 years.push({value: Number($(opt).prop('value')), name: $(opt).text()});
             });
 
@@ -326,7 +327,7 @@ function loadSubjects(e) {
         stud.subjects.com = [ [], [], [] ];
         stud.subjects.opt = [ [], [], [] ];
         $.ajax({
-            url: "./load.php",
+            url: loadUrl,
             method: "POST",
             data: {
                 "a": "u",
@@ -338,7 +339,7 @@ function loadSubjects(e) {
                 // Parse
                 var sem = "winter";
                 var grade = 0;
-                $(e).find("main").first().find("div.table-responsive").first().find("tbody").each(function(o, tbody) {
+                $(e, fakeHtml).find("main").first().find("div.table-responsive").first().find("tbody").each(function(o, tbody) {
                     $(tbody).children("tr").each(function(p, tr) {
                         // Subject
                         var subject = {
@@ -568,7 +569,7 @@ function loadLessons() {
 
         // AJAX
         $.ajax({
-            url: "./load.php",
+            url: loadUrl,
             method: "POST",
             data: {
                 "a": "u",
@@ -578,7 +579,7 @@ function loadLessons() {
             async: false,
             success: function(e) {
                 // Range
-                sub.range = $(e).find("main").find("div.b-detail__body").find("div.grid__cell").find("p:contains('Rozsah')").parent().next().children().html();
+                sub.range = $(e, fakeHtml).find("main").find("div.b-detail__body").find("div.grid__cell").find("p:contains('Rozsah')").parent().next().children().html();
 
                 // Already loaded
                 if(typeof lastLoadedSubjects.find(x => x.name === sub.name) !== "undefined") {
@@ -586,7 +587,7 @@ function loadLessons() {
                 }
 
                 // Lessons
-                $(e).find("table#schedule").find("tbody").find("tr").each(function(o, tr) {
+                $(e, fakeHtml).find("table#schedule").find("tbody").find("tr").each(function(o, tr) {
                     if(($(tr).children("td").eq(0).html().includes("přednáška") || $(tr).children("td").eq(0).html().includes("poč. lab") || $(tr).children("td").eq(0).html().includes("cvičení") || $(tr).children("td").eq(0).html().includes("laboratoř")) &&
                        ($(tr).children("td").eq(1).html().includes("výuky") || $(tr).children("td").eq(1).html().includes("sudý") || $(tr).children("td").eq(1).html().includes("lichý"))) {
                         // Lesson
@@ -1203,6 +1204,18 @@ function loadJSON() {
         }, 2000);
     }
 } // checked
+
+function getLessonCategory(les) {
+    var isCustom = les.type == "custom";
+    var color = isCustom ? les.custom_color : les.type;
+    var out = "";
+    if(color == "green") out += "Přednáška";
+    else if(color == "blue") out += "Cvičení";
+    else if(color == "yellow") out += "Laboratoř";
+    if(isCustom) out += (out != "" ? "," : "") + "Vlastní hodina";
+    return out;
+}
+
 function exportICal() {
     var contents = "";
     var createdDatetime = getIcalDatetime(new Date);
@@ -1214,10 +1227,11 @@ function exportICal() {
 
     // Export all events from final schedule
     $.each(lessons, function(j, les) {
+        if(!les.selected) return;
         // Calculate correct datetimes from les object
-        var fromDatetime = getDatetimeFromHourNumber(les.from, les.day);
+        var fromDatetime = getDatetimeFromHourNumber(les.from, les.day, les.week);
         var fromDatetimeIcal = getIcalDatetime(fromDatetime);
-        var toDatetime = getDatetimeFromHourNumber(les.to, les.day);
+        var toDatetime = getDatetimeFromHourNumber(les.to, les.day, les.week);
         toDatetime = new Date(toDatetime.getTime() - 10 * 1000 * 60);
         var toDatetimeIcal = getIcalDatetime(toDatetime);
 
@@ -1226,17 +1240,18 @@ function exportICal() {
         // Event header
         contents += "BEGIN:VEVENT\r\n";
         contents += "UID:" + createdDatetime + "-" + les.id + "\r\n";
-        contents += "DTSTAMP:" + createdDatetime + "\r\n";
+        contents += "DTSTAMP;TZID=Europe/Prague:" + createdDatetime + "\r\n";
 
         // Datetimes
-        contents += "DTSTART:" + fromDatetimeIcal + "\r\n";
-        contents += "DTEND:" + toDatetimeIcal + "\r\n";
-        contents += "RRULE:FREQ=WEEKLY\r\n";
+        contents += "DTSTART;TZID=Europe/Prague:" + fromDatetimeIcal + "\r\n";
+        contents += "DTEND;TZID=Europe/Prague:" + toDatetimeIcal + "\r\n";
+        contents += "RRULE:FREQ=WEEKLY;INTERVAL=" + (les.week == "" ? 1 : 2) + "\r\n";
 
         // Additional info
         contents += "SUMMARY:" + les.name + " " + typeString + "\r\n";
         contents += "LOCATION:" + les.rooms.join(" ") + "\r\n";
-        contents += "URL:https://www.fit.vut.cz/study/course/" + les.url + "\r\n";
+        contents += "URL:https://www.fit.vut.cz/study/course/" + les.link + "\r\n";
+        if(getLessonCategory(les) != "") contents += "CATEGORIES:" + getLessonCategory(les) + "\r\n"; // custom color
 
         // Event footer
         contents += "END:VEVENT\r\n";
@@ -1343,25 +1358,64 @@ function makeHash(string) {
 function padNumber(number) {
     return (number < 10) ? ("0" + number) : number;
 } // checked
+
+// https://stackoverflow.com/a/53652131/7361496
+function changeTimezone(date, ianatz) {
+
+    // suppose the date is 12:00 UTC
+    var invdate = new Date(date.toLocaleString('en-US', {
+      timeZone: ianatz
+    }));
+  
+    // then invdate will be 07:00 in Toronto
+    // and the diff is 5 hours
+    var diff = date.getTime() - invdate.getTime();
+  
+    // so 12:00 in Toronto is 17:00 UTC
+    return new Date(date.getTime() - diff); // needs to substract
+  
+  }
+
 function getIcalDatetime(date) {
+    date = changeTimezone(date, "Europe/Prague");
     var buffer = "";
-    buffer += date.getUTCFullYear();
-    buffer += padNumber(date.getUTCMonth() + 1);
-    buffer += padNumber(date.getUTCDate());
+    buffer += date.getFullYear();
+    buffer += padNumber(date.getMonth() + 1);
+    buffer += padNumber(date.getDate());
     buffer += "T";
-    buffer += padNumber(date.getUTCHours());
-    buffer += padNumber(date.getUTCMinutes());
-    buffer += padNumber(date.getUTCSeconds());
-    buffer += "Z";
+    buffer += padNumber(date.getHours());
+    buffer += padNumber(date.getMinutes());
+    buffer += padNumber(date.getSeconds());
     return buffer;
 } // checked
-function getDatetimeFromHourNumber(hour, dayIndex) {
+
+// https://stackoverflow.com/a/6117889/7361496
+function getWeekNumber(d) {
+    // Copy date so don't modify original
+    d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+    // Set to nearest Thursday: current date + 4 - current day number
+    // Make Sunday's day number 7
+    d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay()||7));
+    // Get first day of year
+    var yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
+    // Calculate full weeks to nearest Thursday
+    var weekNo = Math.ceil(( ( (d - yearStart) / 86400000) + 1)/7);
+    // Return week number
+    return weekNo;
+}
+
+function getDatetimeFromHourNumber(hour, dayIndex, week) {
     hour += 7; // Convert to actual hour
 
     var date = new Date;
     var currentDay = date.getDay();
     var distance = (dayIndex + 1) - currentDay;
     date.setDate(date.getDate() + distance);
+    if(week != "") {
+        if(getWeekNumber(date)&1 != (week == "lichý" ? 1 : 0)) {
+            date.setDate(date.getDate() + 7);
+        }
+    }
     date.setHours(hour, 0, 0, 0);
 
     return date;
