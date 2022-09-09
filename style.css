@@ -496,11 +496,26 @@ html, body, * {
                                         .schedule_cell_type_yellow {
                                             background-color: #DBB21F;
                                         }
+                                        .schedule_cell_type_darkblue {
+                                            background-color: #2900bc;
+                                        }
                                         .schedule_cell_type_purple {
                                             background-color: #bc1fdb;
                                         }
                                         .schedule_cell_type_red {
                                             background-color: #db1f1f;
+                                        }
+                                        .schedule_cell_type_orange {
+                                            background-color: #ff8f33 ;
+                                        }
+                                        .schedule_cell_type_brown {
+                                            background-color: #76310f;
+                                        }
+                                        .schedule_cell_type_gray {
+                                            background-color: #4d4d4d;
+                                        }
+                                        .schedule_cell_type_white {
+                                            background-color: #fff;
                                         }
                                         .schedule_cell_selected {
                                             border-style: solid;
