@@ -221,7 +221,7 @@ $(document).on("click", ".lesson_add_card_button", function() {
     lessons.push(lesson);
     storeLocalStorage();
     renderAll();
-});
+}); // checked
 
 ///////////////////////////////////// Menu /////////////////////////////////////
 function loadStudies(e) {
@@ -1214,8 +1214,7 @@ function getLessonCategory(les) {
     else if(color == "yellow") out += "Laboratoř";
     if(isCustom) out += (out != "" ? "," : "") + "Vlastní hodina";
     return out;
-}
-
+} // checked
 function exportICal() {
     var contents = "";
     var createdDatetime = getIcalDatetime(new Date);
@@ -1354,28 +1353,23 @@ function makeHash(string) {
         hash = Math.abs(hash);
     }
     return hash.toString();
-}; // checked
+} // checked
 function padNumber(number) {
     return (number < 10) ? ("0" + number) : number;
 } // checked
-
-// https://stackoverflow.com/a/53652131/7361496
 function changeTimezone(date, ianatz) {
-
     // suppose the date is 12:00 UTC
     var invdate = new Date(date.toLocaleString('en-US', {
-      timeZone: ianatz
+        timeZone: ianatz
     }));
-  
+
     // then invdate will be 07:00 in Toronto
     // and the diff is 5 hours
     var diff = date.getTime() - invdate.getTime();
-  
+
     // so 12:00 in Toronto is 17:00 UTC
     return new Date(date.getTime() - diff); // needs to substract
-  
-  }
-
+} // checked (https://stackoverflow.com/a/53652131/7361496)
 function getIcalDatetime(date) {
     date = changeTimezone(date, "Europe/Prague");
     var buffer = "";
@@ -1388,8 +1382,6 @@ function getIcalDatetime(date) {
     buffer += padNumber(date.getSeconds());
     return buffer;
 } // checked
-
-// https://stackoverflow.com/a/6117889/7361496
 function getWeekNumber(d) {
     // Copy date so don't modify original
     d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
@@ -1402,8 +1394,7 @@ function getWeekNumber(d) {
     var weekNo = Math.ceil(( ( (d - yearStart) / 86400000) + 1)/7);
     // Return week number
     return weekNo;
-}
-
+} // checked (https://stackoverflow.com/a/6117889/7361496)
 function getDatetimeFromHourNumber(hour, dayIndex, week) {
     hour += 7; // Convert to actual hour
 
