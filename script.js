@@ -140,23 +140,23 @@ $(document).on("click", ".menu_generate_add_rule", function() {
                 <input type="number" style="float:left;" value="0" min="0" class="rule_max_value">
             <div class="cleaner"></div></div>
             <div class="menu_column_row">
-                <input class="menu_column_row_checkbox menu_sel_checkbox rule_monday" type="checkbox" checked="checked">
+                <input class="menu_column_row_checkbox rule_monday" type="checkbox" checked="checked">
                 <div class="menu_column_row_text">Pondělí</div>
             <div class="cleaner"></div></div>
             <div class="menu_column_row">
-                <input class="menu_column_row_checkbox menu_sel_checkbox rule_tuesday" type="checkbox" checked="checked">
+                <input class="menu_column_row_checkbox rule_tuesday" type="checkbox" checked="checked">
                 <div class="menu_column_row_text">Úterý</div>
             <div class="cleaner"></div></div>
             <div class="menu_column_row">
-                <input class="menu_column_row_checkbox menu_sel_checkbox rule_wednesday" type="checkbox" checked="checked">
+                <input class="menu_column_row_checkbox rule_wednesday" type="checkbox" checked="checked">
                 <div class="menu_column_row_text">Středa</div>
             <div class="cleaner"></div></div>
             <div class="menu_column_row">
-                <input class="menu_column_row_checkbox menu_sel_checkbox rule_thursday" type="checkbox" checked="checked">
+                <input class="menu_column_row_checkbox rule_thursday" type="checkbox" checked="checked">
                 <div class="menu_column_row_text">Čtvrtek</div>
             <div class="cleaner"></div></div>
             <div class="menu_column_row">
-                <input class="menu_column_row_checkbox menu_sel_checkbox rule_friday" type="checkbox" checked="checked">
+                <input class="menu_column_row_checkbox rule_friday" type="checkbox" checked="checked">
                 <div class="menu_column_row_text">Pátek</div>
             <div class="cleaner"></div></div>
             <div class="menu_column_row">
@@ -198,7 +198,7 @@ $(document).on("click", ".menu_generate_add_rule", function() {
                 </select>
             <div class="cleaner"></div></div>
             <div class="menu_column_row">
-                <input class="menu_column_row_checkbox menu_sel_checkbox rule_weighted" type="checkbox" checked="checked">
+                <input class="menu_column_row_checkbox rule_weighted" type="checkbox" checked="checked">
                 <div class="menu_column_row_text">Váženo</div>
             <div class="cleaner"></div></div>
             <div class="menu_column_row">
