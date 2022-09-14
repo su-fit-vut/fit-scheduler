@@ -247,7 +247,7 @@ $(document).on("change", ".menu_column_row_select", function(e) {
              "subjects": [], "custom": [], "selected": [], "deleted": [] };
     loadStudies();
     loadLessons();
-});
+}); // checked
 $(document).on("click", ".menu_sem_radio", function() {
     $(".menu_com_search_input").prop("value", ""); $(".menu_com_search_input").trigger("keyup");
     $(".menu_opt_search_input").prop("value", ""); $(".menu_opt_search_input").trigger("keyup");
@@ -385,6 +385,7 @@ $(document).on("click", ".lesson_add_card_button", function() {
         "type": "custom",
         "custom_color": $(".lesson_add_card_color").val(),
         "rooms": [$(".lesson_add_card_room").val()],
+        "info": $(".lesson_add_card_info").val(),
         "layer": 1,
         "selected": false,
         "deleted": false
@@ -773,7 +774,8 @@ function loadLessons() {
                 // Lessons
                 $(e, fakeHtml).find("table#schedule").find("tbody").find("tr").each(function(o, tr) {
                     if(($(tr).children("td").eq(0).html().includes("přednáška") || $(tr).children("td").eq(0).html().includes("poč. lab") || $(tr).children("td").eq(0).html().includes("cvičení") || $(tr).children("td").eq(0).html().includes("laboratoř")) &&
-                       ($(tr).children("td").eq(1).html().includes("výuky") || $(tr).children("td").eq(1).html().includes("sudý") || $(tr).children("td").eq(1).html().includes("lichý"))) {
+                       ($(tr).children("td").eq(1).html().includes("výuky") || $(tr).children("td").eq(1).html().includes("sudý") || $(tr).children("td").eq(1).html().includes("lichý")) &&
+                       ($(tr).children("td").eq(5).html() != "0" && !$(tr).children("td").eq(0).html().includes("*)"))) {
                         // Lesson
                         var lesson = {
                             "id": "",
@@ -783,6 +785,7 @@ function loadLessons() {
                             "week": parseWeek($(tr).children("td").eq(1).html()),
                             "from": parseTimeFrom($(tr).children("td").eq(3).html()),
                             "to":   parseTimeTo($(tr).children("td").eq(4).html()),
+                            "info": $(tr).children("td").eq(8).html(),
                             "type": "unknown",
                             "rooms": [],
                             "layer": 1,
@@ -791,13 +794,13 @@ function loadLessons() {
                         };
 
                         // Type
-                        if($(tr).children("td").eq(0).html() === "přednáška") {
+                        if($(tr).children("td").eq(0).html().includes("přednáška")) {
                             lesson.type = "green";
-                        } else if($(tr).children("td").eq(0).html() === "cvičení") {
+                        } else if($(tr).children("td").eq(0).html().includes("cvičení")) {
                             lesson.type = "blue";
-                        } else if($(tr).children("td").eq(0).html() === "poč. lab") {
+                        } else if($(tr).children("td").eq(0).html().includes("poč. lab")) {
                             lesson.type = "yellow";
-                        } else if($(tr).children("td").eq(0).html() === "laboratoř") {
+                        } else if($(tr).children("td").eq(0).html().includes("laboratoř")) {
                             lesson.type = "yellow";
                         }
 
@@ -1012,7 +1015,7 @@ function renderSchedule() {
             $(".schedule_all").find(".schedule_row").eq(d).children(".schedule_row_layers").append(`<div class="schedule_row_layer"></div>`);
         }
 
-        $(".schedule_all").find(".schedule_row").eq(d).children(".schedule_row_header").css("line-height", (scheduleLayersCount[d] * 72 + 6) + "px");
+        $(".schedule_all").find(".schedule_row").eq(d).children(".schedule_row_header").css("line-height", (scheduleLayersCount[d] * 90 + 6) + "px");
     }
 
     // Generation of cells
@@ -1055,6 +1058,7 @@ function renderSchedule() {
                                     <div class="schedule_cell_name"><a target="_blank" href="https://www.fit.vut.cz/study/course/` + les.link.split("-")[1] + `">` + les.name + `</a></div>
                                     <div class="schedule_cell_rooms">` + rooms + `</div>
                                     <div class="schedule_cell_desc">` + les.week + `</div>
+                                    <div class="schedule_cell_info" title="` + (typeof les.info !== "undefined" ? les.info : "") + `">` + (typeof les.info !== "undefined" ? les.info : "") + `</div>
                                     <div class="schedule_cell_star"></div>
                                     <div class="schedule_cell_bin"></div>
                                     <div class="id hidden">` + les.id + `</div>
@@ -1107,7 +1111,7 @@ function renderScheduleFin() {
             $(".schedule_fin").find(".schedule_row").eq(d).children(".schedule_row_layers").append(`<div class="schedule_row_layer"></div>`);
         }
 
-        $(".schedule_fin").find(".schedule_row").eq(d).children(".schedule_row_header").css("line-height", (scheduleLayersCount[d] * 72 + 6) + "px");
+        $(".schedule_fin").find(".schedule_row").eq(d).children(".schedule_row_header").css("line-height", (scheduleLayersCount[d] * 90 + 6) + "px");
     }
 
     // Generation of cells
@@ -1144,6 +1148,7 @@ function renderScheduleFin() {
                                     <div class="schedule_cell_name"><a target="_blank" href="https://www.fit.vut.cz/study/course/` + les.link.split("-")[1] + `">` + les.name + `</a></div>
                                     <div class="schedule_cell_rooms">` + rooms + `</div>
                                     <div class="schedule_cell_desc">` + les.week + `</div>
+                                    <div class="schedule_cell_info" title="` + (typeof les.info !== "undefined" ? les.info : "") + `">` + (typeof les.info !== "undefined" ? les.info : "") + `</div>
                                 </div>`)
         });
     }
