@@ -553,11 +553,14 @@ html, body, * {
                                                 color: #000000;
                                             }
                                             .schedule_cell_info {
+                                                overflow: hidden;
                                                 width: 100%;
                                                 height: 18px;
                                                 line-height: 18px;
                                                 font-size: 11px;
                                                 text-align: center;
+                                                text-overflow: ellipsis;
+                                                white-space: nowrap;
                                                 color: #000000;
                                             }
                                             .schedule_cell_star {
