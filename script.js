@@ -589,7 +589,8 @@ function loadLessons() {
                 // Lessons
                 $(e, fakeHtml).find("table#schedule").find("tbody").find("tr").each(function(o, tr) {
                     if(($(tr).children("td").eq(0).html().includes("přednáška") || $(tr).children("td").eq(0).html().includes("poč. lab") || $(tr).children("td").eq(0).html().includes("cvičení") || $(tr).children("td").eq(0).html().includes("laboratoř")) &&
-                       ($(tr).children("td").eq(1).html().includes("výuky") || $(tr).children("td").eq(1).html().includes("sudý") || $(tr).children("td").eq(1).html().includes("lichý")) && $(tr).children("td").eq(5).html() != "0") {
+                       ($(tr).children("td").eq(1).html().includes("výuky") || $(tr).children("td").eq(1).html().includes("sudý") || $(tr).children("td").eq(1).html().includes("lichý")) &&
+                       ($(tr).children("td").eq(5).html() != "0" && !$(tr).children("td").eq(0).html().includes("*)"))) {
                         // Lesson
                         var lesson = {
                             "id": "",
