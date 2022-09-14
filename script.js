@@ -63,7 +63,7 @@ $(document).on("change", ".menu_column_row_select", function(e) {
              "subjects": [], "custom": [], "selected": [], "deleted": [] };
     loadStudies();
     loadLessons();
-});
+}); // checked
 $(document).on("click", ".menu_sem_radio", function() {
     $(".menu_com_search_input").prop("value", ""); $(".menu_com_search_input").trigger("keyup");
     $(".menu_opt_search_input").prop("value", ""); $(".menu_opt_search_input").trigger("keyup");
@@ -831,7 +831,7 @@ function renderSchedule() {
             $(".schedule_all").find(".schedule_row").eq(d).children(".schedule_row_layers").append(`<div class="schedule_row_layer"></div>`);
         }
 
-        $(".schedule_all").find(".schedule_row").eq(d).children(".schedule_row_header").css("line-height", (scheduleLayersCount[d] * 92 + 6) + "px");
+        $(".schedule_all").find(".schedule_row").eq(d).children(".schedule_row_header").css("line-height", (scheduleLayersCount[d] * 90 + 6) + "px");
     }
 
     // Generation of cells
@@ -874,7 +874,7 @@ function renderSchedule() {
                                     <div class="schedule_cell_name"><a target="_blank" href="https://www.fit.vut.cz/study/course/` + les.link.split("-")[1] + `">` + les.name + `</a></div>
                                     <div class="schedule_cell_rooms">` + rooms + `</div>
                                     <div class="schedule_cell_desc">` + les.week + `</div>
-                                    <div class="schedule_cell_info">` + les.info + `</div>
+                                    <div class="schedule_cell_info">` + (typeof les.info !== "undefined" ? les.info : "") + `</div>
                                     <div class="schedule_cell_star"></div>
                                     <div class="schedule_cell_bin"></div>
                                     <div class="id hidden">` + les.id + `</div>
@@ -927,7 +927,7 @@ function renderScheduleFin() {
             $(".schedule_fin").find(".schedule_row").eq(d).children(".schedule_row_layers").append(`<div class="schedule_row_layer"></div>`);
         }
 
-        $(".schedule_fin").find(".schedule_row").eq(d).children(".schedule_row_header").css("line-height", (scheduleLayersCount[d] * 92 + 6) + "px");
+        $(".schedule_fin").find(".schedule_row").eq(d).children(".schedule_row_header").css("line-height", (scheduleLayersCount[d] * 90 + 6) + "px");
     }
 
     // Generation of cells
@@ -964,7 +964,7 @@ function renderScheduleFin() {
                                     <div class="schedule_cell_name"><a target="_blank" href="https://www.fit.vut.cz/study/course/` + les.link.split("-")[1] + `">` + les.name + `</a></div>
                                     <div class="schedule_cell_rooms">` + rooms + `</div>
                                     <div class="schedule_cell_desc">` + les.week + `</div>
-                                    <div class="schedule_cell_info">` + les.info + `</div>
+                                    <div class="schedule_cell_info">` + (typeof les.info !== "undefined" ? les.info : "") + `</div>
                                 </div>`)
         });
     }
