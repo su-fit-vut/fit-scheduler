@@ -607,13 +607,13 @@ function loadLessons() {
                         };
 
                         // Type
-                        if($(tr).children("td").eq(0).html() === "přednáška") {
+                        if($(tr).children("td").eq(0).html().includes("přednáška")) {
                             lesson.type = "green";
-                        } else if($(tr).children("td").eq(0).html() === "cvičení") {
+                        } else if($(tr).children("td").eq(0).html().includes("cvičení")) {
                             lesson.type = "blue";
-                        } else if($(tr).children("td").eq(0).html() === "poč. lab") {
+                        } else if($(tr).children("td").eq(0).html().includes("poč. lab")) {
                             lesson.type = "yellow";
-                        } else if($(tr).children("td").eq(0).html() === "laboratoř") {
+                        } else if($(tr).children("td").eq(0).html().includes("laboratoř")) {
                             lesson.type = "yellow";
                         }
 
