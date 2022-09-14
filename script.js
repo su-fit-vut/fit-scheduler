@@ -62,7 +62,7 @@ $(document).on("click", ".menu_generate_next", function() {
         let friday = $(rule).find(".rule_friday").prop("checked");
         let begginning = Number($(rule).find(".rule_begginning").val());
         let ending = Number($(rule).find(".rule_ending").val());
-        let weighted = $(rule).find(".rule_weighted").prop("checked");
+        let weighted = true;
         let days = [];
         if(monday) days.push(0);
         if(tuesday) days.push(1);
@@ -76,7 +76,7 @@ $(document).on("click", ".menu_generate_next", function() {
     generator.every_hour_only_once();
     let schedules_count = generator.get_schedules_count();
     if(schedules_count == 0) {
-        alert("No schedules found!");
+        alert("Nelze vygenerovat rozvrh pro dané pravidla!");
         return;
     }
     generate_schedule_id += 1;
@@ -101,7 +101,7 @@ $(document).on("click", ".menu_generate_prev", function() {
         let friday = $(rule).find(".rule_friday").prop("checked");
         let begginning = Number($(rule).find(".rule_begginning").val());
         let ending = Number($(rule).find(".rule_ending").val());
-        let weighted = $(rule).find(".rule_weighted").prop("checked");
+        let weighted = true;
         let days = [];
         if(monday) days.push(0);
         if(tuesday) days.push(1);
@@ -134,9 +134,11 @@ $(document).on("click", ".delete_rule", function() {
 
 $(document).on("click", ".menu_generate_add_rule", function() {
     $(".menu_generate_rules").append(
-        `<div class="menu_generate_rule" style="display: block;float: left;width: 100%;">
+        `<div class="menu_generate_rule">
             <div class="menu_column_row">
-                <div class="menu_column_row_text">Maximální hodnota:</div>
+                <div class="menu_column_row_text">Maximální počet hodin:</div>
+            <div class="cleaner"></div></div>
+            <div class="menu_column_row">
                 <input type="number" style="float:left;" value="0" min="0" class="rule_max_value">
             <div class="cleaner"></div></div>
             <div class="menu_column_row">
@@ -196,10 +198,6 @@ $(document).on("click", ".menu_generate_add_rule", function() {
                 <option value="12">19:50</option>
                 <option value="13">20:50</option>
                 </select>
-            <div class="cleaner"></div></div>
-            <div class="menu_column_row">
-                <input class="menu_column_row_checkbox rule_weighted" type="checkbox" checked="checked">
-                <div class="menu_column_row_text">Váženo</div>
             <div class="cleaner"></div></div>
             <div class="menu_column_row">
                 <button class="delete_rule" style="float:left;">Odstranit pravidlo</button>
