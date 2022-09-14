@@ -201,6 +201,7 @@ $(document).on("click", ".lesson_add_card_button", function() {
         "type": "custom",
         "custom_color": $(".lesson_add_card_color").val(),
         "rooms": [$(".lesson_add_card_room").val()],
+        "info": $(".lesson_add_card_info").val(),
         "layer": 1,
         "selected": false,
         "deleted": false
