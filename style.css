@@ -554,8 +554,9 @@ html, body, * {
                                             }
                                             .schedule_cell_info {
                                                 overflow: hidden;
-                                                width: 100%;
+                                                width: calc(100% - 10px);
                                                 height: 18px;
+                                                padding: 0 5px;
                                                 line-height: 18px;
                                                 font-size: 11px;
                                                 text-align: center;
