@@ -852,9 +852,9 @@ function renderSchedule() {
             } else if(les.type === "custom") {
                 classes += "schedule_cell_type_" + les.custom_color + " ";
             }
-            if(les.week.includes("lichý")) {
+            if(isOddWeek(les.week)) {
                 classes += "schedule_cell_week_odd ";
-            } else if(les.week.includes("sudý")) {
+            } else if(isEvenWeek(les.week)) {
                 classes += "schedule_cell_week_even ";
             }
             if(les.selected === true) {
@@ -948,9 +948,9 @@ function renderScheduleFin() {
             } else if(les.type === "custom") {
                 classes += "schedule_cell_type_" + les.custom_color + " ";
             }
-            if(les.week.includes("lichý")) {
+            if(isOddWeek(les.week)) {
                 classes += "schedule_cell_week_odd ";
-            } else if(les.week.includes("sudý")) {
+            } else if(isEvenWeek(les.week)) {
                 classes += "schedule_cell_week_even ";
             }
 
@@ -1407,8 +1407,8 @@ function getDatetimeFromHourNumber(hour, dayIndex, week) {
     var currentDay = date.getDay();
     var distance = (dayIndex + 1) - currentDay;
     date.setDate(date.getDate() + distance);
-    if(week != "") {
-        if(getWeekNumber(date)&1 != (week == "lichý" ? 1 : 0)) {
+    if(isOddWeek(week) || isEvenWeek(week)) {
+        if(getWeekNumber(date)&1 != (isOddWeek(week) ? 1 : 0)) {
             date.setDate(date.getDate() + 7);
         }
     }
@@ -1430,3 +1430,47 @@ function getTypeString(type) {
             return "Jiný typ";
     }
 } // checked
+function isOddWeek(week) {
+    if(week.includes("lichý")) return true;
+    // consits of numbers, dots and spaces
+    if(week.match(/^[\d.\s]+$/)) {
+        var oddNumbers = 0;
+        var evenNumbers = 0;
+        var numbers = week.split(" ");
+        for(var i = 0; i < numbers.length; i++) {
+            // regex keep only numbers
+            var number = numbers[i].replace(/\D/g,'');
+            if(number == "") continue;
+            if(number % 2 == 0) {
+                evenNumbers++;
+            } else {
+                oddNumbers++;
+            }
+        }
+        // it seems like every semester starts with even week, so even numbers imply odd week
+        if(evenNumbers > 4 && oddNumbers == 0) return true;
+    }
+    return false;
+}
+function isEvenWeek(week) {
+    if(week.includes("sudý")) return true;
+    // consits of numbers, dots and spaces
+    if(week.match(/^[\d.\s]+$/)) {
+        var oddNumbers = 0;
+        var evenNumbers = 0;
+        var numbers = week.split(" ");
+        for(var i = 0; i < numbers.length; i++) {
+            // regex keep only numbers
+            var number = numbers[i].replace(/\D/g,'');
+            if(number == "") continue;
+            if(number % 2 == 0) {
+                evenNumbers++;
+            } else {
+                oddNumbers++;
+            }
+        }
+        // it seems like every semester starts with even week, so odd numbers imply even week
+        if(oddNumbers > 4 && evenNumbers == 0) return true;
+    }
+    return false;
+}
