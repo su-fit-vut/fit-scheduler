@@ -45,7 +45,9 @@ $.ajax({
 let generate_schedule_id=0;
 
 $(document).on("click", ".menu_generate_next", function() {
-    let generator = pyodide.globals.get('ScheduleGenerator')(lessons);
+    let filteredLessons = lessons.filter(lesson => !lesson.deleted);
+    let inverseFilteredLessons = lessons.filter(lesson => lesson.deleted);
+    let generator = pyodide.globals.get('ScheduleGenerator')(filteredLessons);
     $(".menu_generate_rules").children().each(function(i, rule) {
         let max_value = Number($(rule).find(".rule_max_value").val());
         let monday = $(rule).find(".rule_monday").prop("checked");
@@ -75,15 +77,20 @@ $(document).on("click", ".menu_generate_next", function() {
     generate_schedule_id += 1;
     if(generate_schedule_id<0) generate_schedule_id = 0;
     if(generate_schedule_id>=schedules_count) generate_schedule_id = schedules_count-1;
+    $.each(inverseFilteredLessons, function(i, lesson) {
+        lesson.selected = false;
+    });
     $.each(generator.generate_schedule(generate_schedule_id), function(i, selected) {
-        lessons[i].selected = selected;
+        filteredLessons[i].selected = selected;
     });
     $(".generated_rozvrh_options").text("Rozvrh: " + (generate_schedule_id+1) + "/" + schedules_count);
     renderAll();
 });
 
 $(document).on("click", ".menu_generate_prev", function() {
-    let generator = pyodide.globals.get('ScheduleGenerator')(lessons);
+    let filteredLessons = lessons.filter(lesson => !lesson.deleted);
+    let inverseFilteredLessons = lessons.filter(lesson => lesson.deleted);
+    let generator = pyodide.globals.get('ScheduleGenerator')(filteredLessons);
     $(".menu_generate_rules").children().each(function(i, rule) {
         let max_value = Number($(rule).find(".rule_max_value").val());
         let monday = $(rule).find(".rule_monday").prop("checked");
@@ -114,8 +121,11 @@ $(document).on("click", ".menu_generate_prev", function() {
     generate_schedule_id -= 1;
     if(generate_schedule_id<0) generate_schedule_id = 0;
     if(generate_schedule_id>=schedules_count) generate_schedule_id = schedules_count-1;
+    $.each(inverseFilteredLessons, function(i, lesson) {
+        lesson.selected = false;
+    });
     $.each(generator.generate_schedule(generate_schedule_id), function(i, selected) {
-        lessons[i].selected = selected;
+        filteredLessons[i].selected = selected;
     });
     $(".generated_rozvrh_options").text("Rozvrh: " + (generate_schedule_id+1) + "/" + schedules_count);
     renderAll();
