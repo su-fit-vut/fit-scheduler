@@ -42,13 +42,6 @@ $.ajax({
     }
 }); // checked 
 
-function generateSchedule() {
-    let generator = pyodide.globals.get('ScheduleGenerator')(lessons);
-    generator.every_class_type_only_once();
-    generator.every_hour_only_once();
-    console.log(generator.get_schedules_count());
-}
-
 let generate_schedule_id=0;
 
 $(document).on("click", ".menu_generate_next", function() {
