@@ -580,7 +580,7 @@ function loadLessons() {
             async: false,
             success: function(e) {
                 // Range
-                sub.range = $(e, fakeHtml).find("main").find("div.b-detail__body").find("div.grid__cell").find("p:contains('Rozsah')").parent().next().children().html();
+                sub.range = $(e, fakeHtml).find("main").find("div.b-detail__body").find("div.grid__cell").find("p:contains('Rozsah')").parent().next().children().html() || "neznámý rozsah výuky";
 
                 // Already loaded
                 if(typeof lastLoadedSubjects.find(x => x.name === sub.name) !== "undefined") {
