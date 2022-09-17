@@ -219,6 +219,14 @@ $(document).on("click", ".header_info_icon", function() {
 
     $(".secs_main").addClass("hidden");
     $(".secs_info").removeClass("hidden");
+    $(".secs_generator_info").addClass("hidden");
+}); // checked
+$(document).on("click", ".generator_info_icon", function() {
+    $(".header_cross_icon").removeClass("hidden");
+
+    $(".secs_main").addClass("hidden");
+    $(".secs_info").addClass("hidden");
+    $(".secs_generator_info").removeClass("hidden");
 }); // checked
 $(document).on("click", ".header_cross_icon", function() {
     $(".header_info_icon").removeClass("hidden");
@@ -226,6 +234,7 @@ $(document).on("click", ".header_cross_icon", function() {
 
     $(".secs_main").removeClass("hidden");
     $(".secs_info").addClass("hidden");
+    $(".secs_generator_info").addClass("hidden");
 }); // checked
 $(document).on("click", ".menu_icon", function() {
     $(".menu_icon").addClass("hidden");
@@ -691,6 +700,7 @@ function loadLessons() {
         $(".header_cross_icon").addClass("hidden");
         $(".secs_main").removeClass("hidden");
         $(".secs_info").addClass("hidden");
+        $(".secs_generator_info").addClass("hidden");
 
         $(".menu_column_row_checkbox").prop("disabled", true);
         $(".menu_column_row_radio").prop("disabled", true);
