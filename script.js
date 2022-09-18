@@ -1448,7 +1448,7 @@ function isOddWeek(week) {
             }
         }
         // it seems like every semester starts with even week, so even numbers imply odd week
-        if(evenNumbers == 6 && oddNumbers == 0) return true;
+        if(evenNumbers >= 3 && oddNumbers == 0) return true;
     }
     return false;
 } // checked
@@ -1470,7 +1470,7 @@ function isEvenWeek(week) {
             }
         }
         // it seems like every semester starts with even week, so odd numbers imply even week
-        if(evenNumbers == 0 && oddNumbers == 7) return true;
+        if(evenNumbers == 0 && oddNumbers >= 3) return true;
     }
     return false;
 } // checked
