@@ -8,7 +8,7 @@ var file = { "sem": "", "studies": [], "grades": [],
              "subjects": [], "custom": [], "selected": [], "deleted": [] };                                // File cache
 var year = (new Date()).getMonth() + 1 >= 8 ? (new Date()).getFullYear() : (new Date()).getFullYear() - 1; // Academic year (from august display next ac. year)
 var fakeHtml = document.implementation.createHTMLDocument('virtual');                                      // https://stackoverflow.com/a/50194774/7361496
-var loadUrl = "https://www.kubosh.net/apps/fitsch/load.php";
+var loadUrl = "./load.php";
 ///////////////////////////////////// Main /////////////////////////////////////
 $(document).ready(function() {
     // Semester radio auto select
