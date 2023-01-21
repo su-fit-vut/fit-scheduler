@@ -779,6 +779,9 @@ function mergeLessons(lessons) {
     lecturers = lecturers.filter(function(item, pos) {
         return lecturers.indexOf(item) == pos;
     });
+    weeks = weeks.filter(function(item, pos) {
+        return weeks.indexOf(item) == pos;
+    });
 
     // Sort
     weeks.sort(function(a, b) {
