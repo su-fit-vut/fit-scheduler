@@ -811,13 +811,10 @@ function renderAll() {
         }
         lessonsDisection[key].push(lesson);
     });
-    console.log(lessons);
-    console.log(lessonsDisection);
 
     // Merge
     lessons = [];
     $.each(lessonsDisection, function(i, lessonsDisection) {
-        console.log("AAAA");
         // the assumption:
         // - the otherLessons is non-empty:
         //   -> this means that there is no split of the lessons into odd and even weeks
@@ -832,14 +829,11 @@ function renderAll() {
         
         if(otherLessons.length > 0) {
             lessons.push(mergeLessons(otherLessons.concat(oddLessons).concat(evenLessons)));
-            console.log("Merged: " + otherLessons.concat(oddLessons).concat(evenLessons));
         } else {
             lessons.push(mergeLessons(oddLessons));
             lessons.push(mergeLessons(evenLessons));
-            console.log("Merged: " + oddLessons);
         }
     });
-    console.log(lessons);
 
     // Sort
     lessons.sort(function(a, b) {
