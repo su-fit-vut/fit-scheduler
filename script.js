@@ -835,6 +835,10 @@ function renderAll() {
         }
     });
 
+    $.each(lessons, function(i, lesson) {
+        lesson.week = lesson.week.replaceAll("1. 2. 3. 4. 5. 6. 7. 8. 9. 10. 11. 12. 13.", "");
+    });
+
     // Sort
     lessons.sort(function(a, b) {
         if(a.type === "green" && b.type !== "green") {
