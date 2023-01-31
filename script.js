@@ -685,9 +685,9 @@ function loadLessons() {
         rangeRaw = rangeRaw.replaceAll("\\n", "");
         rangeRaw = rangeRaw.replaceAll("hod. ", "");
         rangeRaw = rangeRaw.trim();
-        $.each(rangeRaw.split(","), function(i, rang) {
-            rang = rang.trim();
-
+        $.each([...rangeRaw.matchAll(/(?<=<li>)[^<]+(?=<\/li)/gm)], function(i, rang) {
+            rang = rang[0].trim();
+            
             if(rang.split(" ")[1].trim() === "přednášky") {
                 greenRange = +rang.split(" ")[0].trim();
             } else if(rang.split(" ")[1].trim() === "cvičení") {
