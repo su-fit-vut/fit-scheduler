@@ -256,6 +256,11 @@ html, body, * {
                         background-repeat: no-repeat;
                         background-size: 100% 100%;
                     }
+                    .menu_qrpay_ghlink {
+                        color: #fff;
+                        font-size: 13px;
+                        cursor: pointer;
+                    }
 
                 .menu_generate_rule {
                     border: 1px #ffffff solid;
