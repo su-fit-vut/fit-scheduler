@@ -4,6 +4,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
         <title>VUT FIT scheduler</title>
         <link rel="stylesheet" href="./style.css"/>
+        <script src="https://cdn.jsdelivr.net/pyodide/v0.21.2/full/pyodide.js"></script>
     </head>
 
     <body>
@@ -114,6 +115,40 @@
                             </div>
 
                             <input class="json_load_input hidden" type="file" name="json_load_input"/>
+                        </div>
+
+                        <div class="menu_columns">
+                            <div class="menu_column">
+                                <div class="menu_column_title">
+                                    Pravidla pro generátor
+                                    <div class="generator_info_icon">&#9432;</div>
+                                </div>
+                                <div class="menu_column_conta menu_rules_sel"></div>
+                            </div>
+                        </div>
+                        <div class="menu_columns menu_generate_rules">
+
+                        </div>
+                        <div class="menu_buttons">
+                            <div class="menu_buttons_row">
+                                <input class="menu_button menu_generate_add_rule" type="button" value="Přidat pravidlo"/>
+                                <div class="cleaner"></div>
+                            </div>
+                        </div>
+                        <div class="menu_columns">
+                            <div class="menu_column">
+                                <div class="menu_column_row_text generated_rozvrh_options">Rozvrh: 0/0</div>
+                            </div>
+                        </div>
+                        <div class="menu_buttons">
+                            <div class="menu_buttons_row">
+                                <input class="menu_button menu_generate_next" type="button" value="Vygenerovat další rozvrh"/>
+                                <div class="cleaner"></div>
+                            </div>
+                            <div class="menu_buttons_row">
+                                <input class="menu_button menu_generate_prev" type="button" value="Vygenerovat předchozí rozvrh"/>
+                                <div class="cleaner"></div>
+                            </div>
                         </div>
 
                         <div class="menu_qrpay">
@@ -423,6 +458,46 @@
                             <div class="cleaner"></div>
                         </div>
                     </div>
+
+                    <div class="secs_generator_info hidden">
+                        <div class="info_full">
+                            <div class="title">Generátor rozvrhů</div>
+                            <div class="bubble">
+                                <b>Akce prováděné generátorem:</b><br>
+                                - Zajištění že se hodiny nemůžou překrývat<br>
+                                - Zajištění že každý druh hodiny je zvolen pouze jednou<br>
+                                - Ignorování předmětů které byly smazány ikonou koše
+                            </div>
+                            <div class="bubble">
+                                <b>Přidávání pravidel:</b><br>
+                                - Přidává se kliknutím na tlačítko "Přidat pravidlo"<br>
+                                - Následně se vybere na které dny a časový interval se vztahuje<br>
+                                - Poté se vybere kolik hodin se maximálně může v daném intervalu nacházet
+                            </div>
+                            <div class="bubble">
+                                <b>Pravidlo na volný den:</b><br>
+                                - Vybere se den/dny kdy má být volno<br>
+                                - Čas se nastaví od 7:00 do 20:50<br>
+                                - Počet hodin se nastaví na 0
+                            </div>
+                            <div class="bubble">
+                                <b>Pravidlo pro volné rána:</b><br>
+                                - Vyberou se všechny dny<br>
+                                - Čas se nastaví od např. 7:00 do 8:50<br>
+                                - Počet hodin se nastaví na 0<br>
+                                - Pokud aplikace není schopná vygenerovat rozvrh, tak se pravidlo zkrátí tak, aby rozvrh vygenerovat šel.<br>
+                                <b>Toto se následně hodí doplnit o další pravidlo:</b><br>
+                                - Druhé pravidlo bude stejné jako první, ale bude mít delší čas např. 7:00 - 10:50 a malý povolený počet hodin např. 1
+                            </div>
+                            <div class="bubble">
+                                <b>Pravidlo pro přestávku:</b><br>
+                                - Vybere se jeden den<br>
+                                - Čas se nastaví na rozmezí kdy by se měla přestávka nacházet např. 11:00 až 13:50<br>
+                                - Počet hodin se nastaví na <code>délku rozmezí - délku přestávky</code><br>
+                                - Např. při požadované délce přestávky 1h a délce 3h, se nastaví počet hodin na 2
+                            </div>
+                        </div>
+                        <div class="cleaner"></div>
                 </div>
 
                 <div class="loading_message">Načítání...</div>

@@ -26,6 +26,191 @@ $(document).ready(function() {
     loadLocalStorage();
 }); // checked
 
+/////////////////////////////////// Automatic schedule generator //////////////////////////////////
+let pyodide = null;
+$.ajax({
+    url: "rozvrh_gen.py",
+    method: "GET",
+    async: true,
+    success: async function(e) {
+        sourceCode = e;
+        pyodide = await loadPyodide();
+        await pyodide.loadPackage(
+            "https://files.pythonhosted.org/packages/c7/c7/cd77b2992c565ff70e9cd9b2d29f4b83cc754aab9936f9d1937a980b459c/python_constraint-1.3.1-py2.py3-none-any.whl"
+        );
+        console.log(pyodide.runPython(e));
+    }
+}); // checked 
+
+let generate_schedule_id=0;
+
+$(document).on("click", ".menu_generate_next", function() {
+    let filteredLessons = lessons.filter(lesson => !lesson.deleted);
+    let inverseFilteredLessons = lessons.filter(lesson => lesson.deleted);
+    let generator = pyodide.globals.get('ScheduleGenerator')(filteredLessons);
+    $(".menu_generate_rules").children().each(function(i, rule) {
+        let max_value = Number($(rule).find(".rule_max_value").val());
+        let monday = $(rule).find(".rule_monday").prop("checked");
+        let tuesday = $(rule).find(".rule_tuesday").prop("checked");
+        let wednesday = $(rule).find(".rule_wednesday").prop("checked");
+        let thursday = $(rule).find(".rule_thursday").prop("checked");
+        let friday = $(rule).find(".rule_friday").prop("checked");
+        let begginning = Number($(rule).find(".rule_begginning").val());
+        let ending = Number($(rule).find(".rule_ending").val());
+        let weighted = true;
+        let days = [];
+        if(monday) days.push(0);
+        if(tuesday) days.push(1);
+        if(wednesday) days.push(2);
+        if(thursday) days.push(3);
+        if(friday) days.push(4);
+        console.log(max_value, days, begginning, ending, weighted);
+        generator.add_constraint(max_value, days, begginning, ending, weighted);
+    });
+    generator.every_class_type_only_once();
+    generator.every_hour_only_once();
+    let schedules_count = generator.get_schedules_count();
+    if(schedules_count == 0) {
+        alert("Nelze vygenerovat rozvrh pro dané pravidla!");
+        return;
+    }
+    generate_schedule_id += 1;
+    if(generate_schedule_id<0) generate_schedule_id = 0;
+    if(generate_schedule_id>=schedules_count) generate_schedule_id = schedules_count-1;
+    $.each(inverseFilteredLessons, function(i, lesson) {
+        lesson.selected = false;
+    });
+    $.each(generator.generate_schedule(generate_schedule_id), function(i, selected) {
+        filteredLessons[i].selected = selected;
+    });
+    $(".generated_rozvrh_options").text("Rozvrh: " + (generate_schedule_id+1) + "/" + schedules_count);
+    renderAll();
+});
+
+$(document).on("click", ".menu_generate_prev", function() {
+    let filteredLessons = lessons.filter(lesson => !lesson.deleted);
+    let inverseFilteredLessons = lessons.filter(lesson => lesson.deleted);
+    let generator = pyodide.globals.get('ScheduleGenerator')(filteredLessons);
+    $(".menu_generate_rules").children().each(function(i, rule) {
+        let max_value = Number($(rule).find(".rule_max_value").val());
+        let monday = $(rule).find(".rule_monday").prop("checked");
+        console.log(i, rule);
+        let tuesday = $(rule).find(".rule_tuesday").prop("checked");
+        let wednesday = $(rule).find(".rule_wednesday").prop("checked");
+        let thursday = $(rule).find(".rule_thursday").prop("checked");
+        let friday = $(rule).find(".rule_friday").prop("checked");
+        let begginning = Number($(rule).find(".rule_begginning").val());
+        let ending = Number($(rule).find(".rule_ending").val());
+        let weighted = true;
+        let days = [];
+        if(monday) days.push(0);
+        if(tuesday) days.push(1);
+        if(wednesday) days.push(2);
+        if(thursday) days.push(3);
+        if(friday) days.push(4);
+        console.log(max_value, days, begginning, ending, weighted);
+        generator.add_constraint(max_value, days, begginning, ending, weighted);
+    });
+    generator.every_class_type_only_once();
+    generator.every_hour_only_once();
+    let schedules_count = generator.get_schedules_count();
+    if(schedules_count == 0) {
+        alert("No schedules found!");
+        return;
+    }
+    generate_schedule_id -= 1;
+    if(generate_schedule_id<0) generate_schedule_id = 0;
+    if(generate_schedule_id>=schedules_count) generate_schedule_id = schedules_count-1;
+    $.each(inverseFilteredLessons, function(i, lesson) {
+        lesson.selected = false;
+    });
+    $.each(generator.generate_schedule(generate_schedule_id), function(i, selected) {
+        filteredLessons[i].selected = selected;
+    });
+    $(".generated_rozvrh_options").text("Rozvrh: " + (generate_schedule_id+1) + "/" + schedules_count);
+    renderAll();
+});
+
+$(document).on("click", ".delete_rule", function() {
+    $(this).parent().parent().remove();
+});
+
+$(document).on("click", ".menu_generate_add_rule", function() {
+    $(".menu_generate_rules").append(
+        `<div class="menu_generate_rule">
+            <div class="menu_column_row">
+                <div class="menu_column_row_text">Maximální počet hodin:</div>
+            <div class="cleaner"></div></div>
+            <div class="menu_column_row">
+                <input type="number" style="float:left;" value="0" min="0" class="rule_max_value">
+            <div class="cleaner"></div></div>
+            <div class="menu_column_row">
+                <input class="menu_column_row_checkbox rule_monday" type="checkbox" checked="checked">
+                <div class="menu_column_row_text">Pondělí</div>
+            <div class="cleaner"></div></div>
+            <div class="menu_column_row">
+                <input class="menu_column_row_checkbox rule_tuesday" type="checkbox" checked="checked">
+                <div class="menu_column_row_text">Úterý</div>
+            <div class="cleaner"></div></div>
+            <div class="menu_column_row">
+                <input class="menu_column_row_checkbox rule_wednesday" type="checkbox" checked="checked">
+                <div class="menu_column_row_text">Středa</div>
+            <div class="cleaner"></div></div>
+            <div class="menu_column_row">
+                <input class="menu_column_row_checkbox rule_thursday" type="checkbox" checked="checked">
+                <div class="menu_column_row_text">Čtvrtek</div>
+            <div class="cleaner"></div></div>
+            <div class="menu_column_row">
+                <input class="menu_column_row_checkbox rule_friday" type="checkbox" checked="checked">
+                <div class="menu_column_row_text">Pátek</div>
+            <div class="cleaner"></div></div>
+            <div class="menu_column_row">
+                <div class="menu_column_row_text">Začátek:</div>
+                <select class="rule_begginning">
+                <option value="0">7:00</option>
+                <option value="1">8:00</option>
+                <option value="2">9:00</option>
+                <option value="3">10:00</option>
+                <option value="4">11:00</option>
+                <option value="5">12:00</option>
+                <option value="6">13:00</option>
+                <option value="7">14:00</option>
+                <option value="8">15:00</option>
+                <option value="9">16:00</option>
+                <option value="10">17:00</option>
+                <option value="11">18:00</option>
+                <option value="12">19:00</option>
+                <option value="13">20:00</option>
+                </select>
+            <div class="cleaner"></div></div>
+            <div class="menu_column_row">
+                <div class="menu_column_row_text">Konec:</div>
+                <select class="rule_ending">
+                <option value="0">7:50</option>
+                <option value="1">8:50</option>
+                <option value="2">9:50</option>
+                <option value="3">10:50</option>
+                <option value="4">11:50</option>
+                <option value="5">12:50</option>
+                <option value="6">13:50</option>
+                <option value="7">14:50</option>
+                <option value="8">15:50</option>
+                <option value="9">16:50</option>
+                <option value="10">17:50</option>
+                <option value="11">18:50</option>
+                <option value="12">19:50</option>
+                <option value="13">20:50</option>
+                </select>
+            <div class="cleaner"></div></div>
+            <div class="menu_column_row">
+                <button class="delete_rule" style="float:left;">Odstranit pravidlo</button>
+            <div class="cleaner"></div></div>
+            <div class="menu_column_row">
+                <div style="float:left;line-height: 10px;margin-bottom: 5px;border-bottom: 2px #ffffff solid;width:100%"></div>
+            <div class="cleaner"></div></div>
+        </div>`);
+}); // checked
+
 //////////////////////////////////// Events ////////////////////////////////////
 // Icons
 $(document).on("click", ".header_info_icon", function() {
@@ -34,6 +219,14 @@ $(document).on("click", ".header_info_icon", function() {
 
     $(".secs_main").addClass("hidden");
     $(".secs_info").removeClass("hidden");
+    $(".secs_generator_info").addClass("hidden");
+}); // checked
+$(document).on("click", ".generator_info_icon", function() {
+    $(".header_cross_icon").removeClass("hidden");
+
+    $(".secs_main").addClass("hidden");
+    $(".secs_info").addClass("hidden");
+    $(".secs_generator_info").removeClass("hidden");
 }); // checked
 $(document).on("click", ".header_cross_icon", function() {
     $(".header_info_icon").removeClass("hidden");
@@ -41,6 +234,7 @@ $(document).on("click", ".header_cross_icon", function() {
 
     $(".secs_main").removeClass("hidden");
     $(".secs_info").addClass("hidden");
+    $(".secs_generator_info").addClass("hidden");
 }); // checked
 $(document).on("click", ".menu_icon", function() {
     $(".menu_icon").addClass("hidden");
@@ -506,6 +700,7 @@ function loadLessons() {
         $(".header_cross_icon").addClass("hidden");
         $(".secs_main").removeClass("hidden");
         $(".secs_info").addClass("hidden");
+        $(".secs_generator_info").addClass("hidden");
 
         $(".menu_column_row_checkbox").prop("disabled", true);
         $(".menu_column_row_radio").prop("disabled", true);
