@@ -983,7 +983,86 @@ function loadLessons() {
     renderAll();
 } // checked
 
+function mergeLessons(lessons) {
+    var lesson = lessons[0];
+
+    var rooms = [];
+    var lecturers = [];
+    var weeks = [];
+
+    $.each(lessons, function(i, l) {
+        rooms = rooms.concat(l.rooms);
+        lecturers = lecturers.concat(l.info.split(", "));
+        weeks = weeks.concat(l.week.split(" "));
+    });
+
+    // Remove duplicates
+    rooms = rooms.filter(function(item, pos) {
+        return rooms.indexOf(item) == pos;
+    });
+    lecturers = lecturers.filter(function(item, pos) {
+        return lecturers.indexOf(item) == pos;
+    });
+    weeks = weeks.filter(function(item, pos) {
+        return weeks.indexOf(item) == pos;
+    });
+
+    // Sort
+    weeks.sort(function(a, b) {
+        return a - b; // math on strings seems to not cause any issues
+    });
+
+    lesson.rooms = rooms;
+    lesson.info = lecturers.join(", ");
+    lesson.week = weeks.join(" ");
+
+    return lesson;
+} // checked
+
 function renderAll() {
+    // Disect
+    var lessonsDisection = {};
+    $.each(lessons, function(i, lesson) {
+        // we disect the lessons into groups of possibly same lessons
+        // the lessons differ only in the week and the room and the lecturer -> probably the same lesson
+        // the cases when the lessons are possibly different:
+        // - !!! the lessons are in different rooms -> unnecessary detail for planing, not preventing merge
+        // - the lessons are in different weeks -> the lessons are different, the merge will be prevented
+        // - the lessons are from different lecturers -> probably the same lessons with just the change of lecturer, not preventing merge
+        var key = lesson.name + ";" + lesson.day + ";" + lesson.from + ";" + lesson.to + ";" + lesson.type;
+        if(typeof lessonsDisection[key] == "undefined") {
+            lessonsDisection[key] = [];
+        }
+        lessonsDisection[key].push(lesson);
+    });
+
+    // Merge
+    lessons = [];
+    $.each(lessonsDisection, function(i, lessonsDisection) {
+        // the assumption:
+        // - the otherLessons is non-empty:
+        //   -> this means that there is no split of the lessons into odd and even weeks
+        //   -> the lessons are probably the same, so we merge them all into one lesson
+        // - the otherLessons is empty:
+        //   -> this means that there is a split of the lessons into odd and even weeks
+        //   -> we merge even with even and odd with odd lessons
+        //   (NOTE - TODO?) maybe this split is incidental and it should be merged into one lesson - for example green
+        var oddLessons = lessonsDisection.filter(x => isOddWeek(x.week, 1));
+        var evenLessons = lessonsDisection.filter(x => isEvenWeek(x.week, 1));
+        var otherLessons = lessonsDisection.filter(x => !isOddWeek(x.week, 1) && !isEvenWeek(x.week, 1));
+        
+        if(otherLessons.length > 0) {
+            lessons.push(mergeLessons(otherLessons.concat(oddLessons).concat(evenLessons)));
+        } else {
+            lessons.push(mergeLessons(oddLessons));
+            lessons.push(mergeLessons(evenLessons));
+        }
+    });
+
+    $.each(lessons, function(i, lesson) {
+        lesson.week = lesson.week.replaceAll("1. 2. 3. 4. 5. 6. 7. 8. 9. 10. 11. 12. 13.", "");
+    });
+
     // Sort
     lessons.sort(function(a, b) {
         if(a.type === "green" && b.type !== "green") {
@@ -1654,7 +1733,7 @@ function getTypeString(type) {
             return "Jiný typ";
     }
 } // checked
-function isOddWeek(week) {
+function isOddWeek(week, minOddLessons = 3) {
     if(week.includes("lichý")) return true;
     // consits of numbers, dots and spaces
     if(week.match(/^[\d.\s]+$/)) {
@@ -1672,11 +1751,11 @@ function isOddWeek(week) {
             }
         }
         // it seems like every semester starts with even week, so even numbers imply odd week
-        if(evenNumbers >= 3 && oddNumbers == 0) return true;
+        if(evenNumbers >= minOddLessons && oddNumbers == 0) return true;
     }
     return false;
 } // checked
-function isEvenWeek(week) {
+function isEvenWeek(week, minEvenLessons = 3) {
     if(week.includes("sudý")) return true;
     // consits of numbers, dots and spaces
     if(week.match(/^[\d.\s]+$/)) {
@@ -1694,7 +1773,7 @@ function isEvenWeek(week) {
             }
         }
         // it seems like every semester starts with even week, so odd numbers imply even week
-        if(evenNumbers == 0 && oddNumbers >= 3) return true;
+        if(evenNumbers == 0 && oddNumbers >= minEvenLessons) return true;
     }
     return false;
 } // checked
