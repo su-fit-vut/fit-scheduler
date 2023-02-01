@@ -40,7 +40,7 @@ $.ajax({
         );
         console.log(pyodide.runPython(e));
     }
-}); // checked 
+}); // checked
 
 let generate_schedule_id=0;
 
@@ -140,74 +140,103 @@ $(document).on("click", ".menu_generate_add_rule", function() {
         `<div class="menu_generate_rule">
             <div class="menu_column_row">
                 <div class="menu_column_row_text">Maximální počet hodin:</div>
-            <div class="cleaner"></div></div>
-            <div class="menu_column_row">
-                <input type="number" style="float:left;" value="0" min="0" class="rule_max_value">
-            <div class="cleaner"></div></div>
+                <div class="cleaner"></div>
+            </div>
+            <div class="menu_column_row" style="height: 40px">
+                <select class="menu_column_row_select rule_max_value">
+                    <option value="0">0</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                    <option value="9">9</option>
+                    <option value="10">10</option>
+                    <option value="11">11</option>
+                    <option value="12">12</option>
+                    <option value="13">13</option>
+                    <option value="14">13</option>
+                </select>
+                <div class="cleaner"></div>
+            </div>
             <div class="menu_column_row">
                 <input class="menu_column_row_checkbox rule_monday" type="checkbox" checked="checked">
                 <div class="menu_column_row_text">Pondělí</div>
-            <div class="cleaner"></div></div>
+                <div class="cleaner"></div>
+            </div>
             <div class="menu_column_row">
                 <input class="menu_column_row_checkbox rule_tuesday" type="checkbox" checked="checked">
                 <div class="menu_column_row_text">Úterý</div>
-            <div class="cleaner"></div></div>
+                <div class="cleaner"></div>
+            </div>
             <div class="menu_column_row">
                 <input class="menu_column_row_checkbox rule_wednesday" type="checkbox" checked="checked">
                 <div class="menu_column_row_text">Středa</div>
-            <div class="cleaner"></div></div>
+                <div class="cleaner"></div>
+            </div>
             <div class="menu_column_row">
                 <input class="menu_column_row_checkbox rule_thursday" type="checkbox" checked="checked">
                 <div class="menu_column_row_text">Čtvrtek</div>
-            <div class="cleaner"></div></div>
+                <div class="cleaner"></div>
+            </div>
             <div class="menu_column_row">
                 <input class="menu_column_row_checkbox rule_friday" type="checkbox" checked="checked">
                 <div class="menu_column_row_text">Pátek</div>
-            <div class="cleaner"></div></div>
+                <div class="cleaner"></div>
+            </div>
             <div class="menu_column_row">
                 <div class="menu_column_row_text">Začátek:</div>
-                <select class="rule_begginning">
-                <option value="0">7:00</option>
-                <option value="1">8:00</option>
-                <option value="2">9:00</option>
-                <option value="3">10:00</option>
-                <option value="4">11:00</option>
-                <option value="5">12:00</option>
-                <option value="6">13:00</option>
-                <option value="7">14:00</option>
-                <option value="8">15:00</option>
-                <option value="9">16:00</option>
-                <option value="10">17:00</option>
-                <option value="11">18:00</option>
-                <option value="12">19:00</option>
-                <option value="13">20:00</option>
+                <div class="cleaner"></div>
+            </div>
+            <div class="menu_column_row" style="height: 40px">
+                <select class="menu_column_row_select rule_begginning">
+                    <option value="0">7:00</option>
+                    <option value="1">8:00</option>
+                    <option value="2">9:00</option>
+                    <option value="3">10:00</option>
+                    <option value="4">11:00</option>
+                    <option value="5">12:00</option>
+                    <option value="6">13:00</option>
+                    <option value="7">14:00</option>
+                    <option value="8">15:00</option>
+                    <option value="9">16:00</option>
+                    <option value="10">17:00</option>
+                    <option value="11">18:00</option>
+                    <option value="12">19:00</option>
+                    <option value="13">20:00</option>
                 </select>
-            <div class="cleaner"></div></div>
+                <div class="cleaner"></div>
+            </div>
             <div class="menu_column_row">
                 <div class="menu_column_row_text">Konec:</div>
-                <select class="rule_ending">
-                <option value="0">7:50</option>
-                <option value="1">8:50</option>
-                <option value="2">9:50</option>
-                <option value="3">10:50</option>
-                <option value="4">11:50</option>
-                <option value="5">12:50</option>
-                <option value="6">13:50</option>
-                <option value="7">14:50</option>
-                <option value="8">15:50</option>
-                <option value="9">16:50</option>
-                <option value="10">17:50</option>
-                <option value="11">18:50</option>
-                <option value="12">19:50</option>
-                <option value="13">20:50</option>
+                <div class="cleaner"></div>
+            </div>
+            <div class="menu_column_row" style="height: 40px">
+                <select class="menu_column_row_select rule_ending">
+                    <option value="0">7:50</option>
+                    <option value="1">8:50</option>
+                    <option value="2">9:50</option>
+                    <option value="3">10:50</option>
+                    <option value="4">11:50</option>
+                    <option value="5">12:50</option>
+                    <option value="6">13:50</option>
+                    <option value="7">14:50</option>
+                    <option value="8">15:50</option>
+                    <option value="9">16:50</option>
+                    <option value="10">17:50</option>
+                    <option value="11">18:50</option>
+                    <option value="12">19:50</option>
+                    <option value="13">20:50</option>
                 </select>
-            <div class="cleaner"></div></div>
-            <div class="menu_column_row">
-                <button class="delete_rule" style="float:left;">Odstranit pravidlo</button>
-            <div class="cleaner"></div></div>
-            <div class="menu_column_row">
-                <div style="float:left;line-height: 10px;margin-bottom: 5px;border-bottom: 2px #ffffff solid;width:100%"></div>
-            <div class="cleaner"></div></div>
+                <div class="cleaner"></div>
+            </div>
+            <div class="menu_column_row" style="padding-top:10px">
+                <button class="menu_button delete_rule">Odstranit pravidlo</button>
+                <div class="cleaner"></div>
+            </div>
         </div>`);
 }); // checked
 
@@ -250,7 +279,7 @@ $(document).on("click", ".menu_cross_icon", function() {
 }); // checked
 
 // Menu
-$(document).on("change", ".menu_column_row_select", function(e) {
+$(document).on("change", ".year_select", function(e) {
     year = Number($(this).val());
     studies = subjects = lastLoadedSubjects = ranges = lessons = [];
     file = { "sem": "", "studies": [], "grades": [],
@@ -496,12 +525,12 @@ function loadStudies(e) {
             });
 
             // Generate
-            $(".menu_column_row_select").html("");
+            $(".year_select").html("");
             if (years.length === 0)
-                $(".menu_column_row_select").append(` <option value="` + year + `" selected>` + year + `/` + (year+1) + `</option>`);
+                $(".year_select").append(` <option value="` + year + `" selected>` + year + `/` + (year+1) + `</option>`);
             else
                 $.each(years, function(i, y) {
-                    $(".menu_column_row_select").append(` <option value="` + y.value + `" ` + (year === y.value ? "selected" : "") + `>` + y.name + `</option>`);
+                    $(".year_select").append(` <option value="` + y.value + `" ` + (year === y.value ? "selected" : "") + `>` + y.name + `</option>`);
                 });
 
             // Start load subjects
@@ -1269,7 +1298,7 @@ function restoreFile() {
     // Year
     if(file.year) {
         year = file.year;
-        $(".menu_column_row_select").val(year);
+        $(".year_select").val(year);
     }
 
     // Sem

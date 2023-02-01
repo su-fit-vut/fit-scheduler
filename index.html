@@ -28,7 +28,7 @@
                                 <div class="menu_column_title">Rok a semestr</div>
                                 <div class="menu_column_conta">
                                     <div class="menu_column_row" style="height: 40px">
-                                        <select class="menu_column_row_select" name="ac_year"></select>
+                                        <select class="menu_column_row_select year_select" name="ac_year"></select>
                                         <div class="cleaner"></div>
                                     </div>
                                     <div class="menu_column_row">
@@ -119,34 +119,26 @@
 
                         <div class="menu_columns">
                             <div class="menu_column">
-                                <div class="menu_column_title">
-                                    Pravidla pro generátor
-                                    <div class="generator_info_icon">&#9432;</div>
-                                </div>
-                                <div class="menu_column_conta menu_rules_sel"></div>
+                                <div class="menu_column_title" style="font-size: 18px;">Pravidla pro generátor <span class="generator_info_icon">&#9432;</span></div>
+                                <div class="menu_column_conta menu_generate_rules" style="max-height: 844px"></div>
+                            </div>
+                            <div class="menu_column">
+                                <div class="menu_column_title generated_rozvrh_options" style="font-size: 18px;">Rozvrh: 0/0</div>
                             </div>
                         </div>
-                        <div class="menu_columns menu_generate_rules">
 
-                        </div>
                         <div class="menu_buttons">
                             <div class="menu_buttons_row">
                                 <input class="menu_button menu_generate_add_rule" type="button" value="Přidat pravidlo"/>
                                 <div class="cleaner"></div>
                             </div>
-                        </div>
-                        <div class="menu_columns">
-                            <div class="menu_column">
-                                <div class="menu_column_row_text generated_rozvrh_options">Rozvrh: 0/0</div>
-                            </div>
-                        </div>
-                        <div class="menu_buttons">
+                            <div class="menu_buttons_line"></div>
                             <div class="menu_buttons_row">
-                                <input class="menu_button menu_generate_next" type="button" value="Vygenerovat další rozvrh"/>
+                                <input class="menu_button menu_generate_prev" type="button" value="Generovat předchozí"/>
                                 <div class="cleaner"></div>
                             </div>
                             <div class="menu_buttons_row">
-                                <input class="menu_button menu_generate_prev" type="button" value="Vygenerovat předchozí rozvrh"/>
+                                <input class="menu_button menu_generate_next" type="button" value="Generovat další"/>
                                 <div class="cleaner"></div>
                             </div>
                         </div>

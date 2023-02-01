@@ -257,6 +257,12 @@ html, body, * {
                         background-size: 100% 100%;
                     }
 
+                .menu_generate_rule {
+                    border: 1px #ffffff solid;
+                    padding: 5px;
+                    margin-bottom: 10px;
+                }
+
             .menu_icons {
                 float: left;
                 width: 30px;
@@ -747,7 +753,7 @@ html, body, * {
                     border-bottom-width: 2px;
                 }
 
-code { 
+code {
     font-family: monospace;
     font-size: 0.9em;
 }
