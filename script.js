@@ -811,11 +811,30 @@ function loadLessons() {
                     return;
                 }
 
+                // Find all enabled and disabled lesson types
+                var disabledTypes = [];
+                var enabledTypes = [];
+                $(e, fakeHtml).find("table#schedule").find("tbody").find("tr").each(function(o, tr) {
+                    if(($(tr).children("td").eq(0).html().includes("přednáška") || $(tr).children("td").eq(0).html().includes("poč. lab") || $(tr).children("td").eq(0).html().includes("cvičení") || $(tr).children("td").eq(0).html().includes("laboratoř")) &&
+                       ($(tr).children("td").eq(1).html().includes("výuky") || $(tr).children("td").eq(1).html().includes("sudý") || $(tr).children("td").eq(1).html().includes("lichý"))) {
+                        if($(tr).children("td").eq(5).html() != "0" && !$(tr).children("td").eq(0).html().includes("*)")) {
+                            enabledTypes.push($(tr).children("td").eq(0).children("span").html());
+                        } else {
+                            disabledTypes.push($(tr).children("td").eq(0).children("span").html());
+                        }
+                    }
+                });
+                
+                // Remove enabled lessons from disabled lessons
+                $.each(enabledTypes, function(i, type) {
+                    disabledTypes = disabledTypes.filter(x => x !== type);
+                });
+
                 // Lessons
                 $(e, fakeHtml).find("table#schedule").find("tbody").find("tr").each(function(o, tr) {
                     if(($(tr).children("td").eq(0).html().includes("přednáška") || $(tr).children("td").eq(0).html().includes("poč. lab") || $(tr).children("td").eq(0).html().includes("cvičení") || $(tr).children("td").eq(0).html().includes("laboratoř")) &&
                        ($(tr).children("td").eq(1).html().includes("výuky") || $(tr).children("td").eq(1).html().includes("sudý") || $(tr).children("td").eq(1).html().includes("lichý")) &&
-                       ($(tr).children("td").eq(5).html() != "0" && !$(tr).children("td").eq(0).html().includes("*)"))) {
+                       ($(tr).children("td").eq(5).html() != "0" && !$(tr).children("td").eq(0).html().includes("*)") || disabledTypes.includes($(tr).children("td").eq(0).children("span").html()))) {
                         // Lesson
                         var lesson = {
                             "id": "",
