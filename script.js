@@ -816,7 +816,7 @@ function loadLessons() {
                 var enabledTypes = [];
                 $(e, fakeHtml).find("table#schedule").find("tbody").find("tr").each(function(o, tr) {
                     if(($(tr).children("td").eq(0).html().includes("přednáška") || $(tr).children("td").eq(0).html().includes("poč. lab") || $(tr).children("td").eq(0).html().includes("cvičení") || $(tr).children("td").eq(0).html().includes("laboratoř")) &&
-                       ($(tr).children("td").eq(1).html().includes("výuky") || $(tr).children("td").eq(1).html().includes("sudý") || $(tr).children("td").eq(1).html().includes("lichý"))) {
+                       ($(tr).children("td").eq(1).html().includes("výuky") || $(tr).children("td").eq(1).html().includes("sudý") || $(tr).children("td").eq(1).html().includes("lichý") || $(tr).children("td").eq(1).html().trim().match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/))) {
                         if($(tr).children("td").eq(5).html() != "0" && !$(tr).children("td").eq(0).html().includes("*)")) {
                             enabledTypes.push($(tr).children("td").eq(0).children("span").html());
                         } else {
@@ -833,7 +833,7 @@ function loadLessons() {
                 // Lessons
                 $(e, fakeHtml).find("table#schedule").find("tbody").find("tr").each(function(o, tr) {
                     if(($(tr).children("td").eq(0).html().includes("přednáška") || $(tr).children("td").eq(0).html().includes("poč. lab") || $(tr).children("td").eq(0).html().includes("cvičení") || $(tr).children("td").eq(0).html().includes("laboratoř")) &&
-                       ($(tr).children("td").eq(1).html().includes("výuky") || $(tr).children("td").eq(1).html().includes("sudý") || $(tr).children("td").eq(1).html().includes("lichý")) &&
+                       ($(tr).children("td").eq(1).html().includes("výuky") || $(tr).children("td").eq(1).html().includes("sudý") || $(tr).children("td").eq(1).html().includes("lichý") || $(tr).children("td").eq(1).html().trim().match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/)) &&
                        ($(tr).children("td").eq(5).html() != "0" && !$(tr).children("td").eq(0).html().includes("*)") || disabledTypes.includes($(tr).children("td").eq(0).children("span").html()))) {
                         // Lesson
                         var lesson = {
@@ -851,6 +851,9 @@ function loadLessons() {
                             "selected": false,
                             "deleted": false
                         };
+                        if(lesson.week == null) {
+                            return;
+                        }
 
                         // Type
                         if($(tr).children("td").eq(0).html().includes("přednáška")) {
@@ -1636,6 +1639,11 @@ function parseWeek(week) {
     week = week.replace("výuky", "");
     week = week.replaceAll(",", "");
     week = week.trim();
+    if(week.match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/)) {
+        var weekNum =  getSemesterWeekFromDate(new Date(week));
+        if(weekNum < 1) return null;
+        return weekNum + ".";
+    }
     return week;
 } // checked
 function parseTimeFrom(time) {
@@ -1795,4 +1803,22 @@ function isEvenWeek(week, minEvenLessons = 3) {
         if(evenNumbers == 0 && oddNumbers >= minEvenLessons) return true;
     }
     return false;
+} // checked
+function getSemesterWeekFromDate(date) {
+    // source: https://www.fit.vut.cz/study/calendar/.cs
+    // TODO: get this data automatically
+    var winterStart = {2022: getWeekNumber(new Date("2022-09-19")), 2023: new Date("2023-09-18")};
+    var summerStart = {2023: getWeekNumber(new Date("2023-02-06")), 2024: new Date("2024-02-05")};
+    var dateWeek = getWeekNumber(date);
+    var year = date.getFullYear();
+    var relativeWinterWeek = dateWeek - winterStart[year] + 1;
+    var relativeSummerWeek = dateWeek - summerStart[year] + 1;
+    if(relativeWinterWeek >= 1 && relativeWinterWeek <= 13) {
+        return relativeWinterWeek;
+    } else if(relativeSummerWeek >= 1 && relativeSummerWeek <= 13) {
+        return relativeSummerWeek;
+    } else {
+        console.warn("Date " + date + " is not in any semester week, so will be ignored");
+        return -1;
+    }
 } // checked
