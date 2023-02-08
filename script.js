@@ -26,6 +26,220 @@ $(document).ready(async function() {
     loadLocalStorage();
 }); // checked
 
+/////////////////////////////////// Automatic schedule generator //////////////////////////////////
+let pyodide = null;
+$.ajax({
+    url: "rozvrh_gen.py",
+    method: "GET",
+    async: true,
+    success: async function(e) {
+        sourceCode = e;
+        pyodide = await loadPyodide();
+        await pyodide.loadPackage(
+            "https://files.pythonhosted.org/packages/c7/c7/cd77b2992c565ff70e9cd9b2d29f4b83cc754aab9936f9d1937a980b459c/python_constraint-1.3.1-py2.py3-none-any.whl"
+        );
+        console.log(pyodide.runPython(e));
+    }
+}); // checked
+
+let generate_schedule_id=0;
+
+$(document).on("click", ".menu_generate_next", function() {
+    let filteredLessons = lessons.filter(lesson => !lesson.deleted);
+    let inverseFilteredLessons = lessons.filter(lesson => lesson.deleted);
+    let generator = pyodide.globals.get('ScheduleGenerator')(filteredLessons);
+    $(".menu_generate_rules").children().each(function(i, rule) {
+        let max_value = Number($(rule).find(".rule_max_value").val());
+        let monday = $(rule).find(".rule_monday").prop("checked");
+        let tuesday = $(rule).find(".rule_tuesday").prop("checked");
+        let wednesday = $(rule).find(".rule_wednesday").prop("checked");
+        let thursday = $(rule).find(".rule_thursday").prop("checked");
+        let friday = $(rule).find(".rule_friday").prop("checked");
+        let begginning = Number($(rule).find(".rule_begginning").val());
+        let ending = Number($(rule).find(".rule_ending").val());
+        let weighted = true;
+        let days = [];
+        if(monday) days.push(0);
+        if(tuesday) days.push(1);
+        if(wednesday) days.push(2);
+        if(thursday) days.push(3);
+        if(friday) days.push(4);
+        console.log(max_value, days, begginning, ending, weighted);
+        generator.add_constraint(max_value, days, begginning, ending, weighted);
+    });
+    generator.every_class_type_only_once();
+    generator.every_hour_only_once();
+    let schedules_count = generator.get_schedules_count();
+    if(schedules_count == 0) {
+        alert("Nelze vygenerovat rozvrh pro dané pravidla!");
+        return;
+    }
+    generate_schedule_id += 1;
+    if(generate_schedule_id<0) generate_schedule_id = 0;
+    if(generate_schedule_id>=schedules_count) generate_schedule_id = schedules_count-1;
+    $.each(inverseFilteredLessons, function(i, lesson) {
+        lesson.selected = false;
+    });
+    $.each(generator.generate_schedule(generate_schedule_id), function(i, selected) {
+        filteredLessons[i].selected = selected;
+    });
+    $(".generated_rozvrh_options").text("Rozvrh: " + (generate_schedule_id+1) + "/" + schedules_count);
+    renderAll();
+});
+
+$(document).on("click", ".menu_generate_prev", function() {
+    let filteredLessons = lessons.filter(lesson => !lesson.deleted);
+    let inverseFilteredLessons = lessons.filter(lesson => lesson.deleted);
+    let generator = pyodide.globals.get('ScheduleGenerator')(filteredLessons);
+    $(".menu_generate_rules").children().each(function(i, rule) {
+        let max_value = Number($(rule).find(".rule_max_value").val());
+        let monday = $(rule).find(".rule_monday").prop("checked");
+        console.log(i, rule);
+        let tuesday = $(rule).find(".rule_tuesday").prop("checked");
+        let wednesday = $(rule).find(".rule_wednesday").prop("checked");
+        let thursday = $(rule).find(".rule_thursday").prop("checked");
+        let friday = $(rule).find(".rule_friday").prop("checked");
+        let begginning = Number($(rule).find(".rule_begginning").val());
+        let ending = Number($(rule).find(".rule_ending").val());
+        let weighted = true;
+        let days = [];
+        if(monday) days.push(0);
+        if(tuesday) days.push(1);
+        if(wednesday) days.push(2);
+        if(thursday) days.push(3);
+        if(friday) days.push(4);
+        console.log(max_value, days, begginning, ending, weighted);
+        generator.add_constraint(max_value, days, begginning, ending, weighted);
+    });
+    generator.every_class_type_only_once();
+    generator.every_hour_only_once();
+    let schedules_count = generator.get_schedules_count();
+    if(schedules_count == 0) {
+        alert("No schedules found!");
+        return;
+    }
+    generate_schedule_id -= 1;
+    if(generate_schedule_id<0) generate_schedule_id = 0;
+    if(generate_schedule_id>=schedules_count) generate_schedule_id = schedules_count-1;
+    $.each(inverseFilteredLessons, function(i, lesson) {
+        lesson.selected = false;
+    });
+    $.each(generator.generate_schedule(generate_schedule_id), function(i, selected) {
+        filteredLessons[i].selected = selected;
+    });
+    $(".generated_rozvrh_options").text("Rozvrh: " + (generate_schedule_id+1) + "/" + schedules_count);
+    renderAll();
+});
+
+$(document).on("click", ".delete_rule", function() {
+    $(this).parent().parent().remove();
+});
+
+$(document).on("click", ".menu_generate_add_rule", function() {
+    $(".menu_generate_rules").append(
+        `<div class="menu_generate_rule">
+            <div class="menu_column_row">
+                <div class="menu_column_row_text">Maximální počet hodin:</div>
+                <div class="cleaner"></div>
+            </div>
+            <div class="menu_column_row" style="height: 40px">
+                <select class="menu_column_row_select rule_max_value">
+                    <option value="0">0</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                    <option value="9">9</option>
+                    <option value="10">10</option>
+                    <option value="11">11</option>
+                    <option value="12">12</option>
+                    <option value="13">13</option>
+                    <option value="14">13</option>
+                </select>
+                <div class="cleaner"></div>
+            </div>
+            <div class="menu_column_row">
+                <input class="menu_column_row_checkbox rule_monday" type="checkbox" checked="checked">
+                <div class="menu_column_row_text">Pondělí</div>
+                <div class="cleaner"></div>
+            </div>
+            <div class="menu_column_row">
+                <input class="menu_column_row_checkbox rule_tuesday" type="checkbox" checked="checked">
+                <div class="menu_column_row_text">Úterý</div>
+                <div class="cleaner"></div>
+            </div>
+            <div class="menu_column_row">
+                <input class="menu_column_row_checkbox rule_wednesday" type="checkbox" checked="checked">
+                <div class="menu_column_row_text">Středa</div>
+                <div class="cleaner"></div>
+            </div>
+            <div class="menu_column_row">
+                <input class="menu_column_row_checkbox rule_thursday" type="checkbox" checked="checked">
+                <div class="menu_column_row_text">Čtvrtek</div>
+                <div class="cleaner"></div>
+            </div>
+            <div class="menu_column_row">
+                <input class="menu_column_row_checkbox rule_friday" type="checkbox" checked="checked">
+                <div class="menu_column_row_text">Pátek</div>
+                <div class="cleaner"></div>
+            </div>
+            <div class="menu_column_row">
+                <div class="menu_column_row_text">Začátek:</div>
+                <div class="cleaner"></div>
+            </div>
+            <div class="menu_column_row" style="height: 40px">
+                <select class="menu_column_row_select rule_begginning">
+                    <option value="0">7:00</option>
+                    <option value="1">8:00</option>
+                    <option value="2">9:00</option>
+                    <option value="3">10:00</option>
+                    <option value="4">11:00</option>
+                    <option value="5">12:00</option>
+                    <option value="6">13:00</option>
+                    <option value="7">14:00</option>
+                    <option value="8">15:00</option>
+                    <option value="9">16:00</option>
+                    <option value="10">17:00</option>
+                    <option value="11">18:00</option>
+                    <option value="12">19:00</option>
+                    <option value="13">20:00</option>
+                </select>
+                <div class="cleaner"></div>
+            </div>
+            <div class="menu_column_row">
+                <div class="menu_column_row_text">Konec:</div>
+                <div class="cleaner"></div>
+            </div>
+            <div class="menu_column_row" style="height: 40px">
+                <select class="menu_column_row_select rule_ending">
+                    <option value="0">7:50</option>
+                    <option value="1">8:50</option>
+                    <option value="2">9:50</option>
+                    <option value="3">10:50</option>
+                    <option value="4">11:50</option>
+                    <option value="5">12:50</option>
+                    <option value="6">13:50</option>
+                    <option value="7">14:50</option>
+                    <option value="8">15:50</option>
+                    <option value="9">16:50</option>
+                    <option value="10">17:50</option>
+                    <option value="11">18:50</option>
+                    <option value="12">19:50</option>
+                    <option value="13">20:50</option>
+                </select>
+                <div class="cleaner"></div>
+            </div>
+            <div class="menu_column_row" style="padding-top:10px">
+                <button class="menu_button delete_rule">Odstranit pravidlo</button>
+                <div class="cleaner"></div>
+            </div>
+        </div>`);
+}); // checked
+
 //////////////////////////////////// Events ////////////////////////////////////
 // Icons
 $(document).on("click", ".header_info_icon", function() {
@@ -34,6 +248,14 @@ $(document).on("click", ".header_info_icon", function() {
 
     $(".secs_main").addClass("hidden");
     $(".secs_info").removeClass("hidden");
+    $(".secs_generator_info").addClass("hidden");
+}); // checked
+$(document).on("click", ".generator_info_icon", function() {
+    $(".header_cross_icon").removeClass("hidden");
+
+    $(".secs_main").addClass("hidden");
+    $(".secs_info").addClass("hidden");
+    $(".secs_generator_info").removeClass("hidden");
 }); // checked
 $(document).on("click", ".header_cross_icon", function() {
     $(".header_info_icon").removeClass("hidden");
@@ -41,6 +263,7 @@ $(document).on("click", ".header_cross_icon", function() {
 
     $(".secs_main").removeClass("hidden");
     $(".secs_info").addClass("hidden");
+    $(".secs_generator_info").addClass("hidden");
 }); // checked
 $(document).on("click", ".menu_icon", function() {
     $(".menu_icon").addClass("hidden");
@@ -56,7 +279,7 @@ $(document).on("click", ".menu_cross_icon", function() {
 }); // checked
 
 // Menu
-$(document).on("change", ".menu_column_row_select", async function(e) {
+$(document).on("change", ".year_select", async function(e) {
     year = Number($(this).val());
     studies = subjects = lastLoadedSubjects = ranges = lessons = [];
     file = { "sem": "", "studies": [], "grades": [],
@@ -312,7 +535,16 @@ async function loadStudies() {
             $.each(years, function(i, y) {
                 $(".menu_column_row_select").append(` <option value="` + y.value + `" ` + (year === y.value ? "selected" : "") + `>` + y.name + `</option>`);
             });
-        
+  
+        // Generate
+        $(".year_select").html("");
+        if (years.length === 0)
+            $(".year_select").append(` <option value="` + year + `" selected>` + year + `/` + (year+1) + `</option>`);
+        else
+            $.each(years, function(i, y) {
+                $(".year_select").append(` <option value="` + y.value + `" ` + (year === y.value ? "selected" : "") + `>` + y.name + `</option>`);
+            });
+      
         // Start load subjects
         await loadSubjects();
     } catch (e) {
@@ -504,6 +736,7 @@ function loadLessons() {
         $(".header_cross_icon").addClass("hidden");
         $(".secs_main").removeClass("hidden");
         $(".secs_info").addClass("hidden");
+        $(".secs_generator_info").addClass("hidden");
 
         $(".menu_column_row_checkbox").prop("disabled", true);
         $(".menu_column_row_radio").prop("disabled", true);
@@ -585,11 +818,30 @@ function loadLessons() {
                     return;
                 }
 
+                // Find all enabled and disabled lesson types
+                var disabledTypes = [];
+                var enabledTypes = [];
+                $(e, fakeHtml).find("table#schedule").find("tbody").find("tr").each(function(o, tr) {
+                    if(($(tr).children("td").eq(0).html().includes("přednáška") || $(tr).children("td").eq(0).html().includes("poč. lab") || $(tr).children("td").eq(0).html().includes("cvičení") || $(tr).children("td").eq(0).html().includes("laboratoř")) &&
+                       ($(tr).children("td").eq(1).html().includes("výuky") || $(tr).children("td").eq(1).html().includes("sudý") || $(tr).children("td").eq(1).html().includes("lichý") || $(tr).children("td").eq(1).html().trim().match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/))) {
+                        if($(tr).children("td").eq(5).html() != "0" && !$(tr).children("td").eq(0).html().includes("*)")) {
+                            enabledTypes.push($(tr).children("td").eq(0).children("span").html());
+                        } else {
+                            disabledTypes.push($(tr).children("td").eq(0).children("span").html());
+                        }
+                    }
+                });
+                
+                // Remove enabled lessons from disabled lessons
+                $.each(enabledTypes, function(i, type) {
+                    disabledTypes = disabledTypes.filter(x => x !== type);
+                });
+
                 // Lessons
                 $(e, fakeHtml).find("table#schedule").find("tbody").find("tr").each(function(o, tr) {
                     if(($(tr).children("td").eq(0).html().includes("přednáška") || $(tr).children("td").eq(0).html().includes("poč. lab") || $(tr).children("td").eq(0).html().includes("cvičení") || $(tr).children("td").eq(0).html().includes("laboratoř")) &&
-                       ($(tr).children("td").eq(1).html().includes("výuky") || $(tr).children("td").eq(1).html().includes("sudý") || $(tr).children("td").eq(1).html().includes("lichý")) &&
-                       ($(tr).children("td").eq(5).html() != "0" && !$(tr).children("td").eq(0).html().includes("*)"))) {
+                       ($(tr).children("td").eq(1).html().includes("výuky") || $(tr).children("td").eq(1).html().includes("sudý") || $(tr).children("td").eq(1).html().includes("lichý") || $(tr).children("td").eq(1).html().trim().match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/)) &&
+                       ($(tr).children("td").eq(5).html() != "0" && !$(tr).children("td").eq(0).html().includes("*)") || disabledTypes.includes($(tr).children("td").eq(0).children("span").html()))) {
                         // Lesson
                         var lesson = {
                             "id": "",
@@ -606,6 +858,9 @@ function loadLessons() {
                             "selected": false,
                             "deleted": false
                         };
+                        if(lesson.week == null) {
+                            return;
+                        }
 
                         // Type
                         if($(tr).children("td").eq(0).html().includes("přednáška")) {
@@ -683,9 +938,9 @@ function loadLessons() {
         rangeRaw = rangeRaw.replaceAll("\\n", "");
         rangeRaw = rangeRaw.replaceAll("hod. ", "");
         rangeRaw = rangeRaw.trim();
-        $.each(rangeRaw.split(","), function(i, rang) {
-            rang = rang.trim();
-
+        $.each([...rangeRaw.matchAll(/(?<=<li>)[^<]+(?=<\/li)/gm)], function(i, rang) {
+            rang = rang[0].trim();
+            
             if(rang.split(" ")[1].trim() === "přednášky") {
                 greenRange = +rang.split(" ")[0].trim();
             } else if(rang.split(" ")[1].trim() === "cvičení") {
@@ -757,7 +1012,86 @@ function loadLessons() {
     renderAll();
 } // checked
 
+function mergeLessons(lessons) {
+    var lesson = lessons[0];
+
+    var rooms = [];
+    var lecturers = [];
+    var weeks = [];
+
+    $.each(lessons, function(i, l) {
+        rooms = rooms.concat(l.rooms);
+        lecturers = lecturers.concat(l.info.split(", "));
+        weeks = weeks.concat(l.week.split(" "));
+    });
+
+    // Remove duplicates
+    rooms = rooms.filter(function(item, pos) {
+        return rooms.indexOf(item) == pos;
+    });
+    lecturers = lecturers.filter(function(item, pos) {
+        return lecturers.indexOf(item) == pos;
+    });
+    weeks = weeks.filter(function(item, pos) {
+        return weeks.indexOf(item) == pos;
+    });
+
+    // Sort
+    weeks.sort(function(a, b) {
+        return a - b; // math on strings seems to not cause any issues
+    });
+
+    lesson.rooms = rooms;
+    lesson.info = lecturers.join(", ");
+    lesson.week = weeks.join(" ");
+
+    return lesson;
+} // checked
+
 function renderAll() {
+    // Disect
+    var lessonsDisection = {};
+    $.each(lessons, function(i, lesson) {
+        // we disect the lessons into groups of possibly same lessons
+        // the lessons differ only in the week and the room and the lecturer -> probably the same lesson
+        // the cases when the lessons are possibly different:
+        // - !!! the lessons are in different rooms -> unnecessary detail for planing, not preventing merge
+        // - the lessons are in different weeks -> the lessons are different, the merge will be prevented
+        // - the lessons are from different lecturers -> probably the same lessons with just the change of lecturer, not preventing merge
+        var key = lesson.name + ";" + lesson.day + ";" + lesson.from + ";" + lesson.to + ";" + lesson.type;
+        if(typeof lessonsDisection[key] == "undefined") {
+            lessonsDisection[key] = [];
+        }
+        lessonsDisection[key].push(lesson);
+    });
+
+    // Merge
+    lessons = [];
+    $.each(lessonsDisection, function(i, lessonsDisection) {
+        // the assumption:
+        // - the otherLessons is non-empty:
+        //   -> this means that there is no split of the lessons into odd and even weeks
+        //   -> the lessons are probably the same, so we merge them all into one lesson
+        // - the otherLessons is empty:
+        //   -> this means that there is a split of the lessons into odd and even weeks
+        //   -> we merge even with even and odd with odd lessons
+        //   (NOTE - TODO?) maybe this split is incidental and it should be merged into one lesson - for example green
+        var oddLessons = lessonsDisection.filter(x => isOddWeek(x.week, 1));
+        var evenLessons = lessonsDisection.filter(x => isEvenWeek(x.week, 1));
+        var otherLessons = lessonsDisection.filter(x => !isOddWeek(x.week, 1) && !isEvenWeek(x.week, 1));
+        
+        if(otherLessons.length > 0) {
+            lessons.push(mergeLessons(otherLessons.concat(oddLessons).concat(evenLessons)));
+        } else {
+            lessons.push(mergeLessons(oddLessons));
+            lessons.push(mergeLessons(evenLessons));
+        }
+    });
+
+    $.each(lessons, function(i, lesson) {
+        lesson.week = lesson.week.replaceAll("1. 2. 3. 4. 5. 6. 7. 8. 9. 10. 11. 12. 13.", "");
+    });
+
     // Sort
     lessons.sort(function(a, b) {
         if(a.type === "green" && b.type !== "green") {
@@ -1072,7 +1406,7 @@ function restoreFile() {
     // Year
     if(file.year) {
         year = file.year;
-        $(".menu_column_row_select").val(year);
+        $(".year_select").val(year);
     }
 
     // Sem
@@ -1312,6 +1646,11 @@ function parseWeek(week) {
     week = week.replace("výuky", "");
     week = week.replaceAll(",", "");
     week = week.trim();
+    if(week.match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/)) {
+        var weekNum =  getSemesterWeekFromDate(new Date(week));
+        if(weekNum < 1) return null;
+        return weekNum + ".";
+    }
     return week;
 } // checked
 function parseTimeFrom(time) {
@@ -1428,7 +1767,7 @@ function getTypeString(type) {
             return "Jiný typ";
     }
 } // checked
-function isOddWeek(week) {
+function isOddWeek(week, minOddLessons = 3) {
     if(week.includes("lichý")) return true;
     // consits of numbers, dots and spaces
     if(week.match(/^[\d.\s]+$/)) {
@@ -1446,11 +1785,11 @@ function isOddWeek(week) {
             }
         }
         // it seems like every semester starts with even week, so even numbers imply odd week
-        if(evenNumbers >= 3 && oddNumbers == 0) return true;
+        if(evenNumbers >= minOddLessons && oddNumbers == 0) return true;
     }
     return false;
 } // checked
-function isEvenWeek(week) {
+function isEvenWeek(week, minEvenLessons = 3) {
     if(week.includes("sudý")) return true;
     // consits of numbers, dots and spaces
     if(week.match(/^[\d.\s]+$/)) {
@@ -1468,7 +1807,25 @@ function isEvenWeek(week) {
             }
         }
         // it seems like every semester starts with even week, so odd numbers imply even week
-        if(evenNumbers == 0 && oddNumbers >= 3) return true;
+        if(evenNumbers == 0 && oddNumbers >= minEvenLessons) return true;
     }
     return false;
+} // checked
+function getSemesterWeekFromDate(date) {
+    // source: https://www.fit.vut.cz/study/calendar/.cs
+    // TODO: get this data automatically
+    var winterStart = {2022: getWeekNumber(new Date("2022-09-19")), 2023: new Date("2023-09-18")};
+    var summerStart = {2023: getWeekNumber(new Date("2023-02-06")), 2024: new Date("2024-02-05")};
+    var dateWeek = getWeekNumber(date);
+    var year = date.getFullYear();
+    var relativeWinterWeek = dateWeek - winterStart[year] + 1;
+    var relativeSummerWeek = dateWeek - summerStart[year] + 1;
+    if(relativeWinterWeek >= 1 && relativeWinterWeek <= 13) {
+        return relativeWinterWeek;
+    } else if(relativeSummerWeek >= 1 && relativeSummerWeek <= 13) {
+        return relativeSummerWeek;
+    } else {
+        console.warn("Date " + date + " is not in any semester week, so will be ignored");
+        return -1;
+    }
 } // checked

@@ -256,6 +256,17 @@ html, body, * {
                         background-repeat: no-repeat;
                         background-size: 100% 100%;
                     }
+                    .menu_qrpay_ghlink {
+                        color: #fff;
+                        font-size: 13px;
+                        cursor: pointer;
+                    }
+
+                .menu_generate_rule {
+                    border: 1px #ffffff solid;
+                    padding: 5px;
+                    margin-bottom: 10px;
+                }
 
             .menu_icons {
                 float: left;
@@ -605,7 +616,7 @@ html, body, * {
                                                 background-color: #454545;
                                             }
 
-            .secs_info {
+            .secs_info, .secs_generator_info {
                 width: calc(100% - 60px - 10px);
                 height: 100%;
                 padding-left: 60px;
@@ -747,6 +758,14 @@ html, body, * {
                     border-bottom-width: 2px;
                 }
 
+code {
+    font-family: monospace;
+    font-size: 0.9em;
+}
+
+.generator_info_icon {
+    cursor: pointer;
+}
 
 .cleaner {
     clear: both;
