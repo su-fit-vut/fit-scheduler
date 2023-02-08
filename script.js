@@ -10,7 +10,7 @@ var year = (new Date()).getMonth() + 1 >= 8 ? (new Date()).getFullYear() : (new 
 var fakeHtml = document.implementation.createHTMLDocument('virtual');                                      // https://stackoverflow.com/a/50194774/7361496
 var loadUrl = "./load.php";
 ///////////////////////////////////// Main /////////////////////////////////////
-$(document).ready(function() {
+$(document).ready(async function() {
     // Semester radio auto select
     var d = new Date();
     if(d.getMonth() === 11 || d.getMonth() < 4) {
@@ -20,7 +20,7 @@ $(document).ready(function() {
     }
 
     // Start menu load
-    loadStudies();
+    await loadStudies();
 
     // Load local storage
     loadLocalStorage();
@@ -56,12 +56,12 @@ $(document).on("click", ".menu_cross_icon", function() {
 }); // checked
 
 // Menu
-$(document).on("change", ".menu_column_row_select", function(e) {
+$(document).on("change", ".menu_column_row_select", async function(e) {
     year = Number($(this).val());
     studies = subjects = lastLoadedSubjects = ranges = lessons = [];
     file = { "sem": "", "studies": [], "grades": [],
              "subjects": [], "custom": [], "selected": [], "deleted": [] };
-    loadStudies();
+    await loadStudies();
     loadLessons();
 }); // checked
 $(document).on("click", ".menu_sem_radio", function() {
@@ -225,27 +225,50 @@ $(document).on("click", ".lesson_add_card_button", function() {
 }); // checked
 
 ///////////////////////////////////// Menu /////////////////////////////////////
-function loadStudies(e) {
+async function loadStudies() {
     // Title
     $(".loading_message").html("Načítám studia...");
 
     // AJAX
     studies = [];
-    $.ajax({
-        url: loadUrl,
-        method: "POST",
-        data: {
-            "a": "s",
-            "b": "",
-            "c": "",
-            "y": year,
-        },
-        async: false,
-        success: function(e) {
-            // Parse BIT
+    try {
+        var studiesData = await $.ajax({
+            url: loadUrl,
+            method: "POST",
+            data: {
+                "a": "s",
+                "b": "",
+                "c": "",
+                "y": year,
+            },
+            async: true
+        });
+
+        
+        // Parse BIT
+        studies.push({
+            "name": "BIT",
+            "link": parseLinkforLoadPHP($(studiesData, fakeHtml).find("div#bc").find("li.c-programmes__item").first().find("a.b-programme__link").prop("href")),
+            "subjects": {
+                "com": [
+                    [], [], []
+                ],
+                "opt": [
+                    [], [], []
+                ]
+            }
+        });
+
+        // Parse MIT
+        $(studiesData, fakeHtml).find("div#mgr").find("li.c-programmes__item").find("li.c-branches__item").each(function(i, li) {
+
+            // only new mgr program
+            if (!$(li).find("span.tag").html().startsWith('N'))
+                return;
+
             studies.push({
-                "name": "BIT",
-                "link": parseLinkforLoadPHP($(e, fakeHtml).find("div#bc").find("li.c-programmes__item").first().find("a.b-programme__link").prop("href")),
+                "name": "MIT-" + $(li).find("span.tag").html(),
+                "link": parseLinkforLoadPHP($(li).find("a.b-branch__link").prop("href")),
                 "subjects": {
                     "com": [
                         [], [], []
@@ -255,119 +278,94 @@ function loadStudies(e) {
                     ]
                 }
             });
+        });
 
-            // Parse MIT
-            $(e, fakeHtml).find("div#mgr").find("li.c-programmes__item").find("li.c-branches__item").each(function(i, li) {
+        // Generate
+        $(".menu_stud_column").html("");
+        $.each(studies, function(i, stud) {
+            if(stud.name === "BIT") {
+                $(".menu_stud_column").append(` <div class="menu_column_row">
+                                                    <input class="menu_column_row_checkbox menu_bit_checkbox" type="checkbox" value="BIT">
+                                                    <div class="menu_column_row_text">BIT</div>
+                                                    <div class="cleaner"></div>
+                                                </div>`);
+            } else {
+                $(".menu_stud_column").append(` <div class="menu_column_row">
+                                                    <input class="menu_column_row_radio menu_mit_radio" type="radio" name="mit_grade" value="` + stud.name + `">
+                                                    <div class="menu_column_row_text">` + stud.name + `</div>
+                                                    <div class="cleaner"></div>
+                                                </div>`);
+            }
+        });
 
-                // only new mgr program
-                if (!$(li).find("span.tag").html().startsWith('N'))
-                    return;
+        // Parse years
+        let years = [];
+        $(studiesData, fakeHtml).find("select#year").find("option").each(function (i, opt) {
+            years.push({value: Number($(opt).prop('value')), name: $(opt).text()});
+        });
 
-                studies.push({
-                    "name": "MIT-" + $(li).find("span.tag").html(),
-                    "link": parseLinkforLoadPHP($(li).find("a.b-branch__link").prop("href")),
-                    "subjects": {
-                        "com": [
-                            [], [], []
-                        ],
-                        "opt": [
-                            [], [], []
-                        ]
-                    }
-                });
+        // Generate
+        $(".menu_column_row_select").html("");
+        if (years.length === 0)
+            $(".menu_column_row_select").append(` <option value="` + year + `" selected>` + year + `/` + (year+1) + `</option>`);
+        else
+            $.each(years, function(i, y) {
+                $(".menu_column_row_select").append(` <option value="` + y.value + `" ` + (year === y.value ? "selected" : "") + `>` + y.name + `</option>`);
             });
-
-            // Generate
-            $(".menu_stud_column").html("");
-            $.each(studies, function(i, stud) {
-                if(stud.name === "BIT") {
-                    $(".menu_stud_column").append(` <div class="menu_column_row">
-                                                        <input class="menu_column_row_checkbox menu_bit_checkbox" type="checkbox" value="BIT">
-                                                        <div class="menu_column_row_text">BIT</div>
-                                                        <div class="cleaner"></div>
-                                                    </div>`);
-                } else {
-                    $(".menu_stud_column").append(` <div class="menu_column_row">
-                                                        <input class="menu_column_row_radio menu_mit_radio" type="radio" name="mit_grade" value="` + stud.name + `">
-                                                        <div class="menu_column_row_text">` + stud.name + `</div>
-                                                        <div class="cleaner"></div>
-                                                    </div>`);
-                }
-            });
-
-            // Parse years
-            let years = [];
-            $(e, fakeHtml).find("select#year").find("option").each(function (i, opt) {
-                years.push({value: Number($(opt).prop('value')), name: $(opt).text()});
-            });
-
-            // Generate
-            $(".menu_column_row_select").html("");
-            if (years.length === 0)
-                $(".menu_column_row_select").append(` <option value="` + year + `" selected>` + year + `/` + (year+1) + `</option>`);
-            else
-                $.each(years, function(i, y) {
-                    $(".menu_column_row_select").append(` <option value="` + y.value + `" ` + (year === y.value ? "selected" : "") + `>` + y.name + `</option>`);
-                });
-
-            // Start load subjects
-            loadSubjects();
-        },
-        error: function() {
-            $(".loading_message").html("Chyba při načítání studií...");
-        }
-    });
+        
+        // Start load subjects
+        await loadSubjects();
+    } catch (e) {
+        $(".loading_message").html("Chyba při načítání studií...");
+    }
 } // checked
-function loadSubjects(e) {
-    // Load
-    $.each(studies, function(i, stud) {
-        // Title
-        $(".loading_message").html("Načítám předměty studia " + stud.name + "...");
+async function loadSubjects(e) {
+    // Title
+    $(".loading_message").html("Načítám předměty studií...");
 
-        // AJAX
-        stud.subjects.com = [ [], [], [] ];
-        stud.subjects.opt = [ [], [], [] ];
-        $.ajax({
-            url: loadUrl,
+    await $.when.apply($, [...studies.map(stud => $.ajax({
+        url: loadUrl,
             method: "POST",
             data: {
                 "a": "u",
                 "b": stud.link.split("-")[0],
                 "c": stud.link.split("-")[1]
             },
-            async: false,
-            success: function(e) {
-                // Parse
-                var sem = "winter";
-                var grade = 0;
-                $(e, fakeHtml).find("main").first().find("div.table-responsive").first().find("tbody").each(function(o, tbody) {
-                    $(tbody).children("tr").each(function(p, tr) {
-                        // Subject
-                        var subject = {
-                            "name": $(tr).children("th").html(),
-                            "sem": sem,
-                            "link": parseLinkforLoadPHP($(tr).children("td").first().children("a").prop("href"))
-                        }
+            async: true
+        }).done(function(e) {
+            stud.subjects.com = [ [], [], [] ];
+            stud.subjects.opt = [ [], [], [] ];
 
-                        // Push
-                        if($(tr).css("background-color") === "rgb(255, 228, 192)") {
-                            stud.subjects.com[grade].push(subject);
-                        } else {
-                            stud.subjects.opt[grade].push(subject);
-                        }
-                    });
+            // Parse
+            var sem = "winter";
+            var grade = 0;
+            $(e, fakeHtml).find("main").first().find("div.table-responsive").first().find("tbody").each(function(o, tbody) {
+                $(tbody).children("tr").each(function(p, tr) {
+                    // Subject
+                    var subject = {
+                        "name": $(tr).children("th").html(),
+                        "sem": sem,
+                        "link": parseLinkforLoadPHP($(tr).children("td").first().children("a").prop("href"))
+                    }
 
-                    // Inc
-                    if(sem === "winter") {
-                        sem = "summer";
+                    // Push
+                    if($(tr).css("background-color") === "rgb(255, 228, 192)") {
+                        stud.subjects.com[grade].push(subject);
                     } else {
-                        sem = "winter";
-                        grade++;
+                        stud.subjects.opt[grade].push(subject);
                     }
                 });
-            }
-        });
-    });
+
+                // Inc
+                if(sem === "winter") {
+                    sem = "summer";
+                } else {
+                    sem = "winter";
+                    grade++;
+                }
+            });
+        })
+    )])
 
     // Generate
     $(".menu_com_column").html("");
