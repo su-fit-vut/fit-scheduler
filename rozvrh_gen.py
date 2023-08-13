@@ -17,21 +17,34 @@ class ScheduleGenerator:
         self.problem.addVariables(range(len(data)), [0,1])
         self.data = data.to_py()
         self.hours_list = get_hours_list(self.data)
+        for i, x in enumerate(self.data):
+            if x != self.get_first_of_lesons(x):
+                    self.problem.addConstraint(lambda a,b: a == b, [i, self.data.index(self.get_first_of_lesons(x))])
 
     def every_class_type_only_once(self):
         all_classes = [[] for x in range(len(self.hours_list))]
         for i,j in enumerate(self.data):
-            name = j["name"] + "_" + j["type"]
-            index = self.hours_list.index(name)
-            all_classes[index].append(i)
+            if j == self.get_first_of_lesons(j):
+                name = j["name"] + "_" + j["type"]
+                index = self.hours_list.index(name)
+                all_classes[index].append(i)
 
         for x in all_classes:
             self.problem.addConstraint(ExactSumConstraint(1), x)
 
+    def get_first_of_lesons(self, lesson):
+        for x in self.data:
+                if x["name"] == lesson["name"] and x["type"] == lesson["type"] and x["group"] == lesson["group"]:
+                    if x["group"] != "":
+                        return x
+                    else:
+                        return lesson
+    
     def every_hour_only_once(self):
         all_times = [[[[],[]] for y in range(max(z["to"] for z in self.data)+1)] for x in range(5)]
 
-        for i,j in enumerate(self.data):
+        for j in self.data:
+            i = self.data.index(self.get_first_of_lesons(j))
             for x in range(j["from"], j["to"]):
                 if j["week"] == "lichý":
                     all_times[j["day"]][x][0].append(i)
