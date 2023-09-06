@@ -851,6 +851,7 @@ function loadLessons() {
                             "week": parseWeek($(tr).children("td").eq(1).html()),
                             "from": parseTimeFrom($(tr).children("td").eq(3).html()),
                             "to":   parseTimeTo($(tr).children("td").eq(4).html()),
+                            "group": $(tr).children("td").eq(7).html().replace("xx", "").trim(),
                             "info": $(tr).children("td").eq(8).html(),
                             "type": "unknown",
                             "rooms": [],
