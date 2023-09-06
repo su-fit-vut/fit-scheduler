@@ -1083,8 +1083,12 @@ function renderAll() {
         if(otherLessons.length > 0) {
             lessons.push(mergeLessons(otherLessons.concat(oddLessons).concat(evenLessons)));
         } else {
-            lessons.push(mergeLessons(oddLessons));
-            lessons.push(mergeLessons(evenLessons));
+            if(oddLessons.length > 0) {
+                lessons.push(mergeLessons(oddLessons));
+            }
+            if(evenLessons.length > 0) {
+                lessons.push(mergeLessons(evenLessons));
+            }
         }
     });
 
@@ -1814,12 +1818,14 @@ function isEvenWeek(week, minEvenLessons = 3) {
 function getSemesterWeekFromDate(date) {
     // source: https://www.fit.vut.cz/study/calendar/.cs
     // TODO: get this data automatically
-    var winterStart = {2022: getWeekNumber(new Date("2022-09-19")), 2023: new Date("2023-09-18")};
-    var summerStart = {2023: getWeekNumber(new Date("2023-02-06")), 2024: new Date("2024-02-05")};
+    var winterStart = {2022: "2022-09-19", 2023: "2023-09-18"};
+    var summerStart = {2023: "2023-02-06", 2024: "2024-02-05"};
     var dateWeek = getWeekNumber(date);
     var year = date.getFullYear();
-    var relativeWinterWeek = dateWeek - winterStart[year] + 1;
-    var relativeSummerWeek = dateWeek - summerStart[year] + 1;
+    var winterStartWeek = getWeekNumber(new Date(winterStart[year]));
+    var summerStartWeek = getWeekNumber(new Date(summerStart[year]));
+    var relativeWinterWeek = dateWeek - winterStartWeek + 1;
+    var relativeSummerWeek = dateWeek - summerStartWeek + 1;
     if(relativeWinterWeek >= 1 && relativeWinterWeek <= 13) {
         return relativeWinterWeek;
     } else if(relativeSummerWeek >= 1 && relativeSummerWeek <= 13) {
