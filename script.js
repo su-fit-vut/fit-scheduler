@@ -467,7 +467,7 @@ async function loadStudies() {
             async: true
         });
 
-        
+
         // Parse BIT
         studies.push({
             "name": "BIT",
@@ -535,7 +535,7 @@ async function loadStudies() {
             $.each(years, function(i, y) {
                 $(".menu_column_row_select").append(` <option value="` + y.value + `" ` + (year === y.value ? "selected" : "") + `>` + y.name + `</option>`);
             });
-  
+
         // Generate
         $(".year_select").html("");
         if (years.length === 0)
@@ -544,7 +544,7 @@ async function loadStudies() {
             $.each(years, function(i, y) {
                 $(".year_select").append(` <option value="` + y.value + `" ` + (year === y.value ? "selected" : "") + `>` + y.name + `</option>`);
             });
-      
+
         // Start load subjects
         await loadSubjects();
     } catch (e) {
@@ -822,7 +822,7 @@ function loadLessons() {
                 var disabledTypes = [];
                 var enabledTypes = [];
                 $(e, fakeHtml).find("table#schedule").find("tbody").find("tr").each(function(o, tr) {
-                    if(($(tr).children("td").eq(0).html().includes("přednáška") || $(tr).children("td").eq(0).html().includes("poč. lab") || $(tr).children("td").eq(0).html().includes("cvičení") || $(tr).children("td").eq(0).html().includes("laboratoř")) &&
+                    if(($(tr).children("td").eq(0).html().includes("přednáška") || $(tr).children("td").eq(0).html().includes("poč. lab") || $(tr).children("td").eq(0).html().includes("cvičení") || $(tr).children("td").eq(0).html().includes("laboratoř") || $(tr).children("td").eq(0).html().includes("seminář")) &&
                        ($(tr).children("td").eq(1).html().includes("výuky") || $(tr).children("td").eq(1).html().includes("sudý") || $(tr).children("td").eq(1).html().includes("lichý") || $(tr).children("td").eq(1).html().trim().match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/))) {
                         if($(tr).children("td").eq(5).html() != "0" && !$(tr).children("td").eq(0).html().includes("*)")) {
                             enabledTypes.push($(tr).children("td").eq(0).children("span").html());
@@ -831,7 +831,7 @@ function loadLessons() {
                         }
                     }
                 });
-                
+
                 // Remove enabled lessons from disabled lessons
                 $.each(enabledTypes, function(i, type) {
                     disabledTypes = disabledTypes.filter(x => x !== type);
@@ -839,7 +839,7 @@ function loadLessons() {
 
                 // Lessons
                 $(e, fakeHtml).find("table#schedule").find("tbody").find("tr").each(function(o, tr) {
-                    if(($(tr).children("td").eq(0).html().includes("přednáška") || $(tr).children("td").eq(0).html().includes("poč. lab") || $(tr).children("td").eq(0).html().includes("cvičení") || $(tr).children("td").eq(0).html().includes("laboratoř")) &&
+                    if(($(tr).children("td").eq(0).html().includes("přednáška") || $(tr).children("td").eq(0).html().includes("poč. lab") || $(tr).children("td").eq(0).html().includes("cvičení") || $(tr).children("td").eq(0).html().includes("laboratoř") || $(tr).children("td").eq(0).html().includes("seminář")) &&
                        ($(tr).children("td").eq(1).html().includes("výuky") || $(tr).children("td").eq(1).html().includes("sudý") || $(tr).children("td").eq(1).html().includes("lichý") || $(tr).children("td").eq(1).html().trim().match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/)) &&
                        ($(tr).children("td").eq(5).html() != "0" && !$(tr).children("td").eq(0).html().includes("*)") || disabledTypes.includes($(tr).children("td").eq(0).children("span").html()))) {
                         // Lesson
@@ -867,6 +867,8 @@ function loadLessons() {
                         if($(tr).children("td").eq(0).html().includes("přednáška")) {
                             lesson.type = "green";
                         } else if($(tr).children("td").eq(0).html().includes("cvičení")) {
+                            lesson.type = "blue";
+                        } else if($(tr).children("td").eq(0).html().includes("seminář")) {
                             lesson.type = "blue";
                         } else if($(tr).children("td").eq(0).html().includes("poč. lab")) {
                             lesson.type = "yellow";
@@ -941,10 +943,12 @@ function loadLessons() {
         rangeRaw = rangeRaw.trim();
         $.each([...rangeRaw.matchAll(/(?<=<li>)[^<]+(?=<\/li)/gm)], function(i, rang) {
             rang = rang[0].trim();
-            
+
             if(rang.split(" ")[1].trim() === "přednášky") {
                 greenRange = +rang.split(" ")[0].trim();
             } else if(rang.split(" ")[1].trim() === "cvičení") {
+                blueRange = +rang.split(" ")[0].trim();
+            } else if(rang.split(" ")[1].trim() === "seminář") {
                 blueRange = +rang.split(" ")[0].trim();
             } else if(rang.split(" ")[1].trim() === "pc") {
                 yellowRange = +rang.split(" ")[0].trim();
@@ -1080,7 +1084,7 @@ function renderAll() {
         var oddLessons = lessonsDisection.filter(x => isOddWeek(x.week, 1));
         var evenLessons = lessonsDisection.filter(x => isEvenWeek(x.week, 1));
         var otherLessons = lessonsDisection.filter(x => !isOddWeek(x.week, 1) && !isEvenWeek(x.week, 1));
-        
+
         if(otherLessons.length > 0) {
             lessons.push(mergeLessons(otherLessons.concat(oddLessons).concat(evenLessons)));
         } else {
