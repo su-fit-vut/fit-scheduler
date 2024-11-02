@@ -36,12 +36,12 @@ jobs:
           context: .
           file: Containerfile
           push: true
-          tags: ${{ env.IMAGE_NAME }}
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
 
       - name: Generate artifact attestation
         uses: actions/attest-build-provenance@v1
         with:
-          subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
           subject-digest: ${{ steps.push.outputs.digest }}
           push-to-registry: true
       
