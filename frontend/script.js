@@ -8,7 +8,7 @@ var file = { "sem": "", "studies": [], "grades": [],
              "subjects": [], "custom": [], "selected": [], "deleted": [] };                                // File cache
 var year = (new Date()).getMonth() + 1 >= 8 ? (new Date()).getFullYear() : (new Date()).getFullYear() - 1; // Academic year (from august display next ac. year)
 var fakeHtml = document.implementation.createHTMLDocument('virtual');                                      // https://stackoverflow.com/a/50194774/7361496
-var loadUrl = "/";
+var loadUrl = "/load";
 ///////////////////////////////////// Main /////////////////////////////////////
 $(document).ready(async function() {
     // Semester radio auto select
@@ -439,6 +439,7 @@ async function loadSubjects(e) {
     // Render
     renderSubjects();
 } // checked
+
 function renderSubjects() {
     // Grades render
     if($(".menu_bit_checkbox:checked").length > 0) {
