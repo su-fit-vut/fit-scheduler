@@ -1,7 +1,7 @@
 html, body, * {
     padding: 0;
     margin: 0;
-    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    font-family: Exo, Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
 }
 
 .conta {
@@ -306,7 +306,7 @@ html, body, * {
                         margin: 0 5px;
                         border-bottom: 2px #040D1F solid;
                         color: #051221;
-                        font-size: 25px;
+                        font-size: 21px;
                         text-align: center;
                         cursor: pointer;
                     }
@@ -428,6 +428,7 @@ html, body, * {
                                 border: 1px #000000 solid;
                                 border-bottom-width: 2px;
                                 background-color: #132448;
+                                font-size: 0.8em;
                             }
                                 .schedule_header_cell_week {
                                     float: left;
@@ -798,7 +799,7 @@ code {
         .secs_header_elem {
             width: 90px;
             font-size: 15px;
-            line-height: 25px;
+            line-height: 21px;
         }
 }
 @media only screen and (max-width: 450px) {
@@ -808,7 +809,7 @@ code {
         .secs_header_elem {
             width: 60px;
             font-size: 12px;
-            line-height: 25px;
+            line-height: 21px;
         }
 
     .loading_message {
