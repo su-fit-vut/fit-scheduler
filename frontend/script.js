@@ -11,8 +11,8 @@ var file = {
 var year = (new Date()).getMonth() + 1 >= 8 ? (new Date()).getFullYear() : (new Date()).getFullYear() - 1; // Academic year (from august display next ac. year)
 var fakeHtml = document.implementation.createHTMLDocument('virtual');                                      // https://stackoverflow.com/a/50194774/7361496
 
-const loadUrl = "/load";
 const dataUrl = "/data";
+const subjectUrl = "/subjectData";
 
 ///////////////////////////////////// Main /////////////////////////////////////
 $(document).ready(async function () {
@@ -242,7 +242,7 @@ $(document).on("click", ".lesson_add_card_button", function () {
 
 ///////////////////////////////////// Menu /////////////////////////////////////
 async function loadData() {
-    // Title
+    $(".loading_message").removeClass("hidden");
     $(".loading_message").html("Načítám data...");
 
     // Initialize studies
@@ -508,6 +508,7 @@ async function loadLessons() {
     // Send GET request to /subjectData endpoint
     try {
         // Title
+        $(".loading_message").removeClass("hidden");
         $(".loading_message").html("Načítám data předmětů...");
 
         // Build query parameters
@@ -520,7 +521,7 @@ async function loadLessons() {
         let queryString = $.param(params);
 
         let response = await $.ajax({
-            url: '/subjectData?' + queryString,
+            url: subjectUrl + '?' + queryString,
             method: 'GET',
             dataType: 'json',
             async: true
