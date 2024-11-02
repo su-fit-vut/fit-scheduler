@@ -2,6 +2,7 @@ html, body, * {
     padding: 0;
     margin: 0;
     font-family: Exo, Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    font-weight: 400;
 }
 
 .conta {
@@ -421,6 +422,7 @@ html, body, * {
                             padding: 20px;
                             margin: 0 auto;
                             background-color: #ffffff;
+                            font-weight: 500;
                         }
                             .schedule_header {
                                 width: calc(100% - 2px);
@@ -496,16 +498,16 @@ html, body, * {
                                             opacity: 0.75;
                                         }
                                         .schedule_cell_week_odd {
-                                            border-color: #335AFF;
+                                            border-color: #2257EB;
                                         }
                                         .schedule_cell_week_even {
                                             border-color: #DB1200;
                                         }
                                         .schedule_cell_type_green {
-                                            background-color: #03b300;
+                                            background-color: #31C72F;
                                         }
                                         .schedule_cell_type_blue {
-                                            background-color: #15A2DB;
+                                            background-color: #47B8E6;
                                         }
                                         .schedule_cell_type_yellow {
                                             background-color: #DBB21F;
