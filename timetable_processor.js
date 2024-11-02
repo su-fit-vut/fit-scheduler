@@ -44,7 +44,7 @@ function getSubjectData(subjects, year, callback) {
         const b = parts[0];
         const c = parts[1];
 
-        const urlToFetch = 'https://www.fit.vut.cz/study/' + encodeURIComponent(b) + '/' + encodeURIComponent(c) + '/';
+        const urlToFetch = 'https://www.fit.vut.cz/study/' + encodeURIComponent(b) + '/' + encodeURIComponent(c) + '/.cs';
         const options = {
             headers: {
                 'Accept-language': 'cs'
@@ -285,7 +285,7 @@ function loadSubjectsForStudy(stud, done) {
     const b = parts[0];
     const c = parts[1];
 
-    const urlToFetch = 'https://www.fit.vut.cz/study/' + encodeURIComponent(b) + '/' + encodeURIComponent(c) + '/';
+    const urlToFetch = 'https://www.fit.vut.cz/study/' + encodeURIComponent(b) + '/' + encodeURIComponent(c) + '/.cs';
     const options = {
         headers: {
             'Accept-language': 'cs'
@@ -327,8 +327,8 @@ function parseSubjectsData(htmlData, stud) {
             };
 
             // Determine if it's compulsory or optional
-            let bgColor = $(tr).attr('style');
-            if (bgColor && bgColor.includes('background-color:#ffe4c0')) {
+            const subjType = $($(tr).children('td').get(2)).text();
+            if (subjType === 'P') {
                 stud.subjects.com[grade].push(subject);
             } else {
                 stud.subjects.opt[grade].push(subject);
@@ -346,6 +346,10 @@ function parseSubjectsData(htmlData, stud) {
 }
 
 function parseLinkForSubjectEndpoint(link) {
+    if (link.endsWith('.cs')) {
+        link = link.substring(0, link.length - 4);
+    }
+
     var linkArray = link.split("/");
     linkArray = linkArray.filter(x => x != "");
     return linkArray[linkArray.length - 2] + "-" + linkArray[linkArray.length - 1];
