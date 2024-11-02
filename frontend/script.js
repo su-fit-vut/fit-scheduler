@@ -11,8 +11,8 @@ var file = {
 var year = (new Date()).getMonth() + 1 >= 8 ? (new Date()).getFullYear() : (new Date()).getFullYear() - 1; // Academic year (from august display next ac. year)
 var fakeHtml = document.implementation.createHTMLDocument('virtual');                                      // https://stackoverflow.com/a/50194774/7361496
 
-const dataUrl = "/data";
-const subjectUrl = "/subjectData";
+const dataUrl = "data";
+const subjectUrl = "subjectData";
 
 ///////////////////////////////////// Main /////////////////////////////////////
 $(document).ready(async function () {
