@@ -1,11 +1,42 @@
 const https = require('https');
 const cheerio = require('cheerio'); // Include cheerio for HTML parsing
+const NodeCache = require('node-cache');
 
 module.exports = { getStudiesData, getSubjectData }
 
+const cache = new NodeCache({
+    stdTTL: 600, // 10 minutes
+    checkperiod: 120, // 2 minutes
+    useClones: false
+});
+
+const environment = process.env.NODE_ENV || 'development';
+if (environment === 'development') {
+    cache.on("set", function (key, value) {
+        console.info(`Caching ${key}`);
+    });
+
+    cache.on("expired", function (key, value) {
+        console.info(`Expired ${key}`);
+    });
+}
+
 // Fetch and parse study plans
 function getStudiesData(year, callback) {
-    const urlToFetch = 'https://www.fit.vut.cz/study/programs/?year=' + encodeURIComponent(year);
+    const urlToFetch = 'https://www.fit.vut.cz/study/programs/.cs?year=' + encodeURIComponent(year);
+    const cachedValue = cache.get(urlToFetch);
+    if (cachedValue) {
+        callback(null, cachedValue);
+        return;
+    }
+
+    const setCacheAndCallback = function (e, data) {
+        if (data) {
+            cache.set(urlToFetch, data);
+        }
+        callback(e, data);
+    };
+
     const options = {
         headers: {
             'Accept-language': 'cs'
@@ -21,11 +52,11 @@ function getStudiesData(year, callback) {
 
         response.on('end', () => {
             // Parse the HTML data
-            parseStudiesData(data, year, callback);
+            parseStudiesData(data, year, setCacheAndCallback);
         });
 
     }).on('error', (err) => {
-        callback(err);
+        setCacheAndCallback(err);
     });
 }
 
@@ -39,12 +70,38 @@ function getSubjectData(subjects, year, callback) {
         return;
     }
 
+    function decreaseAndCheckPending() {
+        pending--;
+        if (pending === 0) {
+            // All subjects processed
+            let allLessons = [];
+            let allRanges = [];
+
+            subjectData.forEach((sd) => {
+                allLessons = allLessons.concat(sd.lessons);
+                allRanges = allRanges.concat(sd.ranges);
+            });
+
+            callback(null, { lessons: allLessons, ranges: allRanges });
+        }
+    }
+
     subjects.forEach((sub) => {
         const parts = sub.link.split('-');
         const b = parts[0];
         const c = parts[1];
 
         const urlToFetch = 'https://www.fit.vut.cz/study/' + encodeURIComponent(b) + '/' + encodeURIComponent(c) + '/.cs';
+        const cachedValue = cache.get(urlToFetch);
+        if (cachedValue) {
+            const processed = processFetchedSubjectData(sub, cachedValue);
+            if (processed) {
+                subjectData.push(processed);
+                decreaseAndCheckPending();
+            }
+            return;
+        }
+
         const options = {
             headers: {
                 'Accept-language': 'cs'
@@ -59,156 +116,142 @@ function getSubjectData(subjects, year, callback) {
             });
 
             response.on('end', () => {
-                try {
-                    const $ = cheerio.load(data);
-
-                    // Fetch the subject name from the page
-                    const subjectName = $('.b-detail__annot-item[itemprop="courseCode"]').text().trim() || 'Unknown';
-
-                    // Assign the name to sub
-                    sub.name = subjectName;
-
-                    // Parse range
-                    const rangeElement = $('main').find('div.b-detail__body').find('div.grid__cell').find("p:contains('Rozsah')").parent().next().children();
-                    const rangeHtml = rangeElement.html() || 'neznámý rozsah výuky';
-
-                    // Parse lessons
-                    let lessons = [];
-                    let disabledTypes = [];
-                    let enabledTypes = [];
-
-                    $('table#schedule').find('tbody').find('tr').each((o, tr) => {
-                        const $tr = $(tr);
-                        const typeHtml = $tr.children('td').eq(0).html() || '';
-                        const weekHtml = $tr.children('td').eq(1).html() || '';
-                        const capacityHtml = $tr.children('td').eq(5).html() || '';
-
-                        const typeText = $tr.children('td').eq(0).children('span').text();
-
-                        if (
-                            (typeHtml.includes('přednáška') ||
-                                typeHtml.includes('poč. lab') ||
-                                typeHtml.includes('cvičení') ||
-                                typeHtml.includes('laboratoř') ||
-                                typeHtml.includes('seminář')) &&
-                            (weekHtml.includes('výuky') ||
-                                weekHtml.includes('sudý') ||
-                                weekHtml.includes('lichý') ||
-                                weekHtml.trim().match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/))
-                        ) {
-                            if (capacityHtml != '0' && !typeHtml.includes('*)')) {
-                                enabledTypes.push(typeText);
-                            } else {
-                                disabledTypes.push(typeText);
-                            }
-                        }
-                    });
-
-                    // Remove enabled lessons from disabled lessons
-                    enabledTypes.forEach((type) => {
-                        disabledTypes = disabledTypes.filter((x) => x !== type);
-                    });
-
-                    // Parse lessons
-                    $('table#schedule').find('tbody').find('tr').each((o, tr) => {
-                        const $tr = $(tr);
-                        const typeHtml = $tr.children('td').eq(0).html() || '';
-                        const weekHtml = $tr.children('td').eq(1).html() || '';
-                        const capacityHtml = $tr.children('td').eq(5).html() || '';
-
-                        const typeText = $tr.children('td').eq(0).children('span').text();
-
-                        if (
-                            (typeHtml.includes('přednáška') ||
-                                typeHtml.includes('poč. lab') ||
-                                typeHtml.includes('cvičení') ||
-                                typeHtml.includes('laboratoř') ||
-                                typeHtml.includes('seminář')) &&
-                            (weekHtml.includes('výuky') ||
-                                weekHtml.includes('sudý') ||
-                                weekHtml.includes('lichý') ||
-                                weekHtml.trim().match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/)) &&
-                            ((capacityHtml != '0' && !typeHtml.includes('*)')) || disabledTypes.includes(typeText))
-                        ) {
-                            const lesson = {
-                                id: '',
-                                name: sub.name,
-                                link: sub.link,
-                                day: parseDay($tr.children('th').text()),
-                                week: parseWeek($tr.children('td').eq(1).html()),
-                                from: parseTimeFrom($tr.children('td').eq(3).html()),
-                                to: parseTimeTo($tr.children('td').eq(4).html()),
-                                group: $tr.children('td').eq(7).text().replace('xx', '').trim(),
-                                info: $tr.children('td').eq(8).html(),
-                                type: 'unknown',
-                                rooms: [],
-                                layer: 1,
-                                selected: false,
-                                deleted: false
-                            };
-
-                            // Check if week is valid
-                            if (lesson.week == null) {
-                                return;
-                            }
-
-                            // Determine type
-                            lesson.type = getLessonType(typeHtml);
-
-                            // Rooms
-                            $tr.children('td').eq(2).find('a').each((p, a) => {
-                                lesson.rooms.push($(a).text().trim());
-                            });
-
-                            // Combine rooms (implement room combination logic)
-                            lesson.rooms = combineRooms(lesson.rooms);
-
-                            // Generate ID
-                            lesson.id = 'LOAD_' + makeHash(lesson.name + ';' + lesson.day + ';' + lesson.week + ';' + lesson.from + ';' + lesson.to + ';' + lesson.type + ';' + JSON.stringify(lesson.rooms));
-
-                            lessons.push(lesson);
-                        }
-                    });
-
-                    // Parse ranges
-                    const ranges = parseRanges(rangeHtml, sub.name, sub.link);
-
-                    // Collect data
-                    subjectData.push({
-                        lessons: lessons,
-                        ranges: ranges
-                    });
-
-                    pending--;
-                    if (pending === 0) {
-                        // All subjects processed
-                        let allLessons = [];
-                        let allRanges = [];
-
-                        subjectData.forEach((sd) => {
-                            allLessons = allLessons.concat(sd.lessons);
-                            allRanges = allRanges.concat(sd.ranges);
-                        });
-
-                        callback(null, { lessons: allLessons, ranges: allRanges });
-                    }
-                } catch (e) {
-                    pending--;
-                    if (pending === 0) {
-                        callback(null, { lessons: [], ranges: [] });
-                    }
+                cache.set(urlToFetch, data);
+                const processed = processFetchedSubjectData(sub, data);
+                if (processed) {
+                    subjectData.push(processed);
+                    decreaseAndCheckPending();
                 }
             });
         }).on('error', (err) => {
-            pending--;
-            if (pending === 0) {
-                callback(null, { lessons: [], ranges: [] });
-            }
+            decreaseAndCheckPending();
         });
     });
 }
 
+function processFetchedSubjectData(sub, data) {
+    try {
+        const $ = cheerio.load(data);
 
+        // Fetch the subject name from the page
+        const subjectName = $('.b-detail__annot-item[itemprop="courseCode"]').text().trim() || 'Unknown';
+
+        // Assign the name to sub
+        sub.name = subjectName;
+
+        // Parse range
+        const rangeElement = $('main').find('div.b-detail__body').find('div.grid__cell').find("p:contains('Rozsah')").parent().next().children();
+        const rangeHtml = rangeElement.html() || 'neznámý rozsah výuky';
+
+        // Parse lessons
+        let lessons = [];
+        let disabledTypes = [];
+        let enabledTypes = [];
+
+        $('table#schedule').find('tbody').find('tr').each((o, tr) => {
+            const $tr = $(tr);
+            const typeHtml = $tr.children('td').eq(0).html() || '';
+            const weekHtml = $tr.children('td').eq(1).html() || '';
+            const capacityHtml = $tr.children('td').eq(5).html() || '';
+
+            const typeText = $tr.children('td').eq(0).children('span').text();
+
+            if (
+                (typeHtml.includes('přednáška') ||
+                    typeHtml.includes('poč. lab') ||
+                    typeHtml.includes('cvičení') ||
+                    typeHtml.includes('laboratoř') ||
+                    typeHtml.includes('seminář')) &&
+                (weekHtml.includes('výuky') ||
+                    weekHtml.includes('sudý') ||
+                    weekHtml.includes('lichý') ||
+                    weekHtml.trim().match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/))
+            ) {
+                if (capacityHtml != '0' && !typeHtml.includes('*)')) {
+                    enabledTypes.push(typeText);
+                } else {
+                    disabledTypes.push(typeText);
+                }
+            }
+        });
+
+        // Remove enabled lessons from disabled lessons
+        enabledTypes.forEach((type) => {
+            disabledTypes = disabledTypes.filter((x) => x !== type);
+        });
+
+        // Parse lessons
+        $('table#schedule').find('tbody').find('tr').each((o, tr) => {
+            const $tr = $(tr);
+            const typeHtml = $tr.children('td').eq(0).html() || '';
+            const weekHtml = $tr.children('td').eq(1).html() || '';
+            const capacityHtml = $tr.children('td').eq(5).html() || '';
+
+            const typeText = $tr.children('td').eq(0).children('span').text();
+
+            if (
+                (typeHtml.includes('přednáška') ||
+                    typeHtml.includes('poč. lab') ||
+                    typeHtml.includes('cvičení') ||
+                    typeHtml.includes('laboratoř') ||
+                    typeHtml.includes('seminář')) &&
+                (weekHtml.includes('výuky') ||
+                    weekHtml.includes('sudý') ||
+                    weekHtml.includes('lichý') ||
+                    weekHtml.trim().match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/)) &&
+                ((capacityHtml != '0' && !typeHtml.includes('*)')) || disabledTypes.includes(typeText))
+            ) {
+                const lesson = {
+                    id: '',
+                    name: sub.name,
+                    link: sub.link,
+                    day: parseDay($tr.children('th').text()),
+                    week: parseWeek($tr.children('td').eq(1).html()),
+                    from: parseTimeFrom($tr.children('td').eq(3).html()),
+                    to: parseTimeTo($tr.children('td').eq(4).html()),
+                    group: $tr.children('td').eq(7).text().replace('xx', '').trim(),
+                    info: $tr.children('td').eq(8).html(),
+                    type: 'unknown',
+                    rooms: [],
+                    layer: 1,
+                    selected: false,
+                    deleted: false
+                };
+
+                // Check if week is valid
+                if (lesson.week == null) {
+                    return;
+                }
+
+                // Determine type
+                lesson.type = getLessonType(typeHtml);
+
+                // Rooms
+                $tr.children('td').eq(2).find('a').each((p, a) => {
+                    lesson.rooms.push($(a).text().trim());
+                });
+
+                // Combine rooms (implement room combination logic)
+                lesson.rooms = combineRooms(lesson.rooms);
+
+                // Generate ID
+                lesson.id = 'LOAD_' + makeHash(lesson.name + ';' + lesson.day + ';' + lesson.week + ';' + lesson.from + ';' + lesson.to + ';' + lesson.type + ';' + JSON.stringify(lesson.rooms));
+
+                lessons.push(lesson);
+            }
+        });
+
+        // Parse ranges
+        const ranges = parseRanges(rangeHtml, sub.name, sub.link);
+
+        return {
+            lessons: lessons,
+            ranges: ranges
+        };
+    } catch (e) {
+        return null;
+    }
+}
 
 function parseStudiesData(htmlData, year, callback) {
     try {
@@ -261,7 +304,7 @@ function parseStudiesData(htmlData, year, callback) {
         let pending = studies.length;
         if (pending === 0) {
             // No studies found
-            callback(null, { studies: studies, years: years });
+            callback(null, retModel);
             return;
         }
 
@@ -271,6 +314,7 @@ function parseStudiesData(htmlData, year, callback) {
                 if (pending === 0) {
                     // All studies processed
                     callback(null, { studies: studies, years: years });
+                    return;
                 }
             });
         });
