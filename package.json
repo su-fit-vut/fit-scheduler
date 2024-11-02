@@ -19,5 +19,8 @@
   "bugs": {
     "url": "https://github.com/su-fit-vut/fit-scheduler/issues"
   },
-  "homepage": "https://github.com/su-fit-vut/fit-scheduler#readme"
+  "homepage": "https://github.com/su-fit-vut/fit-scheduler#readme",
+  "dependencies": {
+    "cheerio": "^1.0.0"
+  }
 }
