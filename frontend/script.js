@@ -973,7 +973,7 @@ function makeFile() {
         }
     });
 } // checked
-function restoreFile() {
+async function restoreFile() {
     // Year
     if (file.year) {
         year = file.year;
@@ -1020,23 +1020,23 @@ function restoreFile() {
     renderSubjects();
     lastLoadedSubjects = [];
     lessons = [];
-    loadLessons().then(function () {
-        // Lessons
-        $.each(file.custom, function (i, les) {
-            lessons.push(les);
-        });
-        $.each(file.selected, function (i, les) {
-            if (typeof lessons.find(x => x.id === les) != "undefined") {
-                lessons.find(x => x.id === les).selected = true;
-            }
-        });
-        $.each(file.deleted, function (i, les) {
-            if (typeof lessons.find(x => x.id === les) != "undefined") {
-                lessons.find(x => x.id === les).deleted = true;
-            }
-        });
-        renderAll();
+    await loadLessons();
+    
+    // Lessons
+    $.each(file.custom, function (i, les) {
+        lessons.push(les);
     });
+    $.each(file.selected, function (i, les) {
+        if (typeof lessons.find(x => x.id === les) != "undefined") {
+            lessons.find(x => x.id === les).selected = true;
+        }
+    });
+    $.each(file.deleted, function (i, les) {
+        if (typeof lessons.find(x => x.id === les) != "undefined") {
+            lessons.find(x => x.id === les).deleted = true;
+        }
+    });
+    renderAll();
 } // checked
 
 function downloadJSON() {
@@ -1073,10 +1073,10 @@ function loadJSON() {
 
     var reader = new FileReader();
     reader.readAsText($(".json_load_input")[0].files[0], "UTF-8");
-    reader.onload = function (e) {
+    reader.onload = async function (e) {
         try {
             file = JSON.parse(e.target.result);
-            restoreFile();
+            await restoreFile();
             storeLocalStorage();
         } catch (e) {
             // Parse error
@@ -1182,7 +1182,7 @@ function storeLocalStorage() {
     // Store
     localStorage.setItem("schedule", JSON.stringify(file));
 } // checked
-function loadLocalStorage() {
+async function loadLocalStorage() {
     if (localStorage.getItem("schedule") != null) {
         // Load
         try {
@@ -1190,7 +1190,7 @@ function loadLocalStorage() {
         } catch { }
 
         // Restore
-        restoreFile();
+        await restoreFile();
     }
 } // checked
 
