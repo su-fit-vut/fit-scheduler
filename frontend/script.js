@@ -615,7 +615,6 @@ function mergeLessons(lessons) {
 
     return lesson;
 } // checked
-
 function renderAll() {
     // Disect
     var lessonsDisection = {};
@@ -974,7 +973,7 @@ function makeFile() {
         }
     });
 } // checked
-async function restoreFile() {
+function restoreFile() {
     // Year
     if (file.year) {
         year = file.year;
@@ -1196,43 +1195,6 @@ function loadLocalStorage() {
 } // checked
 
 //////////////////////////////////// Helpers ///////////////////////////////////
-function parseLinkforLoadPHP(link) {
-    var linkArray = link.split("/");
-    linkArray = linkArray.filter(x => x != "");
-    return linkArray[linkArray.length - 2] + "-" + linkArray[linkArray.length - 1];
-} // checked
-function parseDay(day) {
-    if (day === "Po") {
-        return 0;
-    } else if (day === "Út") {
-        return 1;
-    } else if (day === "St") {
-        return 2;
-    } else if (day === "Čt") {
-        return 3;
-    } else if (day === "Pá") {
-        return 4;
-    }
-} // checked
-function parseWeek(week) {
-    week = week.replace("výuky", "");
-    week = week.replaceAll(",", "");
-    week = week.trim();
-    if (week.match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/)) {
-        var weekNum = getSemesterWeekFromDate(new Date(week));
-        if (weekNum < 1) return null;
-        return weekNum + ".";
-    }
-    return week;
-} // checked
-function parseTimeFrom(time) {
-    var hours = +time.split(":")[0];
-    return hours - 7;
-} // checked
-function parseTimeTo(time) {
-    var hours = +time.split(":")[0] + 1;
-    return hours - 7;
-} // checked
 function doLessonsCollide(a, b, x, y) {
     if (x > a && x < b) {
         return true;
@@ -1382,24 +1344,4 @@ function isEvenWeek(week, minEvenLessons = 3) {
         if (evenNumbers == 0 && oddNumbers >= minEvenLessons) return true;
     }
     return false;
-} // checked
-function getSemesterWeekFromDate(date) {
-    // source: https://www.fit.vut.cz/study/calendar/.cs
-    // TODO: get this data automatically
-    var winterStart = { 2022: "2022-09-19", 2023: "2023-09-18" };
-    var summerStart = { 2023: "2023-02-06", 2024: "2024-02-05" };
-    var dateWeek = getWeekNumber(date);
-    var year = date.getFullYear();
-    var winterStartWeek = getWeekNumber(new Date(winterStart[year]));
-    var summerStartWeek = getWeekNumber(new Date(summerStart[year]));
-    var relativeWinterWeek = dateWeek - winterStartWeek + 1;
-    var relativeSummerWeek = dateWeek - summerStartWeek + 1;
-    if (relativeWinterWeek >= 1 && relativeWinterWeek <= 13) {
-        return relativeWinterWeek;
-    } else if (relativeSummerWeek >= 1 && relativeSummerWeek <= 13) {
-        return relativeSummerWeek;
-    } else {
-        console.warn("Date " + date + " is not in any semester week, so will be ignored");
-        return -1;
-    }
 } // checked
