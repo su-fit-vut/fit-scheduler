@@ -657,10 +657,11 @@ html, body, * {
                         border-radius: 8px;
                     }
                     .bubble_red {
-                        color: rgb(143, 25, 25);
                         background-color: rgb(255, 176, 169);
                     }
-
+                    .bubble_green {
+                        background-color: #d7eed2;
+                    }
                     .foot_left {
                         float: left;
                         width: 50%;
